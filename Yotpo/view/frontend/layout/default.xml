@@ -1,0 +1,22 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <!-- <head>
+        <script src="Yotpo_Yotpo::js/widget.js"/>        
+    </head> -->
+    <body>
+		<!-- Add js tag to all pages -->
+		<referenceContainer name="content">
+	        <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>
+	    </referenceContainer>
+
+		<!-- Add yotpo widget div to product page  -->
+        <referenceContainer name="product.info.main">
+			<block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_2" template="widget_div.phtml"/>
+        </referenceContainer>	 
+
+		<!-- Add yotpo widget div to product page below the add to cart button. -->
+        <referenceContainer name="product.info.addtocart">
+			<block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_1" template="widget_div.phtml"/>
+        </referenceContainer>	                  
+	                          
+    </body>
+</page>
