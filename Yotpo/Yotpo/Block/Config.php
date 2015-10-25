@@ -40,6 +40,6 @@ class Config
 
     public function getShowWidget()
     {        
-        return $this->scopeConfig->getValue(self::YOTPO_SHOW_WIDGET, ScopeInterface::SCOPE_STORE);
+        return (bool)$this->scopeConfig->getValue(self::YOTPO_SHOW_WIDGET, ScopeInterface::SCOPE_STORE);
     }         
 }
