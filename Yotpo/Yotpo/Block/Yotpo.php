@@ -6,22 +6,18 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     \Magento\Framework\View\Element\Template\Context $context,
     \Magento\Framework\Registry $registry,
     \Magento\Framework\UrlInterface $urlinterface,
+    \Yotpo\Yotpo\Block\Config $config,
     array $data = []
     ) {
         $this->_coreRegistry = $registry;
         $this->_urlinterface = $urlinterface;
+        $this->_config = $config;
         parent::__construct($context, $data);
     }
 
 	protected function _construct()
     {
-
         parent::_construct();
-
-    }
-
-    public function getAppKey() {
-    	return '7QH55QIfYyIxS1DrNKddf0o2j1W4X72O3QTtLDih';
     }
 
     public function getProduct()
