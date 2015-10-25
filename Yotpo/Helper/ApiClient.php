@@ -12,19 +12,28 @@ class ApiClient
   
   protected $disable_feature = null;
   protected $app_keys = array();
-  protected $secrets = array();  
+  protected $secrets = array();
+
+  private $storeManager;
+  private $bundleSelection;  
+  private $productRepository;     
+  private $escaper;
+  private $curlFactory;
+  private $logger;
 
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
                               \Magento\Bundle\Model\Resource\Selection $bundleSelection,
                               \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
                               \Magento\Framework\Escaper $escaper,
-                              \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory) 
+                              \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
+                              \Psr\Log\LoggerInterface $logger) 
   {
     $this->storeManager = $storeManager;
     $this->bundleSelection = $bundleSelection;  
     $this->productRepository = $productRepository;     
     $this->escaper = $escaper;
     $this->curlFactory = $curlFactory;
+    $this->logger = $logger;
   }
 
   public function prepareProductsData($order) 
@@ -64,18 +73,18 @@ class ApiClient
     $store_secret = $this->secrets[$store_id];
     if ($store_app_key == null or $store_secret == null)
     {
-      // Mage::log('Missing app key or secret');  //TODO: change to magento logging
+      $this->logger->addDebug('Missing app key or secret');
       return null;
     }
     $yotpo_options = array('client_id' => $store_app_key, 'client_secret' => $store_secret, 'grant_type' => 'client_credentials');
     try 
     {
       $result = $this->createApiPost('oauth/token', $yotpo_options);
-      return $result['body']->access_token;
+      return $result['body']->access_token; //Add check if bad response
     } 
     catch(Exception $e) 
     {
-      // Mage::log('error: ' .$e); //TODO: change to magento logging
+      $this->logger->addDebug('error: ' .$e); 
       return null;
     }
   }
@@ -94,7 +103,7 @@ class ApiClient
     }
     catch(Exception $e)
     {
-      // Mage::log('error: ' .$e); //TODO: change to magento logging
+      $this->logger->addDebug('error: ' .$e); 
     } 
   }
 
