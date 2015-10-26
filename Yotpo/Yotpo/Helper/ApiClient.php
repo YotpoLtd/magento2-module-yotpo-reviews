@@ -67,7 +67,7 @@ class ApiClient
 
   public function oauthAuthentication($store_id)
   {
-    $this->app_keys[$store_id] = 'MzOL50pmJg6ZKoQWTY1IgxYlK8EkCWzZ9wxi6XWq'; //TODO: mock data
+    $this->app_keys[$store_id] = 'MzOL50pmJg6ZKoQWTY1IgxYlK8EkCWzZ9wxi6XWq'; //TODO: mock data should be taken from DB
     $this->secrets[$store_id] = 'uvSIGTmD1tQy9POOsRqQhDBiiyJvfAHcUfaLBl4R'; //TODO: mock data
     $store_app_key = $this->app_keys[$store_id];
     $store_secret = $this->secrets[$store_id];
@@ -88,6 +88,16 @@ class ApiClient
       return null;
     }
   }
+
+  // public function isEnabled($store_id)   //TODO: need to be implemented
+  // {
+  //   //check if both app_key and secret exist
+  //   if(($this->app_keys[$store_id] == null) or ($this->secrets[$store_id] == null))
+  //   {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
 
   public function createApiPost($path, $data, $timeout=self::DEFAULT_TIMEOUT) {

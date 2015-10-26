@@ -5,7 +5,6 @@ namespace Yotpo\Yotpo\Model\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Core\Model\ObjectManager;
 
-
 class PurchaseObserver 
 {   
     
@@ -23,9 +22,16 @@ class PurchaseObserver
     public function dispatch(Observer $observer)
     {
         try {
-            $this->logger->addDebug('TEST STSTST'); 
             $order = $observer->getEvent()->getOrder();
             $store_id = $order->getStoreId();
+            // if (!$this->helper->isEnabled($store_id)) //TODO: Need to be implemented when local db works
+            // {
+            //     return $this;
+            // }
+            if($order->getStatus() != \Magento\Sales\Model\Order::STATE_COMPLETE)
+            {
+                return $this;
+            }
             $data['email'] = $order->getCustomerEmail();
             $data['customer_name'] = $order->getCustomerName();
             $data['order_id'] = $order->getIncrementId();
