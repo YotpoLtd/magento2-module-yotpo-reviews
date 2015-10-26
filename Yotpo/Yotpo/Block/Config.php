@@ -29,5 +29,10 @@ class Config
     public function getShowWidget()
     {        
         return (bool)$this->scopeConfig->getValue(self::YOTPO_SHOW_WIDGET, ScopeInterface::SCOPE_STORE);
-    }         
+    } 
+
+    public function isAppKeyAndSecretSet()
+    {        
+        return ($this->$app_key != null && $this->$secret != null);
+    }             
 }
