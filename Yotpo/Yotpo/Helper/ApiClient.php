@@ -9,18 +9,7 @@ class ApiClient
   const YOTPO_SECURED_API_URL   = "https://api.yotpo.com";
   const YOTPO_UNSECURED_API_URL = "http://api.yotpo.com";
   const DEFAULT_TIMEOUT = 30;
-  
-  protected $disable_feature = null;
-
-  private $storeManager;
-  private $bundleSelection;  
-  private $productRepository;     
-  private $escaper;
-  private $curlFactory;
-  private $logger;
-  private $app_key = null;
-  private $secret = null;
-
+                         
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
                               \Magento\Bundle\Model\Resource\Selection $bundleSelection,
                               \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
@@ -34,8 +23,8 @@ class ApiClient
     $this->productRepository = $productRepository;     
     $this->escaper = $escaper;
     $this->curlFactory = $curlFactory;    
-    $this->$app_key = $config->getAppKey();
-    $this->$secret = $config->getSecret();
+    $this->app_key = $config->getAppKey();
+    $this->secret = $config->getSecret();
     $this->logger = $logger;
   }
 
@@ -70,11 +59,11 @@ class ApiClient
 
   public function oauthAuthentication()
   {
-    if($this->$app_key == null|| $this->$secret == null) {
+    if($this->app_key == null|| $this->secret == null) {
       $this->logger->addDebug('Missing app key or secret');
       return null;
     }
-    $yotpo_options = array('client_id' => $this->$app_key, 'client_secret' => $this->$secret, 'grant_type' => 'client_credentials');
+    $yotpo_options = array('client_id' => $this->app_key, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials');
     try 
     {
       $result = $this->createApiPost('oauth/token', $yotpo_options);
@@ -90,10 +79,10 @@ class ApiClient
   public function createApiPost($path, $data, $timeout=self::DEFAULT_TIMEOUT) {
     try 
     {
-      $config = array('timeout' => $timeout);
+      $cfg = array('timeout' => $timeout);
       $http = $this->curlFactory->create();
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
-      $http->setConfig($config);
+      $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
       $resData = $http->read();
       return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)));

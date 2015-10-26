@@ -24,11 +24,10 @@ class PurchaseObserver
     public function dispatch(Observer $observer)
     {
         try {
-            if ($this->config->isAppKeyAndSecretSet())
+            if (!$this->config->isAppKeyAndSecretSet())
             {
                 return $this;
             }            
-
             $order = $observer->getEvent()->getOrder();
             if($order->getStatus() != \Magento\Sales\Model\Order::STATE_COMPLETE)
             {

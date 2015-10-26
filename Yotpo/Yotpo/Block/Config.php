@@ -33,6 +33,6 @@ class Config
 
     public function isAppKeyAndSecretSet()
     {        
-        return ($this->$app_key != null && $this->$secret != null);
+        return ($this->getAppKey() != null && $this->getSecret() != null);
     }             
 }
