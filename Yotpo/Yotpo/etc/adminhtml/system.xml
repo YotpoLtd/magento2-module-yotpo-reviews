@@ -6,21 +6,45 @@
         </tab>
         <section id="yotpo" translate="label" sortOrder="130" showInDefault="0" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
-            <label>Yotpo Settings</label>
+            <label>Yotpo Product Reviews Software</label>
             <tab>yotpo</tab>
             <resource>Yotpo_Yotpo::settings</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Yotpo Settings</label>
+                <label>Yotpo Widget Configurations</label>
+                                        <comment>
+                <![CDATA[
+                    <p>Please enter in your <font color="red">Api App Key</font>  and <font color="red">Secret</font> in the fields below to finish the installation.</p>
+                        <p>If you need help the Yotpo support team is here 24/7, don't hesitate to 
+                            <a href="https://yotposupport.zendesk.com/account/dropboxes/20158038#/dropbox/suggestions/ask" target="_blank" title="yotpo-support">contact us.</a>
+                              </p>
+                    <p>Click <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features" target="_blank" 
+                      title="yotpo">here</a> for the advanced customization guide. 
+                    </p><br/>
+                ]]>
+            </comment>
                 <field id="app_key" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>App key</label>
+                    <comment><![CDATA[Get your appkey at your yotpo account setting page. Click
+                        <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" title="yotpo-sign-up">here</a>
+                        to sign in to yotpo]]>
+                    </comment>                    
                 </field>
 
                 <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Secret</label>
+                    <comment><![CDATA[Get your secret at your yotpo account setting page. Click
+                        <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>
+                        to sign in to yotpo]]>
+                    </comment>                    
                 </field>
                 <field id="show_widget" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Show widget</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                      <![CDATA[
+                      By choosing not to use the deafult position, you'll need to follow the instructions in the 
+                      <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
+                    </comment>                    
                 </field>
             </group>
         </section>
