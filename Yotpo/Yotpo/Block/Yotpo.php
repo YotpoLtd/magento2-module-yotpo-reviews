@@ -29,20 +29,20 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     }
 
     public function getProductId() {
-    	$_product = $this->getProduct();     	
-    	return $_product->getId();
+    	$product = $this->getProduct();     	
+    	return $product->getId();
     }
 
     public function getProductName() {
-        $_product = $this->getProduct();
-        $productName = $_product->getName();
+        $product = $this->getProduct();
+        $productName = $product->getName();
         return htmlspecialchars($productName);
     }
     
     public function getProductDescription()
     {
-        $_product = $this->getProduct();
-        return $_product->getShortDescription();
+        $product = $this->getProduct();
+        return $product->getShortDescription();
         
     }
 
@@ -50,4 +50,14 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     {
         return $this->_urlinterface->getCurrentUrl();
     }    
+
+    public function isRenderWidget()
+    {
+        return $this->getProduct() != null && ($this->_config->getShowWidget() || $this->getData('fromHelper'));
+    }    
+
+    private function isProductPage()
+    {
+        return $this->getProduct() != null;
+    }     
 }

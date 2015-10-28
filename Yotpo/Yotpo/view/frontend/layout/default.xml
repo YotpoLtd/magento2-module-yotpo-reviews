@@ -6,10 +6,14 @@
 	        <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>
 	    </referenceContainer>
 
+        <referenceBlock name="content.aside">
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
+        </referenceBlock> 
+        
 		<!-- Add yotpo widget div to product page  -->
-        <referenceContainer name="product.info.main">
+<!--         <referenceContainer name="product.info.main">
 			<block class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
-        </referenceContainer>	 
+        </referenceContainer>	 --> 
 
 		<!-- Add yotpo widget div to product page below the add to cart button. -->
 <!--         <referenceContainer name="product.info.addtocart">

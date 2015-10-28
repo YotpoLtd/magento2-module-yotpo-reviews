@@ -27,13 +27,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return;
         }
 
-        $block->setAttribute('from_code', true);
+        $block->setAttribute('fromHelper', true);
         if ($print == true) {
             echo $block->toHtml();
-            $block->setAttribute('from_code', false);
+            $block->setAttribute('fromHelper', false);
         } else {
             $ret = $block->toHtml();
-            $block->setAttribute('from_code', false);
+            $block->setAttribute('fromHelper', false);
             return $ret;
         }        
     }      
