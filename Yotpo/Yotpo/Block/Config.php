@@ -1,14 +1,5 @@
 <?php
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 
-/**
- * Manage currency symbols block
- *
- * @author     Magento Core Team <core@magentocommerce.com>
- */
 namespace Yotpo\Yotpo\Block;
 use Magento\Store\Model\ScopeInterface;
 class Config
@@ -18,10 +9,7 @@ class Config
     const YOTPO_SHOW_WIDGET = 'yotpo/settings/show_widget';
 
     protected $scopeConfig;
-    /**
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param array $data
-     */
+
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {        

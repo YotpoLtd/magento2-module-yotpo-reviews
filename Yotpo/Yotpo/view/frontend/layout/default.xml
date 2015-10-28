@@ -1,8 +1,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
-    <!-- <head>
-        <script src="Yotpo_Yotpo::js/widget.js"/>        
-    </head> -->
     <body>
+
 		<!-- Add js tag to all pages -->
 		<referenceContainer name="content">
 	        <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>

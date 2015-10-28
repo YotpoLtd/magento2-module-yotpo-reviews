@@ -49,18 +49,5 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     public function getProductUrl()
     {
         return $this->_urlinterface->getCurrentUrl();
-    }
-
-
-        /**
-     * Returns URL for save action
-     *
-     * @return string
-     * @codeCoverageIgnore
-     */
-    public function getFormActionUrl()
-    {
-        return $this->getUrl('adminhtml/*/save');
-    }
-    
+    }    
 }
