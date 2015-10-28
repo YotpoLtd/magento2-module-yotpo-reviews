@@ -6,12 +6,12 @@ class Conversion extends \Magento\Framework\View\Element\Template
 	public function __construct(\Yotpo\Yotpo\Block\Config $config,
 							    \Magento\Checkout\Model\Session $checkoutSession,
 							    \Magento\Framework\View\Element\Template\Context $context,
-							    array $data = [],
-							    \Magento\Sales\Api\OrderRepositoryInterface $orderRepository) 
+							    \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+							    array $data = [],) 
 	{
-		$this->app_key = $config->getAppKey();
-		$this->checkoutSession = $checkoutSession;
-		$this->orderRepository = $orderRepository;
+		$this->_app_key = $config->getAppKey();
+		$this->_checkoutSession = $checkoutSession;
+		$this->_orderRepository = $orderRepository;
 		parent::__construct($context, $data);
 	}
 
@@ -22,16 +22,16 @@ class Conversion extends \Magento\Framework\View\Element\Template
 
 	public function getAppKey() 
 	{
-		return $this->app_key;
+		return $this->_app_key;
 	}
 
 	public function getOrderId()
 	{
-		return $this->checkoutSession->getLastOrderId();	
+		return $this->_checkoutSession->getLastOrderId();	
 	}
 	public function getOrder() 
 	{
-		$order = $this->orderRepository->get($this->getOrderId());
+		$order = $this->_orderRepository->get($this->getOrderId());
 		return $order; 
 	}
 
