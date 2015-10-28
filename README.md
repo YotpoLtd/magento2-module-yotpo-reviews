@@ -1,1 +1,32 @@
-# magento2-plugin
+ Magento 2 Yotpo Extension
+==========================
+
+This library includes the files of the Yotpo Reviews extension The directories hierarchy is as positioned in a standard magento 2 project library
+
+This library will also include different version packages as magento 2 extensions
+
+
+
+## Requirements
+
+magento 2.0 +
+
+## Installation
+### Magento 2 (store) on Vagrant installation
+Follow the installation steps at https://github.com/rgranadino/mage2_vagrant
+ On stage 6. recommended to use ```reinstall -s```
+  
+#### To install the extension on your magento:
+* Copy the extension - copy /Yotpo from git to app/code
+* Edit app/etc/config.php and add Yotpo_Yotpo => 1
+* After copying yotpo open vagrant ssh and inside the root folder (/vagrant/data/magento2) run ```php bin/magento setup:upgrade ```
+
+###Usage
+
+After the installation, Go to The Magento 2 admin panel
+
+Go to Stores -> Settings -> Configuration, change store view (not to be default config) and click on Yotpo Product Reviews Software on the left sidebar
+
+Insert Your account app key and secret
+
+To insert the widget manually on your product page add the following code in the file 
