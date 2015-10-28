@@ -1,7 +1,8 @@
  Magento 2 Yotpo Extension
 ==========================
 
-This library includes the files of the Yotpo Reviews extension The directories hierarchy is as positioned in a standard magento 2 project library
+This library includes the files of the Yotpo Reviews extension.
+The directories hierarchy is as positioned in a standard magento 2 project library
 
 This library will also include different version packages as magento 2 extensions
 
