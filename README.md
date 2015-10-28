@@ -32,4 +32,4 @@ Insert Your account app key and secret
 
 To insert the widget manually on your product page add the following code in one of your product .phtml files 
 
-```php $this->helper('Yotpo\Yotpo\Helper\Data')->showWidget($this);``` 
+```<?php $this->helper('Yotpo\Yotpo\Helper\Data')->showWidget($this); ?>``` 
