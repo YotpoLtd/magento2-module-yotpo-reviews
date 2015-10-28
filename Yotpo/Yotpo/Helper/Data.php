@@ -13,17 +13,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function showWidget($thisObj, $print=true)
     {
-        $res = $this->renderYotpoProductBlock($thisObj, 'widget_div', $print);
-        if ($print == false) {
-            return $res;
-        }
+        return $this->renderYotpoProductBlock($thisObj, 'widget_div', $print);
     }  
     
     private function renderYotpoProductBlock($thisObj, $blockName, $print=true)
     {
         $block = $thisObj->getLayout()->getBlock($blockName);
         if ($block == null) {
-            $this->_logger->addDebug('can\'t find yotpo block1');
+            $this->_logger->addDebug('can\'t find yotpo block');
             return;
         }
 

@@ -15,11 +15,6 @@ class Yotpo extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
 
-	protected function _construct()
-    {
-        parent::_construct();
-    }
-
     public function getProduct()
 	{
 		if (!$this->hasData('product')) {
@@ -29,21 +24,17 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     }
 
     public function getProductId() {
-    	$product = $this->getProduct();     	
-    	return $product->getId();
+    	return $this->getProduct()->getId();
     }
 
     public function getProductName() {
-        $product = $this->getProduct();
-        $productName = $product->getName();
+        $productName = $this->getProduct()->getName();
         return htmlspecialchars($productName);
     }
     
     public function getProductDescription()
     {
-        $product = $this->getProduct();
-        return $product->getShortDescription();
-        
+        return $this->getProduct()->getShortDescription();        
     }
 
     public function getProductUrl()
@@ -53,7 +44,8 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function isRenderWidget()
     {
-        return $this->getProduct() != null && ($this->_config->getShowWidget() || $this->getData('fromHelper'));
+        return $this->getProduct() != null && 
+        ($this->_config->getShowWidget() || $this->getData('fromHelper'));
     }    
 
     private function isProductPage()

@@ -16,11 +16,6 @@ class Conversion extends \Magento\Framework\View\Element\Template
 		parent::__construct($context, $data);
 	}
 
-	protected function _construct()
-    {
-        parent::_construct();
-    }
-
 	public function getAppKey() 
 	{
 		return $this->_app_key;
