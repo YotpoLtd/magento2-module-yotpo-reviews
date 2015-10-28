@@ -9,30 +9,22 @@ class ApiClient
   const YOTPO_SECURED_API_URL   = "https://api.yotpo.com";
   const YOTPO_UNSECURED_API_URL = "http://api.yotpo.com";
   const DEFAULT_TIMEOUT = 30;
-  
-  protected $disable_feature = null;
-  protected $app_keys = array();
-  protected $secrets = array();
-
-  private $storeManager;
-  private $bundleSelection;  
-  private $productRepository;     
-  private $escaper;
-  private $curlFactory;
-  private $logger;
-
+                         
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
                               \Magento\Bundle\Model\Resource\Selection $bundleSelection,
                               \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
                               \Magento\Framework\Escaper $escaper,
                               \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
+                              \Yotpo\Yotpo\Block\Config $config,
                               \Psr\Log\LoggerInterface $logger) 
   {
     $this->storeManager = $storeManager;
     $this->bundleSelection = $bundleSelection;  
     $this->productRepository = $productRepository;     
     $this->escaper = $escaper;
-    $this->curlFactory = $curlFactory;
+    $this->curlFactory = $curlFactory;    
+    $this->app_key = $config->getAppKey();
+    $this->secret = $config->getSecret();
     $this->logger = $logger;
   }
 
@@ -65,18 +57,13 @@ class ApiClient
     }
 
 
-  public function oauthAuthentication($store_id)
+  public function oauthAuthentication()
   {
-    $this->app_keys[$store_id] = 'MzOL50pmJg6ZKoQWTY1IgxYlK8EkCWzZ9wxi6XWq'; //TODO: mock data
-    $this->secrets[$store_id] = 'uvSIGTmD1tQy9POOsRqQhDBiiyJvfAHcUfaLBl4R'; //TODO: mock data
-    $store_app_key = $this->app_keys[$store_id];
-    $store_secret = $this->secrets[$store_id];
-    if ($store_app_key == null or $store_secret == null)
-    {
+    if($this->app_key == null|| $this->secret == null) {
       $this->logger->addDebug('Missing app key or secret');
       return null;
     }
-    $yotpo_options = array('client_id' => $store_app_key, 'client_secret' => $store_secret, 'grant_type' => 'client_credentials');
+    $yotpo_options = array('client_id' => $this->app_key, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials');
     try 
     {
       $result = $this->createApiPost('oauth/token', $yotpo_options);
@@ -89,14 +76,13 @@ class ApiClient
     }
   }
 
-
   public function createApiPost($path, $data, $timeout=self::DEFAULT_TIMEOUT) {
     try 
     {
-      $config = array('timeout' => $timeout);
+      $cfg = array('timeout' => $timeout);
       $http = $this->curlFactory->create();
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
-      $http->setConfig($config);
+      $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
       $resData = $http->read();
       return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)));
@@ -107,17 +93,17 @@ class ApiClient
     } 
   }
 
-  public function createPurchases($order, $store_id)
+  public function createPurchases($order)
   {
-    $this->createApiPost("apps/".$this->app_keys[$store_id]."/purchases", $order);
+    $this->createApiPost("apps/".$this->app_key."/purchases", $order);
   }
-  public function massCreatePurchases($orders, $token, $store_id)
+  public function massCreatePurchases($orders, $token)
   {
     $data = array();
     $data['utoken'] = $token;
     $data['platform'] = 'magento';
     $data['orders'] = $orders;
-    $this->createApiPost("apps/".$this->app_keys[$store_id]."/purchases/mass_create", $data);
+    $this->createApiPost("apps/".$this->app_key."/purchases/mass_create", $data);
   }
 
   // public function createApiGet($path, $timeout=self::DEFAULT_TIMEOUT)  //TODO  -  not sure if needed
