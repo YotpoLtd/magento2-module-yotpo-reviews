@@ -3,11 +3,12 @@ namespace Yotpo\Yotpo\Block;
 
 class Conversion extends \Magento\Framework\View\Element\Template
 {
-	public function __construct(\Yotpo\Yotpo\Block\Config $config,
-							    \Magento\Checkout\Model\Session $checkoutSession,
-							    \Magento\Framework\View\Element\Template\Context $context,
-							    \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-							    array $data = [],) 
+	public function __construct(
+		\Yotpo\Yotpo\Block\Config $config,
+	    \Magento\Checkout\Model\Session $checkoutSession,
+	    \Magento\Framework\View\Element\Template\Context $context,
+	    \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+	    array $data = []) 
 	{
 		$this->_app_key = $config->getAppKey();
 		$this->_checkoutSession = $checkoutSession;
