@@ -18,27 +18,27 @@ class ApiClient
                               \Yotpo\Yotpo\Block\Config $config,
                               \Psr\Log\LoggerInterface $logger) 
   {
-    $this->storeManager = $storeManager;
-    $this->bundleSelection = $bundleSelection;  
-    $this->productRepository = $productRepository;     
-    $this->escaper = $escaper;
-    $this->curlFactory = $curlFactory;    
-    $this->app_key = $config->getAppKey();
-    $this->secret = $config->getSecret();
-    $this->logger = $logger;
+    $this->_storeManager = $storeManager;
+    $this->_bundleSelection = $bundleSelection;  
+    $this->_productRepository = $productRepository;     
+    $this->_escaper = $escaper;
+    $this->_curlFactory = $curlFactory;    
+    $this->_app_key = $config->getAppKey();
+    $this->_secret = $config->getSecret();
+    $this->_logger = $logger;
   }
 
   public function prepareProductsData($order) 
   {
-    $this->storeManager->setCurrentStore($order->getStoreId());
+    $this->_storeManager->setCurrentStore($order->getStoreId());
     $products = $order->getAllVisibleItems(); //filter out simple products
     $products_arr = array();
 
     foreach ($products as $item) {
-      $full_product = $this->productRepository->get($item->getSku()); 
-      $parentIds= $this->bundleSelection->getParentIdsByChild($item->getProductId());
+      $full_product = $this->_productRepository->get($item->getSku()); 
+      $parentIds= $this->_bundleSelection->getParentIdsByChild($item->getProductId());
       if (count($parentIds) > 0) {
-              $full_product = $this->productRepository->get($parentIds[0]); //TODO: needs testing
+              $full_product = $this->_productRepository->get($parentIds[0]); //TODO: needs testing
       }
       $product_data = array();
       $product_data['name'] = $full_product->getName();
@@ -49,7 +49,7 @@ class ApiClient
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
         $product_data['image'] = $full_product->getImageUrl();  
       } catch(Exception $e) { }
-      $product_data['description'] = $this->escaper->escapeHtml(strip_tags($full_product->getDescription()));
+      $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
       $product_data['price'] = $item->getPrice();
       $products_arr[$full_product->getId()] = $product_data;
       }
@@ -59,19 +59,24 @@ class ApiClient
 
   public function oauthAuthentication()
   {
-    if($this->app_key == null|| $this->secret == null) {
-      $this->logger->addDebug('Missing app key or secret');
+    if($this->_app_key == null|| $this->_secret == null) {
+      $this->_logger->addDebug('Missing app key or secret');
       return null;
     }
-    $yotpo_options = array('client_id' => $this->app_key, 'client_secret' => $this->secret, 'grant_type' => 'client_credentials');
+    $yotpo_options = array('client_id' => $this->_app_key, 'client_secret' => $this->_secret, 'grant_type' => 'client_credentials');
     try 
     {
       $result = $this->createApiPost('oauth/token', $yotpo_options);
-      return $result['body']->access_token; //Add check if bad response
+      if(!is_array($result))
+      {
+        $this->_logger->addDebug('error: no response from api'); 
+        return null;
+      }
+      return $result['body']->access_token; 
     } 
     catch(Exception $e) 
     {
-      $this->logger->addDebug('error: ' .$e); 
+      $this->_logger->addDebug('error: ' .$e); 
       return null;
     }
   }
@@ -80,7 +85,7 @@ class ApiClient
     try 
     {
       $cfg = array('timeout' => $timeout);
-      $http = $this->curlFactory->create();
+      $http = $this->_curlFactory->create();
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
@@ -89,13 +94,13 @@ class ApiClient
     }
     catch(Exception $e)
     {
-      $this->logger->addDebug('error: ' .$e); 
+      $this->_logger->addDebug('error: ' .$e); 
     } 
   }
 
   public function createPurchases($order)
   {
-    $this->createApiPost("apps/".$this->app_key."/purchases", $order);
+    $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
   }
   public function massCreatePurchases($orders, $token)
   {
@@ -103,7 +108,7 @@ class ApiClient
     $data['utoken'] = $token;
     $data['platform'] = 'magento';
     $data['orders'] = $orders;
-    $this->createApiPost("apps/".$this->app_key."/purchases/mass_create", $data);
+    $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
   }
 
   // public function createApiGet($path, $timeout=self::DEFAULT_TIMEOUT)  //TODO  -  not sure if needed
