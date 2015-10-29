@@ -16,7 +16,8 @@ class ApiClient
                               \Magento\Framework\Escaper $escaper,
                               \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
                               \Yotpo\Yotpo\Block\Config $config,
-                              \Psr\Log\LoggerInterface $logger) 
+                              \Psr\Log\LoggerInterface $logger,
+                              \Magento\Catalog\Helper\Image $imgHelper) 
   {
     $this->_storeManager = $storeManager;
     $this->_bundleSelection = $bundleSelection;  
@@ -26,6 +27,7 @@ class ApiClient
     $this->_app_key = $config->getAppKey();
     $this->_secret = $config->getSecret();
     $this->_logger = $logger;
+    $this->_imgHelper = $imgHelper;
   }
 
   public function prepareProductsData($order) 
@@ -47,7 +49,7 @@ class ApiClient
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = $full_product->getImageUrl();  
+        $product_data['image'] = (string) $this->_imgHelper->init($full_product, 'image'); 
       } catch(Exception $e) { }
       $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
       $product_data['price'] = $item->getPrice();
