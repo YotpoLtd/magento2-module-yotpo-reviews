@@ -14,7 +14,7 @@ class PurchaseObserver
         \Psr\Log\LoggerInterface $logger)
                         
 	{
-	    $this->_helper = $helper;
+        $this->_helper = $helper;
         $this->_config = $config; 
         $this->_logger = $logger;           
 	}
