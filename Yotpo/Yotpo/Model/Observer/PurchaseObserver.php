@@ -7,24 +7,22 @@ use Magento\Core\Model\ObjectManager;
 
 class PurchaseObserver 
 {   
-    
-    private $logger;
-    private $helper;
 
-	public function __construct(\Yotpo\Yotpo\Helper\ApiClient $helper,
-                                \Yotpo\Yotpo\Block\Config $config,
-                                \Psr\Log\LoggerInterface $logger)
+	public function __construct(
+        \Yotpo\Yotpo\Helper\ApiClient $helper,
+        \Yotpo\Yotpo\Block\Config $config,
+        \Psr\Log\LoggerInterface $logger)
                         
 	{
-	    $this->helper = $helper;
-        $this->config = $config; 
-        $this->logger = $logger;           
+	    $this->_helper = $helper;
+        $this->_config = $config; 
+        $this->_logger = $logger;           
 	}
     //observer function hooked on event sales_order_save_after
     public function dispatch(Observer $observer)
     {
         try {
-            if (!$this->config->isAppKeyAndSecretSet())
+            if (!$this->_config->isAppKeyAndSecretSet())
             {
                 return $this;
             }            
@@ -39,17 +37,17 @@ class PurchaseObserver
             $data['platform'] = 'magento';
             $data['currency_iso'] = $order->getOrderCurrency()->getCode();
             $data['order_date'] = $order->getCreatedAt();        
-            $data['products'] = $this->helper->prepareProductsData($order); 
-            $data['utoken'] = $this->helper->oauthAuthentication();
+            $data['products'] = $this->_helper->prepareProductsData($order); 
+            $data['utoken'] = $this->_helper->oauthAuthentication();
             if ($data['utoken'] == null) {
                 //failed to get access token to api
-                $this->logger->addDebug('access token recieved from yotpo api is null');  
+                $this->_logger->addDebug('access token recieved from yotpo api is null');  
                 return $this;
             }
-            $this->helper->createPurchases($data); 
+            $this->_helper->createPurchases($data); 
             return $this;   
         } catch(Exception $e) {
-            $this->logger->addDebug('Failed to send mail after purchase. Error: '.$e); 
+            $this->_logger->addDebug('Failed to send mail after purchase. Error: '.$e); 
         }
 
     }
