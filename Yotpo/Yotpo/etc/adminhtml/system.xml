@@ -20,7 +20,7 @@
                     <p>Click <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features" target="_blank" 
                       title="yotpo">here</a> for the advanced customization guide. 
                     </p><br/>
-                    <p>Dont have an App Key? <a href="http://my.yotpo.com/" target="_blank" 
+                    <p style="font-size:18px;">Dont have an App Key? <a style="font-size:18px;" href="http://my.yotpo.com/" target="_blank" 
                       title="yotpo">Click here to sign up / sign in</a></p>
                 ]]>
             </comment>
