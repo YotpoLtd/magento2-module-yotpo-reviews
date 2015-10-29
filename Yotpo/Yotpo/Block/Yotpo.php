@@ -6,12 +6,14 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     \Magento\Framework\View\Element\Template\Context $context,
     \Magento\Framework\Registry $registry,
     \Magento\Framework\UrlInterface $urlinterface,
+    \Magento\Catalog\Helper\Image $imageHelper,
     \Yotpo\Yotpo\Block\Config $config,
     array $data = []
     ) {
         $this->_coreRegistry = $registry;
         $this->_urlinterface = $urlinterface;
         $this->_config = $config;
+        $this->_imageHelper = $imageHelper;
         parent::__construct($context, $data);
     }
 
@@ -48,6 +50,11 @@ class Yotpo extends \Magento\Framework\View\Element\Template
         ($this->_config->getShowWidget() || $this->getData('fromHelper'));
     }    
 
+    public function getProductImageUrl()
+    {
+        return $this->_imageHelper->init($this->getProduct(), 'image');;
+    } 
+    
     private function isProductPage()
     {
         return $this->getProduct() != null;
