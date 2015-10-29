@@ -10,15 +10,10 @@ class Conversion extends \Magento\Framework\View\Element\Template
 	    \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
 	    array $data = []) 
 	{
-		$this->_app_key = $config->getAppKey();
+		$this->_config = $config;
 		$this->_checkoutSession = $checkoutSession;
 		$this->_orderRepository = $orderRepository;
 		parent::__construct($context, $data);
-	}
-
-	public function getAppKey() 
-	{
-		return $this->_app_key;
 	}
 
 	public function getOrderId()
