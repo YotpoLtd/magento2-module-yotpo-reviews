@@ -48,6 +48,7 @@ class PurchaseObserver
             return $this;   
         } catch(Exception $e) {
             $this->_logger->addDebug('Failed to send mail after purchase. Error: '.$e); 
+            return $this;
         }
 
     }
