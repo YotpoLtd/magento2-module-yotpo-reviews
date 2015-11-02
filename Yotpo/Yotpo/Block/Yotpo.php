@@ -22,17 +22,12 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     public function getProduct()
 	{
 		if (!$this->hasData('product')) {
-            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         ');
             $this->setData('product', $this->_coreRegistry->registry('current_product'));
-            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         '.json_encode($this->hasData('product')));
-            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         '.json_encode($this->getData('product')));
-
         }
         return $this->getData('product');
     }
 
     public function getProductId() {
-         $this->_logger->addDebug('YOTPO             getProductId         '.json_encode($this->getProduct()));
     	return $this->getProduct()->getId();
     }
 
@@ -54,12 +49,12 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     public function isRenderWidget()
     {
         return $this->getProduct() != null && 
-        ($this->_config->getShowWidget() || $this->getData('fromHelper'));
+        ($this->_config->isWidgetEnabled() || $this->getData('fromHelper'));
     }    
 
     public function isRenderBottomline()
     {
-        return $this->_config->getShowBottomline();
+        return $this->_config->isBottomlineEnabled();
     } 
 
     public function getProductImageUrl()

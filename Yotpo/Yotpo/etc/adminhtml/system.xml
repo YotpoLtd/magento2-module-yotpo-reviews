@@ -39,7 +39,7 @@
                         to sign in to yotpo]]>
                     </comment>                    
                 </field>
-                <field id="show_widget" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="widget_enabled" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Show widget</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -48,7 +48,7 @@
                       <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
-                <field id="show_bottomline" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Show bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
