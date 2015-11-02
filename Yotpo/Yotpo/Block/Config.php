@@ -7,6 +7,7 @@ class Config
     const YOTPO_APP_KEY = 'yotpo/settings/app_key';
     const YOTPO_SECRET = 'yotpo/settings/secret';
     const YOTPO_SHOW_WIDGET = 'yotpo/settings/show_widget';
+    const YOTPO_SHOW_BOTTOMLINE = 'yotpo/settings/show_bottomline';
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -27,6 +28,11 @@ class Config
     public function getShowWidget()
     {        
         return (bool)$this->_scopeConfig->getValue(self::YOTPO_SHOW_WIDGET, ScopeInterface::SCOPE_STORE);
+    } 
+
+    public function getShowBottomline()
+    {        
+        return (bool)$this->_scopeConfig->getValue(self::YOTPO_SHOW_BOTTOMLINE, ScopeInterface::SCOPE_STORE);
     } 
 
     public function isAppKeyAndSecretSet()

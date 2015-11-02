@@ -9,7 +9,11 @@
         <referenceBlock name="content.aside">
             <block  class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
         </referenceBlock> 
-        
+
+       <referenceContainer name="product.info.main">
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml" before="product.info.addto"/> 
+        </referenceContainer>  
+
 		<!-- Add yotpo widget div to product page  -->
 <!--         <referenceContainer name="product.info.main">
 			<block class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>

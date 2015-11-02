@@ -8,24 +8,31 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     \Magento\Framework\UrlInterface $urlinterface,
     \Magento\Catalog\Helper\Image $imageHelper,
     \Yotpo\Yotpo\Block\Config $config,
+    \Psr\Log\LoggerInterface $logger,
     array $data = []
     ) {
         $this->_coreRegistry = $registry;
         $this->_urlinterface = $urlinterface;
         $this->_config = $config;
         $this->_imageHelper = $imageHelper;
+        $this->_logger = $logger;
         parent::__construct($context, $data);
     }
 
     public function getProduct()
 	{
 		if (!$this->hasData('product')) {
+            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         ');
             $this->setData('product', $this->_coreRegistry->registry('current_product'));
+            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         '.json_encode($this->hasData('product')));
+            $this->_logger->addDebug('YOTPO             !$this->hasData(product)         '.json_encode($this->getData('product')));
+
         }
         return $this->getData('product');
     }
 
     public function getProductId() {
+         $this->_logger->addDebug('YOTPO             getProductId         '.json_encode($this->getProduct()));
     	return $this->getProduct()->getId();
     }
 
@@ -49,6 +56,11 @@ class Yotpo extends \Magento\Framework\View\Element\Template
         return $this->getProduct() != null && 
         ($this->_config->getShowWidget() || $this->getData('fromHelper'));
     }    
+
+    public function isRenderBottomline()
+    {
+        return $this->_config->getShowBottomline();
+    } 
 
     public function getProductImageUrl()
     {
