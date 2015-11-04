@@ -33,7 +33,7 @@ class PurchaseObserver
             }
             $data['email'] = $order->getCustomerEmail();
             $data['customer_name'] = $order->getCustomerName();
-            $data['order_id'] = $order->getIncrementId();
+            $data['order_id'] = intval($order->getIncrementId());
             $data['platform'] = 'magento';
             $data['currency_iso'] = $order->getOrderCurrency()->getCode();
             $data['order_date'] = $order->getCreatedAt();        
