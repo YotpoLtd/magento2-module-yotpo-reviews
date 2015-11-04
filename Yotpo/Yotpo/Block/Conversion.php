@@ -31,7 +31,7 @@ class Conversion extends \Magento\Framework\View\Element\Template
         $order = $this->getOrder();
         if ($order != null) 
         {
-            return intval($order->getTotalQtyOrdered());
+            return intval($order->getSubtotal());
         }
     }
     public function getOrderCurrency() 
