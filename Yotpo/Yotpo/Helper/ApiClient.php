@@ -9,9 +9,9 @@ class ApiClient
   const YOTPO_SECURED_API_URL   = "https://api.yotpo.com";
   const YOTPO_UNSECURED_API_URL = "http://api.yotpo.com";
   const DEFAULT_TIMEOUT = 30;
-                         
+ 
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
-                              \Magento\Bundle\Model\Resource\Selection $bundleSelection,
+                              \Magento\ConfigurableProduct\Model\Resource\Product\Type\Configurable $bundleSelection,
                               \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
                               \Magento\Framework\Escaper $escaper,
                               \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
@@ -38,9 +38,9 @@ class ApiClient
 
     foreach ($products as $item) {
       $full_product = $this->_productRepository->get($item->getSku()); 
-      $parentIds= $this->_bundleSelection->getParentIdsByChild($item->getProductId());
+      $parentIds= $this->_bundleSelection->getParentIdsByChild($full_product->getId());
       if (count($parentIds) > 0) {
-              $full_product = $this->_productRepository->get($parentIds[0]); //TODO: needs testing
+              $full_product = $this->_productRepository->getById($parentIds[0]); 
       }
       $product_data = array();
       $product_data['name'] = $full_product->getName();
