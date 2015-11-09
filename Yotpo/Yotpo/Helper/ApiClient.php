@@ -74,6 +74,11 @@ class ApiClient
         $this->_logger->addDebug('error: no response from api'); 
         return null;
       }
+      if(!(array_key_exists('access_token', $result['body'])))
+      {
+        $this->_logger->addDebug('error: no access token received'); 
+        return null;
+      }  
       return $result['body']->access_token; 
     } 
     catch(Exception $e) 
@@ -92,7 +97,7 @@ class ApiClient
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
       $resData = $http->read();
-      return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)));
+      return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)), true);
     }
     catch(Exception $e)
     {
