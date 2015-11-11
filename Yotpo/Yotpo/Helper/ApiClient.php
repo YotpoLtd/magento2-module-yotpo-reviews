@@ -59,6 +59,7 @@ class ApiClient
     }
 
 
+
   public function oauthAuthentication()
   {
     if($this->_app_key == null|| $this->_secret == null) {
@@ -89,6 +90,18 @@ class ApiClient
     }
   }
 
+  public function prepareOrderData($order) 
+  {
+    $data['email'] = $order->getCustomerEmail();
+    $data['customer_name'] = $order->getCustomerName();
+    $data['order_id'] = $order->getIncrementId();
+    $data['platform'] = 'magento';
+    $data['currency_iso'] = $order->getOrderCurrency()->getCode();
+    $data['order_date'] = $order->getCreatedAt();        
+    $data['products'] = $this->prepareProductsData($order); 
+    return $data;
+  }
+
   public function createApiPost($path, $data, $timeout=self::DEFAULT_TIMEOUT) {
     try 
     {
@@ -109,7 +122,8 @@ class ApiClient
 
   public function createPurchases($order)
   {
-    $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
+    $resData = $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
+    return $resData;
   }
   public function massCreatePurchases($orders, $token)
   {
@@ -117,7 +131,8 @@ class ApiClient
     $data['utoken'] = $token;
     $data['platform'] = 'magento';
     $data['orders'] = $orders;
-    $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
+    $resData =  $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
+     return $resData;
   }
 
   // public function createApiGet($path, $timeout=self::DEFAULT_TIMEOUT)  //TODO  -  not sure if needed

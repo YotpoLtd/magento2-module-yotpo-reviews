@@ -25,6 +25,11 @@ class Config
         return $this->_scopeConfig->getValue(self::YOTPO_SECRET, ScopeInterface::SCOPE_STORE);
     }
 
+    public function getCostumeOrderStatus()
+    {
+        null;
+    }
+
     public function isWidgetEnabled()
     {        
         return (bool)$this->_scopeConfig->getValue(self::YOTPO_WIDGET_ENABLED, ScopeInterface::SCOPE_STORE);
