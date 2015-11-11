@@ -4,12 +4,12 @@
         <tab id="yotpo" translate="label" sortOrder="100">
             <label>Yotpo</label>
         </tab>
-        <section id="yotpo" translate="label" sortOrder="130" showInDefault="0" showInWebsite="1" showInStore="1">
+        <section id="yotpo" translate="label" sortOrder="130" showInDefault="0" showInWebsite="0" showInStore="1">
             <class>separator-top</class>
             <label>Yotpo Product Reviews Software</label>
             <tab>yotpo</tab>
             <resource>Yotpo_Yotpo::settings</resource>
-            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label>Yotpo Widget Configurations</label>
                                         <comment>
                 <![CDATA[
@@ -31,7 +31,6 @@
                         to sign in to yotpo]]>
                     </comment>                    
                 </field>
-
                 <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Secret</label>
                     <comment><![CDATA[Get your secret at your yotpo account setting page. Click
@@ -39,8 +38,8 @@
                         to sign in to yotpo]]>
                     </comment>                    
                 </field>
-                <field id="show_widget" translate="label" type="select" sortOrder="3" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>Show widget</label>
+                <field id="widget_enabled" translate="label" type="select" sortOrder="3" showInDefault="0" showInWebsite="0" showInStore="1">
+                    <label>Enable Default Widget Position</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                       <![CDATA[
@@ -48,7 +47,7 @@
                       <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
-                <field id="bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Show bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
@@ -56,6 +55,11 @@
                       By choosing not to use the deafult position, you'll need to follow the instructions in the 
                       <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
+                </field>
+                 <field id="yotpo_button" translate="button_label" sortOrder="5" showInDefault="0" showInWebsite="0" showInStore="1">
+                     <label>Past orders</label>
+                    <button_label>Generate reviews for my past orders</button_label>
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>
                 </field>
             </group>
         </section>

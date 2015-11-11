@@ -31,13 +31,7 @@ class PurchaseObserver
             {
                 return $this;
             }
-            $data['email'] = $order->getCustomerEmail();
-            $data['customer_name'] = $order->getCustomerName();
-            $data['order_id'] = intval($order->getIncrementId());
-            $data['platform'] = 'magento';
-            $data['currency_iso'] = $order->getOrderCurrency()->getCode();
-            $data['order_date'] = $order->getCreatedAt();        
-            $data['products'] = $this->_helper->prepareProductsData($order);
+            $data = $this->_helper->prepareOrderData($order);
             $data['utoken'] = $this->_helper->oauthAuthentication();
             if ($data['utoken'] == null) {
                 //failed to get access token to api
