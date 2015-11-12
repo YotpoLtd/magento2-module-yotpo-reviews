@@ -43,5 +43,12 @@ class Config
     public function isAppKeyAndSecretSet()
     {        
         return ($this->getAppKey() != null && $this->getSecret() != null);
-    }             
+    } 
+
+    public function getTimeFrame()
+    {        
+        $today = time();
+        $last = $today - (60*60*24*90); //90 days ago
+        return date("Y-m-d", $last);
+    }              
 }

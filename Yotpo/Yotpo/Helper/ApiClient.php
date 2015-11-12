@@ -111,8 +111,7 @@ class ApiClient
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
       $resData = $http->read();
-      $formattedRes = array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
-      return $formattedRes;
+      return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
     }
     catch(Exception $e)
     {
@@ -122,19 +121,15 @@ class ApiClient
 
   public function createPurchases($order)
   {
-    $resData = $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
-    return $resData;
+    return $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
   }
+  
   public function massCreatePurchases($orders, $token)
   {
     $data = array();
     $data['utoken'] = $token;
     $data['platform'] = 'magento';
     $data['orders'] = $orders;
-    $resData =  $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
-     return $resData;
+    return $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
   }
-
-  // public function createApiGet($path, $timeout=self::DEFAULT_TIMEOUT)  //TODO  -  not sure if needed
-
 }

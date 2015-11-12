@@ -56,9 +56,6 @@ public function __construct(
         $this->_messageManager->addError(__("Please make sure the APP KEY and SECRET you've entered are correct"));
         return;
       }
-      $today = time();
-      $last = $today - (60*60*24*90); //90 days ago
-      $from = date("Y-m-d", $last);
       $offset = 0;
       $orderStatuses = $this->_config->getCostumeOrderStatus();
       if ($orderStatuses == null) {
@@ -71,7 +68,7 @@ public function __construct(
       $salesCollection = $orderModel->getCollection()
                     ->addFieldToFilter('status', $orderStatuses)
                     ->addFieldToFilter('store_id', $storeId)
-                    ->addAttributeToFilter('created_at', array('gteq' =>$from)) 
+                    ->addAttributeToFilter('created_at', array('gteq' => $this->_config->getTimeFrame())) 
                     ->addAttributeToSort('created_at', 'DESC')
                     ->setPageSize(self::MAX_BULK_SIZE);
       $pages = $salesCollection->getLastPageNumber();
