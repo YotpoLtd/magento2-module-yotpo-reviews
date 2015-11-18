@@ -8,7 +8,7 @@
             <class>separator-top</class>
             <label>Yotpo Product Reviews Software</label>
             <tab>yotpo</tab>
-            <resource>Yotpo_Yotpo::settings</resource>
+            <resource>Magento_Reports::Yotpo</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Yotpo Widget Configurations</label>
                                         <comment>

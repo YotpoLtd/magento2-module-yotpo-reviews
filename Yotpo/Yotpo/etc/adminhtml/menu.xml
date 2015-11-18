@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
     <menu>
-        <add id="Yotpo_Yotpo::settings" title="Yotpo" module="Yotpo_Yotpo" sortOrder="40" resource="Yotpo_Yotpo::settings" action="yotpo/settings"/>
+        <add id="Magento_Reports::Yotpo" title="Yotpo" module="Yotpo_Yotpo" sortOrder="100"  resource="Magento_Reports::Yotpo" action="adminhtml/settings"/>
     </menu>
 </config>
