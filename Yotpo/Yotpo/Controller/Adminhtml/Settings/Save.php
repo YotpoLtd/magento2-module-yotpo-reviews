@@ -21,9 +21,11 @@ class Save extends \Magento\Backend\App\Action
                 $app_key = $this->getRequest()->getParam('app_key');
                 $secret = $this->getRequest()->getParam('secret');
                 $show_widget = $this->getRequest()->getParam('show_widget');
+                $show_buttomline = $this->getRequest()->getParam('show_buttomline');
                 $this->_config->setAppKey($app_key);
                 $this->_config->setSecret($secret);
                 $this->_config->setWidgetEnabled($show_widget);
+                $this->_config->setBottomlineEnabled($show_buttomline);
                 
                 $this->messageManager->addSuccess(__('Yotpo Settings Saved'));  
             } catch (\Exception $e) {
