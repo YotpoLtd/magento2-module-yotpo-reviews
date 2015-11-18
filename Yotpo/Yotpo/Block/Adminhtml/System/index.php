@@ -2,8 +2,6 @@
 
 namespace Yotpo\Yotpo\Block\Adminhtml\System;
 
-
-
 class Index extends \Magento\Backend\Block\Widget\Form\Container
 {
     /**
@@ -25,16 +23,13 @@ class Index extends \Magento\Backend\Block\Widget\Form\Container
 
     protected function _construct()
     {
-       $this->_blockGroup = 'Yotpo_Yotpo';
+        $this->_blockGroup = 'Yotpo_Yotpo';
         $this->_controller = 'adminhtml_Settings_index';
         parent::_construct();
     }
 
-     protected function _prepareLayout()
-    {
+    protected function _prepareLayout(){
     }
-
-
 
         /**
      * Returns URL for save action
@@ -44,7 +39,6 @@ class Index extends \Magento\Backend\Block\Widget\Form\Container
      */
     public function getFormActionUrl()
     {
-
         return $this->getUrl('adminhtml/settings/save');
     }
 
