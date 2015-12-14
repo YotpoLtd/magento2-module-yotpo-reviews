@@ -9,7 +9,7 @@
     <update handle="formkey" />
     <body>
         <referenceContainer name="content">
-            <block class="Yotpo\Yotpo\Block\Adminhtml\System\index" name="yotpo.settings" template="grid.phtml"/>
+            <block class="Yotpo\Yotpo\Block\Adminhtml\System\Index" name="yotpo.settings" template="grid.phtml"/>
         </referenceContainer>
     </body>
 </page>
