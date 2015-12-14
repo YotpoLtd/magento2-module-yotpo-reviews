@@ -33,17 +33,17 @@ class PurchaseObserver
             }
             $data['email'] = $order->getCustomerEmail();
             $data['customer_name'] = $order->getCustomerName();
-            $data['order_id'] = $order->getIncrementId();
+            $data['order_id'] = intval($order->getIncrementId());
             $data['platform'] = 'magento';
             $data['currency_iso'] = $order->getOrderCurrency()->getCode();
             $data['order_date'] = $order->getCreatedAt();        
-            $data['products'] = $this->_helper->prepareProductsData($order); 
+            $data['products'] = $this->_helper->prepareProductsData($order);
             $data['utoken'] = $this->_helper->oauthAuthentication();
             if ($data['utoken'] == null) {
                 //failed to get access token to api
                 $this->_logger->addDebug('access token recieved from yotpo api is null');  
                 return $this;
-            }
+            } 
             $this->_helper->createPurchases($data); 
             return $this;   
         } catch(Exception $e) {
