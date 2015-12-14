@@ -11,7 +11,7 @@ class ApiClient
   const DEFAULT_TIMEOUT = 30;
  
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
-                              \Magento\ConfigurableProduct\Model\Resource\Product\Type\Configurable $bundleSelection,
+                              \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $bundleSelection,
                               \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
                               \Magento\Framework\Escaper $escaper,
                               \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
