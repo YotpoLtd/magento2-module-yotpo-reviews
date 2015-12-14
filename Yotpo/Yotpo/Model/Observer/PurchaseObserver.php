@@ -3,23 +3,23 @@
 namespace Yotpo\Yotpo\Model\Observer;
 
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Core\Model\ObjectManager;
 
-class PurchaseObserver 
+class PurchaseObserver implements ObserverInterface
 {   
 
 	public function __construct(
         \Yotpo\Yotpo\Helper\ApiClient $helper,
-        \Yotpo\Yotpo\Block\Config $config,
-        \Psr\Log\LoggerInterface $logger)
+        \Yotpo\Yotpo\Block\Config $config)
                         
 	{
         $this->_helper = $helper;
-        $this->_config = $config; 
-        $this->_logger = $logger;           
+        $this->_config = $config;           
 	}
+
     //observer function hooked on event sales_order_save_after
-    public function dispatch(Observer $observer)
+    public function execute(Observer $observer) 
     {
         try {
             if (!$this->_config->isAppKeyAndSecretSet())
