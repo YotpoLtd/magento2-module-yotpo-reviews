@@ -35,7 +35,6 @@ class ApiClient
     $this->_storeManager->setCurrentStore($order->getStoreId());
     $products = $order->getAllVisibleItems(); //filter out simple products
     $products_arr = array();
-
     foreach ($products as $item) {
       $full_product = $this->_productRepository->get($item->getSku()); 
       $parentIds= $this->_bundleSelection->getParentIdsByChild($full_product->getId());
@@ -49,8 +48,9 @@ class ApiClient
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = (string) $this->_imgHelper->init($full_product, 'image'); 
-      } catch(Exception $e) { }
+        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_thumbnail_image')->getUrl();
+      } catch(\Exception $e) { 
+       $this->_logger->addDebug('ApiClient prepareProductsData Exception'.json_encode($e)); }
       $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
       $product_data['price'] = $item->getPrice();
       $products_arr[$full_product->getId()] = $product_data;
@@ -83,7 +83,7 @@ class ApiClient
       }  
       return $result['body']['access_token']; 
     } 
-    catch(Exception $e) 
+    catch(\Exception $e) 
     {
       $this->_logger->addDebug('error: ' .$e); 
       return null;
@@ -113,7 +113,7 @@ class ApiClient
       $resData = $http->read();
       return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
     }
-    catch(Exception $e)
+    catch(\Exception $e)
     {
       $this->_logger->addDebug('error: ' .$e); 
     } 
