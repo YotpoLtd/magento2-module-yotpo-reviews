@@ -22,6 +22,7 @@ Follow the installation steps at https://github.com/rgranadino/mage2_vagrant
 * Edit app/etc/config.php and add "Yotpo_Yotpo" => 1
 * Disable Magento reviews - Stores\Configuration\Advanced\Advanced  Magento_Review -> Disable
 * After copying yotpo open vagrant ssh and inside the root folder (/vagrant/data/magento2) run ```php bin/magento setup:upgrade ```
+* For Yotpo to wrok locally with the API you need to add your machine's ip address to point to api.yotpo.com on /etc/hosts on your vagrant 
 
 ###Usage
 
