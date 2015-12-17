@@ -42,7 +42,7 @@
                     </comment>                    
                 </field>
                 <field id="show_widget" translate="label" type="select" sortOrder="3" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>Show widget</label>
+                    <label>Enable Default Widget Position</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                       <![CDATA[
