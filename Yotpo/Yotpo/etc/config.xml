@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+     <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="../../Core/etc/config.xsd">
+        <default>
+            <yotpo>
+                <settings>
+                    <show_widget>1</show_widget>
+                </settings>
+            </yotpo>
+        </default>
+    </config>
