@@ -5,9 +5,6 @@ use Magento\Store\Model\ScopeInterface;
 
 class ValidateSettings extends \Magento\Framework\App\Config\Value
 {
-
-	const YOTPO_CACHE = 'yotpo/settings/cache';
-
 	public function __construct(
 	    \Magento\Framework\Model\Context $context,
 	    \Magento\Framework\Registry $registry,
