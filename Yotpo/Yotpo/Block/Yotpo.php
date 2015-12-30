@@ -52,7 +52,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function getProductImageUrl()
     {
-        return $this->_imageHelper->init($this->getProduct(), 'image');;
+        return $this->_imageHelper->init($this->getProduct(), 'product_page_image_large')->getUrl();
     } 
     
     private function isProductPage()

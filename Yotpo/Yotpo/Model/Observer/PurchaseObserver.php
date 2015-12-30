@@ -3,9 +3,10 @@
 namespace Yotpo\Yotpo\Model\Observer;
 
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 use Magento\Core\Model\ObjectManager;
 
-class PurchaseObserver 
+class PurchaseObserver implements ObserverInterface
 {   
 
 	public function __construct(
@@ -15,11 +16,12 @@ class PurchaseObserver
                         
 	{
         $this->_helper = $helper;
-        $this->_config = $config; 
-        $this->_logger = $logger;           
+        $this->_config = $config;
+        $this->_logger = $logger;       
 	}
+
     //observer function hooked on event sales_order_save_after
-    public function dispatch(Observer $observer)
+    public function execute(Observer $observer) 
     {
         try {
             if (!$this->_config->isAppKeyAndSecretSet())
@@ -46,7 +48,7 @@ class PurchaseObserver
             } 
             $this->_helper->createPurchases($data); 
             return $this;   
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             $this->_logger->addDebug('Failed to send mail after purchase. Error: '.$e); 
             return $this;
         }
