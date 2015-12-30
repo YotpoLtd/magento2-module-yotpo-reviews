@@ -11,11 +11,13 @@ class PurchaseObserver implements ObserverInterface
 
 	public function __construct(
         \Yotpo\Yotpo\Helper\ApiClient $helper,
-        \Yotpo\Yotpo\Block\Config $config)
+        \Yotpo\Yotpo\Block\Config $config,
+        \Psr\Log\LoggerInterface $logger)
                         
 	{
         $this->_helper = $helper;
-        $this->_config = $config;           
+        $this->_config = $config;
+        $this->_logger = $logger;       
 	}
 
     //observer function hooked on event sales_order_save_after
@@ -46,7 +48,7 @@ class PurchaseObserver implements ObserverInterface
             } 
             $this->_helper->createPurchases($data); 
             return $this;   
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             $this->_logger->addDebug('Failed to send mail after purchase. Error: '.$e); 
             return $this;
         }
