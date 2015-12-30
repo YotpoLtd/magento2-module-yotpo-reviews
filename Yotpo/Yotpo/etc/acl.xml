@@ -6,7 +6,7 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Yotpo_Yotpo::settings" title="Helloworld Section" sortOrder="80" />
+                            <resource id="Yotpo_Yotpo::settings" title="Settings page" sortOrder="80" />
                         </resource>
                     </resource>
                 </resource>

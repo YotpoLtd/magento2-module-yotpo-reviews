@@ -26,6 +26,8 @@
             </comment>
                 <field id="app_key" translate="label" type="text" sortOrder="1" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>App key</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment><![CDATA[Get your appkey at your yotpo account setting page. Click
                         <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" title="yotpo-sign-up">here</a>
                         to sign in to yotpo]]>
@@ -33,6 +35,8 @@
                 </field>
                 <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Secret</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment><![CDATA[Get your secret at your yotpo account setting page. Click
                         <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>
                         to sign in to yotpo]]>
@@ -41,6 +45,7 @@
                 <field id="widget_enabled" translate="label" type="select" sortOrder="3" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Enable Default Widget Position</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
                       <![CDATA[
                       By choosing not to use the deafult position, you'll need to follow the instructions in the 
