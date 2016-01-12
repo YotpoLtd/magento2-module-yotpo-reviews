@@ -28,7 +28,7 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
     }
  
     protected function _prepareLayout()
-    {
+    {  
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
             $this->setTemplate('system/config/yotpobutton.phtml');
@@ -52,12 +52,12 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
      *
      * @return string
      */
-    public function getAjaxExportUrl()     {
+    public function getAjaxExportUrl()     { 
         return '/admin/massmap/yotpocontroller/yotpocontroller/';
     }
 
     public function getStoreId()
-    {
+    { 
         return $this->_context->getStoreManager()->getStore()->getId();
     }
  
@@ -67,7 +67,7 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
      * @return string
      */
     public function getButtonHtml()
-    {
+    {   
        $button = $this->getLayout()->createBlock(
             'Magento\Backend\Block\Widget\Button'
         )->setData(
