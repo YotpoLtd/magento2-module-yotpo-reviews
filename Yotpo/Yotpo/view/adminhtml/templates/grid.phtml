@@ -1,0 +1,187 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<?php
+/**
+ *  @var $block \Yotpo\Yoypo\Block\Adminhtml\System\index
+ */
+?>
+
+<form id="yotpo-form" action="<?php echo $block->getFormActionUrl() ?>" method="post">
+
+ 	<span>
+		<input type="submit" value="Save Configuration" class="btn-save">
+	</span>
+	<div>
+	   <p>Please enter in your <font color="red">Api App Key</font> and <font color="red">Secret</font> in the fields below to finish the installation.</p>
+	   <p>If you need help the Yotpo support team is here 24/7, don't hesitate to <a href="https://yotposupport.zendesk.com/account/dropboxes/20158038#/dropbox/suggestions/ask" target="_blank" title="yotpo-support">contact us.</a> </p>
+	   <p>Click <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features" target="_blank" title="yotpo">here</a> for the advanced customization guide. </p>
+	   <br/> 
+	   <p class="no-app-p">Dont have an App Key? <a  href="http://my.yotpo.com/" target="_blank" title="yotpo">Click here to sign up / sign in</a></p>
+	</div>
+
+	
+
+	
+	<?php echo $block->getBlockHtml('formkey')?>
+	<input type="hidden" name="form_key" value="<?php echo $this->getFormKey(); ?>" />
+	<table>
+		<tr id="row_yotpo_settings_app_key">
+			<td class="label td-label" >
+				<label for="yotpo_settings_app_key" class="label-son">
+	    			App key
+	    		</label>
+			</td>
+				
+			<td class="value" style="padding: 2.2rem 1.5rem 0 0; padding-right: 4rem;">
+				<input id="app_key" name="app_key" type="text" value="<?php echo $block->_config->getAppKey();?>" class="input-text admin__control-text input-yotpo" >
+				<p class="note note-yotpo" >
+					<span>
+						Get your appkey at your yotpo account setting page. Click
+                        <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" 
+                        title="yotpo-sign-up" class="yotpo-a">
+					    here</a>
+                        to sign in to yotpo
+                	</span>
+				</p>
+			</td>
+		</tr>
+
+
+		<tr id="sercret_settings">
+			<td class="label td-label">
+				<label for="secret_settings" class="label-son">
+	    			Secret
+	    		</label>
+			</td>
+			<td class="value" style="padding: 2.2rem 1.5rem 0 0; padding-right: 4rem;">
+				<input id="secret" name="secret" type="text" value= "<?php echo $block->_config->getSecret();?>" class="input-text admin__control-text input-yotpo"> 
+					<p class="note note-yotpo" >
+						<span>
+							Get your secret at your yotpo account setting page. Click
+                        <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>
+                        to sign in to yotpo
+                    	</span>
+					</p>
+			</td>
+		</tr>
+
+		<tr id="show_widget_settings">
+			<td class="label td-label " >
+				<label for="show_widget_settings" class="large-boxes">
+	    			Show Widget
+	    		</label>
+			</td>
+			<td class="value" style="padding: 2.2rem 1.5rem 0 0; padding-right: 4rem;">
+				<select name="show_widget" form="yotpo-form"  class="input-text admin__control-text input-yotpo">
+				  <option value="1" <?php echo $block->_config->isWidgetEnabled() == 1 ? 'selected' : '';?>>Yes</option>
+				  <option value="0" <?php echo $block->_config->isWidgetEnabled() == 0 ? 'selected' : '';?>>No</option>
+				</select>
+				<p class="note note-yotpo">
+					<span>
+						By choosing not to use the deafult position, you'll need to follow the instructions in the 
+      					<br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" class="yotpo-a" title="advanced-cusomization-guide">advanced customizations guide</a>
+                	</span>
+				</p>
+			</td>	
+		</tr>
+
+		<tr id="show_bottomline_settings">
+			<td class="label td-label">
+				<label for="show_bottomline_settings" class="large-boxes">
+	    			Show Bottomline
+	    		</label>
+			</td>	
+			<td class="value" style="padding: 2.2rem 1.5rem 0 0; padding-right: 4rem;">
+				<select name="show_buttomline" form="yotpo-form"  class="input-text admin__control-text input-yotpo">
+				  <option value="1" <?php echo $block->_config->isBottomlineEnabled() == 1 ? 'selected' : '';?>>Yes</option>
+				  <option value="0" <?php echo $block->_config->isBottomlineEnabled() == 0 ? 'selected' : '';?>>No</option>
+				</select>
+				<p class="note note-yotpo">
+					<span>
+						By choosing not to use the deafult position, you'll need to follow the instructions in the 
+     					<br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" class="yotpo-a" title="advanced-cusomization-guide">advanced customizations guide
+                	</span>
+				</p>
+			</td>
+		</tr>
+	</table>
+</form>
+
+
+<style>
+	.td-label {
+		color: #303030;
+	    float: none;
+	    font-size: 14px;
+	    font-weight: 600;
+	    padding-right: 30px;
+	    text-align: right;
+	    width: 33%;
+	}
+	.label-son {
+		padding-top: 2px;
+		display: inline-block;
+		font-size: 14px;
+		font-weight: 600; 
+		text-align: right;
+	}
+	.input-yotpo {
+	    border: 1px solid #adadad;
+	    border-radius: 1px;
+	    padding: 4px;
+	    color: #303030;
+	    background-color: #fff;
+	    font-weight: 500;
+	    font-size: 14px;
+	    height: 33px;
+	    width: 100%;
+	}
+	.note-yotpo {
+		color: #303030;
+	    font-size: 12px;
+	    margin: 5px 0;"
+	}
+	.yotpo-a {
+		color: #007dbd; font-size: 12px;
+	    font-weight: 400;		
+	}
+	.no-app-p {
+		font-size:18px;
+	}
+	.btn-save {
+		background-color: #eb5202;
+	    border-color: #eb5202;
+	    color: #ffffff;
+	    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+        border: 1px solid;
+	    border-radius: 0;
+	    display: inline-block;
+	    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	    font-size: 1.4rem;
+	    font-weight: 600;
+	    line-height: 1.36;
+	    padding: 0.8rem 2em 0.8rem;
+	    text-align: center;
+	    vertical-align: baseline;
+        float: right;
+		margin-right: 20px;
+	}
+	.btn-save:hover{
+	    background-color: #ba4000;
+	    border-color: #b84002;
+	    box-shadow: 0 0 0 1px #007bdb;
+	    text-decoration: none;
+	}
+	.large-boxes {
+		margin-bottom: 20px;
+	}
+</style>
+
+    
+
+

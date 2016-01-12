@@ -8,7 +8,7 @@
             <class>separator-top</class>
             <label>Yotpo Product Reviews Software</label>
             <tab>yotpo</tab>
-            <resource>Yotpo_Yotpo::settings</resource>
+            <resource>Magento_Reports::Yotpo</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Yotpo Widget Configurations</label>
                                         <comment>
@@ -20,11 +20,11 @@
                     <p>Click <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features" target="_blank" 
                       title="yotpo">here</a> for the advanced customization guide. 
                     </p><br/>
-                    <p style="font-size:18px;">Dont have an App Key? <a style="font-size:18px;" href="http://my.yotpo.com/" target="_blank" 
+                    <p style="font-size:18px;">Dont have an App Key? <a style="font-size:18px;" href="http://my.yotpo.com/register" target="_blank" 
                       title="yotpo">Click here to sign up / sign in</a></p>
                 ]]>
             </comment>
-                <field id="app_key" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="app_key" translate="label" type="text" sortOrder="1" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>App key</label>
                     <comment><![CDATA[Get your appkey at your yotpo account setting page. Click
                         <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" title="yotpo-sign-up">here</a>
@@ -32,7 +32,7 @@
                     </comment>                    
                 </field>
 
-                <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Secret</label>
                     <comment><![CDATA[Get your secret at your yotpo account setting page. Click
                         <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>

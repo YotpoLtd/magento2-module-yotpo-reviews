@@ -3,14 +3,8 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Magento_Backend::stores">
-                    <resource id="Magento_Backend::stores_settings">
-                        <resource id="Magento_Config::config">
-                            <resource id="Yotpo_Yotpo::settings" title="Helloworld Section" sortOrder="80" />
-                        </resource>
-                    </resource>
-                </resource>
-            </resource>
+                <resource id="Magento_Reports::Yotpo" title="yotpo settings" sortOrder="80" />
+            </resource> 
         </resources>
     </acl>
 </config>
