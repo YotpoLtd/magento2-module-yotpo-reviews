@@ -55,6 +55,7 @@
                 <field id="bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Show bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
                       <![CDATA[
                       By choosing not to use the deafult position, you'll need to follow the instructions in the 
