@@ -34,12 +34,8 @@ public function __construct(
     }
 
 
-    /**
-     * say admin text
-     */
     public function execute()
-    {
-         
+    {  
       try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
       $storeId = $PostDataArr["store_id"];       
@@ -72,6 +68,7 @@ public function __construct(
                     ->addAttributeToSort('created_at', 'DESC')
                     ->setPageSize(self::MAX_BULK_SIZE);
       $pages = $salesCollection->getLastPageNumber();
+      $success = true;
       do {
         try {
             $offset++;
@@ -88,23 +85,25 @@ public function __construct(
             if (count($orders) > 0) 
             {
               $resData = $this->_api->massCreatePurchases($orders, $token); 
-              if($resData['code'] == 200)
-              {
-                $this->_messageManager->addSuccess(__("Past orders were exported successfully. Emails will be sent to your customers within 24 hours, and you will start to receive reviews."));
-              }
-              else
-              {
-                $this->_messageManager->addError(__("An error occured, please try again later."));
-              }
-            }
-            
-          } catch (Exception $e) {
+              $success = ($resData['code'] != 200) ? false : $success;
+            }      
+          } catch (\Exception $e) {
               $this->_logger->addDebug('Failed to export past orders. Error: '.$e);    
           }
         $salesCollection->clear();
         } while ($offset <= (self::MAX_ORDERS_TO_EXPORT / self::MAX_BULK_SIZE) && $offset < $pages);
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             $this->_logger->addDebug('Failed to export past orders. Error: '.$e);
+        }
+        if($success)
+        {
+          $this->_messageManager->addSuccess(__("Past orders were exported successfully. Emails will be sent to your customers within 24 hours, and you will start to receive reviews."));
+          $this->_logger->addDebug("Past orders were exported successfully."); 
+        }
+        else
+        {
+          $this->_messageManager->addError(__("An error occured, please try again later."));
+          $this->_logger->addDebug("Failed to export past orders."); 
         }
         $this->_response->setBody(1);
         return;  
