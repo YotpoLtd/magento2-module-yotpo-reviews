@@ -19,9 +19,8 @@ Follow the installation steps at https://github.com/rgranadino/mage2_vagrant
   
 #### To install the extension on your magento:
 * Copy the extension - copy /Yotpo from git to app/code
-* Edit app/etc/config.php and add "Yotpo_Yotpo" => 1
 * Disable Magento reviews - Stores\Configuration\Advanced\Advanced  Magento_Review -> Disable
-* After copying yotpo open vagrant ssh and inside the root folder (/vagrant/data/magento2) run ```php bin/magento setup:upgrade ```
+* After copying yotpo open vagrant ssh and inside the root folder (/vagrant/data/magento2) run ```bin/magento module:enable --clear-static-content Yotpo_Yotpo  php bin/magento setup:upgrade ```
 * For Yotpo to work locally with the API you need to add your machine's ip address to point to api.yotpo.com on /etc/hosts on your vagrant 
 
 ###Usage
