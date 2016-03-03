@@ -30,16 +30,16 @@ class ApiClient
     $this->_imgHelper = $imgHelper;
   }
 
-  public function prepareProductsData($order) 
+ public function prepareProductsData($order) 
   {
     $this->_storeManager->setCurrentStore($order->getStoreId());
     $products = $order->getAllVisibleItems(); //filter out simple products
     $products_arr = array();
     foreach ($products as $item) {
       $full_product = $this->_productRepository->get($item->getSku()); 
-      $parentIds= $this->_bundleSelection->getParentIdsByChild($full_product->getId());
-      if (count($parentIds) > 0) {
-              $full_product = $this->_productRepository->getById($parentIds[0]); 
+      $parentId = $item->getProduct()->getId(); 
+      if (!empty($parentId)) {
+              $full_product = $this->_productRepository->getById($parentId);
       }
       $product_data = array();
       $product_data['name'] = $full_product->getName();
