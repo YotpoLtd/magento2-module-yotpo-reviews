@@ -75,6 +75,7 @@ class ApiClient
         $this->_logger->addDebug('error: no response from api'); 
         return null;
       } 
+      $this->_logger->addDebug('error: no response from api'.json_encode($result)); 
       $valid_response = is_array($result['body']) && array_key_exists('access_token', $result['body']);
       if(!$valid_response)
       {

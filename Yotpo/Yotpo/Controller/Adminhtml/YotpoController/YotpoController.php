@@ -12,13 +12,12 @@ const MAX_BULK_SIZE        = 200;
 protected $_messageManager;
 
 public function __construct(
-        \Magento\Framework\App\Action\Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\App\Response\Http $response,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Yotpo\Yotpo\Block\Config $config,
         \Yotpo\Yotpo\Helper\ApiClient $api,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         \Psr\Log\LoggerInterface $logger
     ) {
@@ -28,7 +27,7 @@ public function __construct(
         $this->_config = $config;
         $this->_api = $api;
         $this->_logger = $logger;
-        $this->_messageManager = $messageManager;          
+        $this->_messageManager = $context->getMessageManager();          
         $this->_resultRedirectFactory = $resultRedirectFactory;   
         parent::__construct($context);
     }

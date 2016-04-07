@@ -4,10 +4,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Framework\App\Helper\Context $context
     ) {
-        $this->_logger = $logger;
+        $this->_logger = $context->getLogger();
         parent::__construct($context);
     }
 

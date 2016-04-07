@@ -7,13 +7,10 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
 
    public function __construct(
     \Magento\Backend\Block\Template\Context $context,
-    \Magento\Store\Model\StoreManagerInterface $storeManager,
-    \Magento\Framework\Message\ManagerInterface $messageManager,
-    \Psr\Log\LoggerInterface $logger,         
+    \Magento\Framework\Message\ManagerInterface $messageManager,     
     array $data = []
     ) {
-        $this->_logger = $logger;
-        $this->_storeManager = $storeManager;
+        $this->_storeManager = $context->getStoreManager();
         $this->_messageManager = $messageManager;    
         $this->_context = $context;
         parent::__construct($context, $data);
