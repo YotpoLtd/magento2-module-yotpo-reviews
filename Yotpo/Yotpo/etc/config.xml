@@ -4,7 +4,8 @@
         <default>
             <yotpo>
                 <settings>
-                    <show_widget>1</show_widget>
+                    <widget_enabled>1</widget_enabled>
+                    <bottomline_enabled>1</bottomline_enabled>
                 </settings>
             </yotpo>
         </default>
