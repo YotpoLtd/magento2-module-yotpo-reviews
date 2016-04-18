@@ -23,6 +23,6 @@ class ValidateSettings extends \Magento\Framework\App\Config\Value
 		if ($this->isValueChanged()) {
 			$this->context->getCacheManager()->clean();
 		} 
-        return;
+        return $this;
     }
 }
