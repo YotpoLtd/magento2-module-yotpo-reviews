@@ -5,17 +5,13 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     public function __construct(
     \Magento\Framework\View\Element\Template\Context $context,
     \Magento\Framework\Registry $registry,
-    \Magento\Framework\UrlInterface $urlinterface,
     \Magento\Catalog\Helper\Image $imageHelper,
     \Yotpo\Yotpo\Block\Config $config,
-    \Psr\Log\LoggerInterface $logger,
     array $data = []
     ) {
         $this->_coreRegistry = $registry;
-        $this->_urlinterface = $urlinterface;
         $this->_config = $config;
         $this->_imageHelper = $imageHelper;
-        $this->_logger = $logger;
         parent::__construct($context, $data);
     }
 
@@ -43,7 +39,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function getProductUrl()
     {
-        return $this->_urlinterface->getCurrentUrl();
+        return $this->getProduct()->getProductUrl();
     }    
 
     public function isRenderWidget()
