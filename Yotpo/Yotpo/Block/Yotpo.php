@@ -4,6 +4,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 {
     public function __construct(
     \Magento\Framework\View\Element\Template\Context $context,
+    \Magento\Framework\Escaper $escaper,
     \Magento\Framework\Registry $registry,
     \Magento\Catalog\Helper\Image $imageHelper,
     \Yotpo\Yotpo\Block\Config $config,
@@ -12,6 +13,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
         $this->_coreRegistry = $registry;
         $this->_config = $config;
         $this->_imageHelper = $imageHelper;
+        $this->_escaper = $escaper;
         parent::__construct($context, $data);
     }
 
@@ -24,22 +26,22 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     }
 
     public function getProductId() {
-    	return $this->getProduct()->getId();
+    	return $this-> escapeString($this->getProduct()->getId());
     }
 
     public function getProductName() {
-        $productName = $this->getProduct()->getName();
+        $productName = $this-> escapeString($this->getProduct()->getName());
         return htmlspecialchars($productName);
     }
-    
+
     public function getProductDescription()
     {
-        return $this->getProduct()->getShortDescription();        
+        return $this-> escapeString($this->getProduct()->getShortDescription());
     }
 
     public function getProductUrl()
     {
-        return $this->getProduct()->getProductUrl();
+        return $this-> escapeString($this->getProduct()->getProductUrl());
     }    
 
     public function isRenderWidget()
@@ -61,5 +63,10 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     private function isProductPage()
     {
         return $this->getProduct() != null;
-    }     
+    }
+
+    private function escapeString($str)
+    {
+        return $this->_escaper->escapeHtml(strip_tags($str));
+    }
 }
