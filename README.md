@@ -33,7 +33,7 @@ Follow the installation steps at https://github.com/rgranadino/mage2_vagrant
 -  The hosts file should look something like this: <br />
 27.0.0.1       localhost <br />
 127.0.1.1 mage2.dev mage2 <br />
-<Your i.p address> api.yotpo.com <br />
+172.XX.YY.ZZZ api.yotpo.com <br />
 * After updating the hosts file, run ```vagrant reload``` from your workspace
 
 
