@@ -30,13 +30,13 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     }
 
     public function getProductName() {
-        $productName = $this-> escapeString($this->getProduct()->getName());
+        $productName = $this->escapeString($this->getProduct()->getName());
         return htmlspecialchars($productName);
     }
 
     public function getProductDescription()
     {
-        return $this-> escapeString($this->getProduct()->getShortDescription());
+        return $this->escapeString($this->getProduct()->getShortDescription());
     }
 
     public function getProductUrl()
