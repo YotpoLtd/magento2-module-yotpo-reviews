@@ -26,7 +26,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     }
 
     public function getProductId() {
-    	return $this-> escapeString($this->getProduct()->getId());
+    	return $this->getProduct()->getId();
     }
 
     public function getProductName() {
@@ -41,7 +41,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function getProductUrl()
     {
-        return $this-> escapeString($this->getProduct()->getProductUrl());
+        return $this->getProduct()->getProductUrl();
     }    
 
     public function isRenderWidget()
