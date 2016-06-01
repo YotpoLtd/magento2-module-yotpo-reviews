@@ -16,13 +16,26 @@ magento 2.0 +
 ### Magento 2 (store) on Vagrant installation
 Follow the installation steps at https://github.com/rgranadino/mage2_vagrant
  On stage 6. recommended to use ```reinstall -s```
-  
-#### To install the extension on your magento:
-* Copy the extension - copy /Yotpo from git to app/code
-* Edit app/etc/config.php and add "Yotpo_Yotpo" => 1
+
+#### Copy the extension files to your workspace
+* git clone --recursive https://github.com/YotpoLtd/magento2-plugin.git
+
+#### Install the extension on your magento:
+* Go to '~/mage2_vagrant' and edit Vagrantfile
+* Under the line  - config.vm.synced_folder ".", "/vagrant", :nfs => { :mount_options => ["dmode=777", "fmode=777"] }
+* Add the following line - config.vm.synced_folder "/Users/USERNAME/Development/yotpo-workspace/magento2-plugin/Yotpo", "/vagrant/data/magento2/app/code/Yotpo", create: true
+* After updating the Vagrantfile file, run ```vagrant reload``` from your workspace
+* Make sure Yotpo extension and its content were updated in vagrant@mage2:/vagrant/data/magento2/app/code$
 * Disable Magento reviews - Stores\Configuration\Advanced\Advanced  Magento_Review -> Disable
-* After copying yotpo open vagrant ssh and inside the root folder (/vagrant/data/magento2) run ```php bin/magento setup:upgrade ```
-* For Yotpo to work locally with the API you need to add your machine's ip address to point to api.yotpo.com on /etc/hosts on your vagrant 
+* After copying yotpo run ```vagrant ssh``` and inside the root folder (/vagrant/data/magento2) run ```php bin/magento setup:upgrade ```
+- You can ignore the “Please re-run Magento compile command” as Magento 2 compiles the files automatically on the first page load
+* For Yotpo to work locally with the API you need to add your machine's ip address to point to api.yotpo.com on /etc/hosts on your vagrant.
+-  The hosts file should look something like this: <br />
+27.0.0.1       localhost <br />
+127.0.1.1 mage2.dev mage2 <br />
+172.XX.YY.ZZZ api.yotpo.com <br />
+* After updating the hosts file, run ```vagrant reload``` from your workspace
+
 
 ###Usage
 
