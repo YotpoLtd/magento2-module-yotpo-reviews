@@ -4,7 +4,6 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 {
     public function __construct(
     \Magento\Framework\View\Element\Template\Context $context,
-    \Magento\Framework\Escaper $escaper,
     \Magento\Framework\Registry $registry,
     \Magento\Catalog\Helper\Image $imageHelper,
     \Yotpo\Yotpo\Block\Config $config,
@@ -13,7 +12,6 @@ class Yotpo extends \Magento\Framework\View\Element\Template
         $this->_coreRegistry = $registry;
         $this->_config = $config;
         $this->_imageHelper = $imageHelper;
-        $this->_escaper = $escaper;
         parent::__construct($context, $data);
     }
 
