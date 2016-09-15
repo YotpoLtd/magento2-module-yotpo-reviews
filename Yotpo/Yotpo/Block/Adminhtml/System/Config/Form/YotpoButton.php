@@ -5,13 +5,13 @@ namespace Yotpo\Yotpo\Block\Adminhtml\System\Config\Form;
 class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
 {
 
-   public function __construct(
-    \Magento\Backend\Block\Template\Context $context,
-    \Magento\Framework\Message\ManagerInterface $messageManager,     
-    array $data = []
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        array $data = []
     ) {
         $this->_storeManager = $context->getStoreManager();
-        $this->_messageManager = $messageManager;    
+        $this->_messageManager = $messageManager;
         $this->_context = $context;
         parent::__construct($context, $data);
     }
@@ -23,13 +23,14 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
     {
         parent::_construct();
     }
- 
+
     protected function _prepareLayout()
-    {  
+    {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
             $this->setTemplate('system/config/yotpobutton.phtml');
         }
+
         return $this;
     }
 
@@ -43,37 +44,39 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
     {
         return $this->_toHtml();
     }
- 
+
     /**
      * Return ajax url for button
      *
      * @return string
      */
-    public function getAjaxExportUrl()     { 
+    public function getAjaxExportUrl()
+    {
         return '/admin/massmap/yotpocontroller/yotpocontroller/';
     }
 
     public function getStoreId()
-    { 
+    {
         return $this->_context->getStoreManager()->getStore()->getId();
     }
- 
+
     /**
      * Generate button html
      *
      * @return string
      */
     public function getButtonHtml()
-    {   
-       $button = $this->getLayout()->createBlock(
+    {
+        $button = $this->getLayout()->createBlock(
             'Magento\Backend\Block\Widget\Button'
         )->setData(
             [
-            'id'        => 'yotpo_button',
-            'label'     => __('Generate reviews for my past orders'),
-            'onclick'   => 'javascript:exportOrders(); return false;',
+                'id' => 'yotpo_button',
+                'label' => __('Generate reviews for my past orders'),
+                'onclick' => 'javascript:exportOrders(); return false;',
             ]
         );
+
         return $button->toHtml();
     }
 }
