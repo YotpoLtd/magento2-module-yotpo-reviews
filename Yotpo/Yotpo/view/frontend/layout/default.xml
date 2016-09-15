@@ -1,33 +1,36 @@
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
 
-		<!-- Add js tag to all pages -->
-		<referenceContainer name="content">
-	        <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>
-	    </referenceContainer>
+        <!-- Add js tag to all pages -->
+        <referenceContainer name="content">
+            <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>
+        </referenceContainer>
 
         <referenceBlock name="content.aside">
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
-        </referenceBlock> 
+            <block class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
+        </referenceBlock>
 
-       <referenceContainer name="product.info.main">
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml" before="product.info.addto"/> 
-        </referenceContainer>  
+        <referenceContainer name="product.info.main">
+            <block class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml"
+                   before="product.info.addto"/>
+        </referenceContainer>
 
-		<!-- Add yotpo widget div to product page  -->
-<!--         <referenceContainer name="product.info.main">
-			<block class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
-        </referenceContainer>	 --> 
+        <!-- Add yotpo widget div to product page  -->
+        <!--<referenceContainer name="product.info.main">-->
+            <!--<block class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>-->
+        <!--</referenceContainer>-->
 
-		<!-- Add yotpo widget div to product page below the add to cart button. -->
-<!--         <referenceContainer name="product.info.addtocart">
-			<block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_1" template="widget_div.phtml"/>
-        </referenceContainer>	 -->                  
-                      
-	   <!-- Add yotpo pixel for order conversion tracking     --> 
-	    <referenceContainer name="order.success.additional.info">
-			<block class="Yotpo\Yotpo\Block\Conversion" name="yotpo_conversion" template="conversion.phtml" cacheable="false"/>
-        </referenceContainer>	        
+        <!-- Add yotpo widget div to product page below the add to cart button. -->
+        <!--<referenceBlock name="product.info.addtocart">-->
+            <!--<block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_1" template="widget_div.phtml"/>-->
+        <!--</referenceBlock>-->
+
+        <!-- Add yotpo pixel for order conversion tracking     -->
+        <referenceContainer name="order.success.additional.info">
+            <block class="Yotpo\Yotpo\Block\Conversion" name="yotpo_conversion" template="conversion.phtml"
+                   cacheable="false"/>
+        </referenceContainer>
 
     </body>
 </page>

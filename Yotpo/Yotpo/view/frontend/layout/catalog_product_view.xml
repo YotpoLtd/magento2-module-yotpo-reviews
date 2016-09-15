@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Add tab Yotpo Review to the last tab -->
+        <!--<referenceBlock name="product.info.details">-->
+            <!--<block class="Magento\Catalog\Block\Product\View" name="yotpo.tab" template="Yotpo_Yotpo::product/yotpo_tab.phtml" group="detailed_info" >-->
+                <!--<arguments>-->
+                    <!--<argument translate="true" name="title" xsi:type="string">Review</argument>-->
+                <!--</arguments>-->
+            <!--</block>-->
+        <!--</referenceBlock>-->
+    </body>
+</page>

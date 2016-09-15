@@ -1,9 +1,31 @@
-<?php if( $this->isRenderWidget()) { ?>
-	<div class="yotpo yotpo-main-widget"
-		 data-product-id="<?php echo $this->getProductId() ?>"
-		 data-name="<?php echo $this->getProductName() ?>"
-		 data-description="<?php echo $this->getProductDescription() ?>"
-		 data-url="<?php echo $this->getProductUrl() ?>"
-		 data-image-url="<?php echo $this->getProductImageUrl() ?>">	
-	</div>
-	<?php } ?>
+<?php if ($this->isRenderWidget()) { ?>
+    <div class="yotpo yotpo-main-widget"
+         data-product-id="<?php echo $this->getProductId() ?>"
+         data-name="<?php echo $this->getProductName() ?>"
+         data-description="<?php echo $this->getProductDescription() ?>"
+         data-url="<?php echo $this->getProductUrl() ?>"
+         data-image-url="<?php echo $this->getProductImageUrl() ?>">
+    </div>
+<?php } ?>
+
+
+<?php /*
+<div id="y-carousel" class="yotpo yotpo-reviews-carousel"
+data-mode="top_rated"
+data-type="product"
+data-count="3"></div>
+
+<%if @data_show_bottomline%>data-show-bottomline="<%= @data_show_bottomline %>" <%end%>
+<%if @data_autoplay_enabled%>data-autoplay-enabled="<%= @data_autoplay_enabled %>" <%end%>
+<%if @data_autoplay_speed%>data-autoplay-speed="<%= @data_autoplay_speed %>" <%end%>
+<%if @data_show_navigation%>data-show-navigation="<%= @data_show_navigation %>" <%end%>
+<%if @data_header_customisation_enabled%>data-header-customisation-enabled="<%= @data_header_customisation_enabled %>" <%end%>
+<%if @data_header_customisation_text%>data-header-customisation-text="<%= @data_header_customisation_text %>" <%end%>
+<%if @data_header_customisation_font_size%>data-header-customisation-font-size="<%= @data_header_customisation_font_size %>" <%end%>
+<%if @data_header_customisation_color%>data-header-customisation-color="<%= @data_header_customisation_color %>" <%end%>
+<%if @data_header_customisation_alignment%>data-header-customisation-alignment="<%= @data_header_customisation_alignment %>" <%end%>
+<%if @data_testimonials_page_enabled%>data-testimonials-page-enabled="<%= @data_testimonials_page_enabled %>" <%end%>
+<%if @data_testimonials_page_link%>data-testimonials-page-link="<%= @data_testimonials_page_link %>" <%end%>
+<%if @data_testimonials_page_text%>data-testimonials-page-text="<%= @data_testimonials_page_text %>" <%end%>
+<%if @data_background_color%>data-background-color="<%= @data_background_color %>" <%end%>
+ */  ?>
