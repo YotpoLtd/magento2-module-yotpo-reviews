@@ -16,7 +16,8 @@ magento 2.0 +
 
 The Magento 2 module can be installed with Composer (https://getcomposer.org/download/).
 From the command line, do the following in your Magento 2 installation directory:
-```composer require yotpo/magento2-plugin```
+
+```composer require yotpo/module-review```
 
 ```sudo bin/magento setup:upgrade```
 
