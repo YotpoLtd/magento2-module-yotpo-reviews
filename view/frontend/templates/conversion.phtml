@@ -1,6 +1,9 @@
-<img 
-    src="https://api.yotpo.com/conversion_tracking.gif?app_key=<?php
-    echo $this->_config->getAppKey();?>&order_id=<?php echo $this->getOrderId();?>&order_amount=<?php echo $this->getOrderAmount();?>&order_currency=<?php echo $this->getOrderCurrency();?>"
-    width="1"
-    height="1"
-/>
+<script type="text/javascript">
+(function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/<?php echo $this->_config->getAppKey();?>/widget.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+</script>
+<script>
+yotpoTrackConversionData = {orderId: "<?php echo $this->getOrderId();?>", orderAmount: "<?php echo $this->getOrderAmount();?>", orderCurrency: "<?php echo $this->getOrderCurrency();?>"}
+</script>
+<noscript>
+<img src="//api.yotpo.com/conversion_tracking.gif?app_key=<?php echo $this->_config->getAppKey();?>&order_id=<?php echo $this->getOrderId();?>&order_amount=<?php echo $this->getOrderAmount();?>&order_currency=<?php echo $this->getOrderCurrency();?>" width="1" height="1">
+</noscript>
