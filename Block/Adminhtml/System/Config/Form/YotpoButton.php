@@ -50,7 +50,7 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
      * @return string
      */
     public function getAjaxExportUrl()     { 
-        return '/admin/massmap/yotpocontroller/yotpocontroller/';
+        return 'admin/massmap/yotpocontroller/yotpocontroller/';
     }
 
     public function getStoreId()
