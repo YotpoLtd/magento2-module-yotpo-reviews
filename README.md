@@ -21,6 +21,10 @@ From the command line, do the following in your Magento 2 installation directory
 
 ```sudo bin/magento setup:upgrade```
 
+
+before releasing a new extension need to compile and see we don't have any errors:
+```php bin/magento setup:di:compile```
+
 ###Usage
 
 After the installation, Go to The Magento 2 admin panel
