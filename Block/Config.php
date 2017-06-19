@@ -8,6 +8,7 @@ class Config
     const YOTPO_SECRET = 'yotpo/settings/secret';
     const YOTPO_WIDGET_ENABLED = 'yotpo/settings/widget_enabled';
     const YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
+    const YOTPO_QABOTTOMLINE_ENABLED = 'yotpo/settings/qabottomline_enabled';
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -38,6 +39,11 @@ class Config
     public function isBottomlineEnabled()
     {        
         return (bool)$this->_scopeConfig->getValue(self::YOTPO_BOTTOMLINE_ENABLED, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function isQaBottomlineEnabled()
+    {        
+        return (bool)$this->_scopeConfig->getValue(self::YOTPO_QABOTTOMLINE_ENABLED, ScopeInterface::SCOPE_STORE);
     } 
 
     public function isAppKeyAndSecretSet($storeId = null)

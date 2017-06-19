@@ -1,0 +1,12 @@
+<?php if( $this->isRenderQaBottomline()) { ?>
+<div class="yotpo QABottomLine" data-boom="woo"
+	data-product-id="<?php echo $this->getProductId() ?>"
+	data-url="<?php echo $this->getProductUrl() ?>">
+</div><br>
+<style type="text/css">
+/* If star rating is enabled make them appear side-by-side */
+	.yotpo-icon-double-bubble, .yotpo-stars { margin: 0 5px 0 0 !important; }
+	div.yotpo.bottomLine		 { display: inline-block; margin: 0 10px 1px 0;}
+	div.yotpo.QABottomLine	 { display: inline-block; }  
+</style>
+<?php } ?>
