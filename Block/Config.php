@@ -15,14 +15,14 @@ class Config
         $this->_scopeConfig = $scopeConfig;
     }
 
-    public function getAppKey()
+    public function getAppKey($storeId = null)
     {   
-        return $this->_scopeConfig->getValue(self::YOTPO_APP_KEY, ScopeInterface::SCOPE_STORE);     
+        return $this->_scopeConfig->getValue(self::YOTPO_APP_KEY, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    public function getSecret()
+    public function getSecret($storeId = null)
     {        
-        return $this->_scopeConfig->getValue(self::YOTPO_SECRET, ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue(self::YOTPO_SECRET, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getCostumeOrderStatus()
@@ -40,9 +40,9 @@ class Config
         return (bool)$this->_scopeConfig->getValue(self::YOTPO_BOTTOMLINE_ENABLED, ScopeInterface::SCOPE_STORE);
     } 
 
-    public function isAppKeyAndSecretSet()
+    public function isAppKeyAndSecretSet($storeId = null)
     {        
-        return ($this->getAppKey() != null && $this->getSecret() != null);
+        return ($this->getAppKey($storeId) != null && $this->getSecret($storeId) != null);
     } 
 
     public function getTimeFrame()

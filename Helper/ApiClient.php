@@ -23,10 +23,9 @@ class ApiClient
     $this->_bundleSelection = $bundleSelection;  
     $this->_productRepository = $productRepository;     
     $this->_escaper = $escaper;
-    $this->_curlFactory = $curlFactory;    
-    $this->_app_key = $config->getAppKey();
-    $this->_secret = $config->getSecret();
+    $this->_curlFactory = $curlFactory;
     $this->_logger = $logger;
+    $this->_config = $config;
     $this->_imgHelper = $imgHelper;
   }
 
@@ -58,15 +57,15 @@ class ApiClient
       return $products_arr;
     }
 
-
-
-  public function oauthAuthentication()
+  public function oauthAuthentication($storeId)
   {
-    if($this->_app_key == null|| $this->_secret == null) {
+    $app_key = $this->_config->getAppKey($storeId);
+    $secret = $this->_config->getSecret($storeId);
+    if($app_key == null|| $secret == null) {
       $this->_logger->addDebug('Missing app key or secret');
       return null;
     }
-    $yotpo_options = array('client_id' => $this->_app_key, 'client_secret' => $this->_secret, 'grant_type' => 'client_credentials');
+    $yotpo_options = array('client_id' => $app_key, 'client_secret' => $secret, 'grant_type' => 'client_credentials');
     try 
     {
       $result = $this->createApiPost('oauth/token', $yotpo_options);
@@ -74,8 +73,7 @@ class ApiClient
       {
         $this->_logger->addDebug('error: no response from api'); 
         return null;
-      } 
-      $this->_logger->addDebug('error: no response from api'.json_encode($result)); 
+      }
       $valid_response = is_array($result['body']) && array_key_exists('access_token', $result['body']);
       if(!$valid_response)
       {
@@ -120,17 +118,19 @@ class ApiClient
     } 
   }
 
-  public function createPurchases($order)
+  public function createPurchases($order, $storeId)
   {
-    return $this->createApiPost("apps/".$this->_app_key."/purchases", $order);
+    $appKey = $this->_config->getAppKey($storeId);
+    return $this->createApiPost("apps/".$appKey."/purchases", $order);
   }
   
-  public function massCreatePurchases($orders, $token)
+  public function massCreatePurchases($orders, $token, $storeId)
   {
+    $appKey = $this->_config->getAppKey($storeId);
     $data = array();
     $data['utoken'] = $token;
     $data['platform'] = 'magento';
     $data['orders'] = $orders;
-    return $this->createApiPost("apps/".$this->_app_key."/purchases/mass_create", $data);
+    return $this->createApiPost("apps/".$appKey."/purchases/mass_create", $data);
   }
 }

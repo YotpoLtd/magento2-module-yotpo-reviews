@@ -7,11 +7,12 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
 
    public function __construct(
     \Magento\Backend\Block\Template\Context $context,
-    \Magento\Framework\Message\ManagerInterface $messageManager,     
+    \Magento\Framework\Message\ManagerInterface $messageManager,
+    \Magento\Framework\App\Request\Http $request,
     array $data = []
     ) {
-        $this->_storeManager = $context->getStoreManager();
-        $this->_messageManager = $messageManager;    
+        $this->_messageManager = $messageManager;
+        $this->_request = $request;
         $this->_context = $context;
         parent::__construct($context, $data);
     }
@@ -55,7 +56,11 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
 
     public function getStoreId()
     { 
-        return $this->_context->getStoreManager()->getStore()->getId();
+        if ($this->_request->getParam('store', 0)) {
+            return $this->_request->getParam('store', 0);
+        } else {
+            return $this->_context->getStoreManager()->getStore()->getId();
+        }
     }
  
     /**

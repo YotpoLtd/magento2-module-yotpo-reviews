@@ -15,7 +15,6 @@ public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\App\Response\Http $response,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Yotpo\Yotpo\Block\Config $config,
         \Yotpo\Yotpo\Helper\ApiClient $api,
         \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
@@ -23,7 +22,6 @@ public function __construct(
     ) {
         $this->_request = $request;
         $this->_response = $response; 
-        $this->_storeManager = $storeManager;
         $this->_config = $config;
         $this->_api = $api;
         $this->_logger = $logger;
@@ -37,15 +35,15 @@ public function __construct(
     {  
       try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
-      $storeId = $PostDataArr["store_id"];       
-      $appKey = $this->_config->getAppKey();
-      $secret = $this->_config->getSecret();
+      $storeId = $PostDataArr["store_id"];
+      $appKey = $this->_config->getAppKey($storeId);
+      $secret = $this->_config->getSecret($storeId);
       if(($secret == null) || ($appKey == null))
       {
         $this->_messageManager->addError(__('Please make sure you insert your APP KEY and SECRET and save configuration before trying to export past orders'));
         return;
       }
-      $token = $this->_api->oauthAuthentication();   
+      $token = $this->_api->oauthAuthentication($storeId);
       if ($token == null) 
       {                
         $this->_messageManager->addError(__("Please make sure the APP KEY and SECRET you've entered are correct"));
@@ -83,7 +81,7 @@ public function __construct(
             }
             if (count($orders) > 0) 
             {
-              $resData = $this->_api->massCreatePurchases($orders, $token); 
+              $resData = $this->_api->massCreatePurchases($orders, $token, $storeId);
               $success = ($resData['code'] != 200) ? false : $success;
             }      
           } catch (\Exception $e) {
