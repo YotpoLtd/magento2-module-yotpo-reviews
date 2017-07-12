@@ -32,7 +32,8 @@ public function __construct(
 
 
     public function execute()
-    {  
+    { 
+	  $this->_logger->addInfo("Execute Process initiated by Yopto");
       try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
       $storeId = $PostDataArr["store_id"];
@@ -50,12 +51,13 @@ public function __construct(
         return;
       }
       $offset = 0;
-      $orderStatuses = $this->_config->getCostumeOrderStatus();
+      $orderStatuses = $this->_config->getCustomOrderStatus();
       if ($orderStatuses == null) {
           $orderStatuses = array(\Magento\Sales\Model\Order::STATE_COMPLETE);
       } else {
-        $orderStatuses = array_map('strtolower', explode(' ', $orderStatuses));
+        $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
       }
+	  $this->_logger->addInfo("Statuses: ".print_r($orderStatuses, true));
       $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
       $orderModel = $objectManager->get('Magento\Sales\Model\Order');
       $salesCollection = $orderModel->getCollection()
@@ -66,6 +68,7 @@ public function __construct(
                     ->setPageSize(self::MAX_BULK_SIZE);
       $pages = $salesCollection->getLastPageNumber();
       $success = true;
+	  $this->_logger->addInfo("Changes in execute process have no effect in system changes.");
       do {
         try {
             $offset++;

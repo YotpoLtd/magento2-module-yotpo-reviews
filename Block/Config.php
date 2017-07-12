@@ -8,6 +8,7 @@ class Config
     const YOTPO_SECRET = 'yotpo/settings/secret';
     const YOTPO_WIDGET_ENABLED = 'yotpo/settings/widget_enabled';
     const YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
+    const YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -29,6 +30,11 @@ class Config
     {
         null;
     }
+	
+	public function getCustomOrderStatus($storeId = null)
+	{
+		return $this->_scopeConfig->getValue(self::YOTPO_CUSTOM_ORDER_STATUS, ScopeInterface::SCOPE_STORE, $storeId);
+	}
 
     public function isWidgetEnabled()
     {        
