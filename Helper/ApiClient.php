@@ -92,7 +92,12 @@ class ApiClient
   public function prepareOrderData($order) 
   {
     $data['email'] = $order->getCustomerEmail();
-    $data['customer_name'] = $order->getCustomerName();
+	$customer = $order->getCustomerName();
+	if($customer == "Guest"){
+		$customer = $order->getBillingAddress();
+		$customer = $customer->getFirstname().' '.$customer->getLastname();
+	}
+    $data['customer_name'] = $customer;
     $data['order_id'] = $order->getIncrementId();
     $data['platform'] = 'magento';
     $data['currency_iso'] = $order->getOrderCurrency()->getCode();
