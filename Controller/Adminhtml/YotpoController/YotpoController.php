@@ -33,8 +33,7 @@ public function __construct(
 
     public function execute()
     { 
-	  $this->_logger->addInfo("Execute Process initiated by Yopto");
-      try {
+	  try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
       $storeId = $PostDataArr["store_id"];
       $appKey = $this->_config->getAppKey($storeId);
@@ -57,8 +56,8 @@ public function __construct(
       } else {
         $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
       }
-	  $this->_logger->addInfo("Statuses: ".print_r($orderStatuses, true));
-      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
       $orderModel = $objectManager->get('Magento\Sales\Model\Order');
       $salesCollection = $orderModel->getCollection()
                     ->addFieldToFilter('status', $orderStatuses)
@@ -68,8 +67,8 @@ public function __construct(
                     ->setPageSize(self::MAX_BULK_SIZE);
       $pages = $salesCollection->getLastPageNumber();
       $success = true;
-	  $this->_logger->addInfo("Changes in execute process have no effect in system changes.");
-      do {
+	  
+	  do {
         try {
             $offset++;
             $salesCollection->setCurPage($offset)->load();

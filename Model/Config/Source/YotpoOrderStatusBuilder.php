@@ -3,7 +3,7 @@ namespace Yotpo\Yotpo\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 
-class Statusyop implements ArrayInterface
+class YotpoOrderStatusBuilder implements ArrayInterface
 {
     protected $_manager;
 

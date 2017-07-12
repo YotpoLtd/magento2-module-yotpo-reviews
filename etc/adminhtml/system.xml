@@ -64,8 +64,7 @@
                 </field>
 				<field id="custom_order_status" translate="label" type="multiselect" sortOrder="4" showInDefault="0" showInWebsite="0" showInStore="1">
 					<label>Export Order After Purchase</label>
-					<!-- <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
-					<source_model>Yotpo\Yotpo\Model\Config\Source\Statusyop</source_model>
+					<source_model>Yotpo\Yotpo\Model\Config\Source\YotpoOrderStatusBuilder</source_model>
 					<comment>
                       <![CDATA[
                               Customize the order status that will trigger the order export after purchase. You can choose multiple statuses by holding ctrl button.
