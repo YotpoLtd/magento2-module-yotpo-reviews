@@ -33,7 +33,7 @@ public function __construct(
 
     public function execute()
     { 
-	  try {
+      try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
       $storeId = $PostDataArr["store_id"];
       $appKey = $this->_config->getAppKey($storeId);
@@ -50,14 +50,14 @@ public function __construct(
         return;
       }
       $offset = 0;
-      $orderStatuses = $this->_config->getCustomOrderStatus();
+      $orderStatuses = $this->_config->getCustomOrderStatus($storeId);
       if ($orderStatuses == null) {
           $orderStatuses = array(\Magento\Sales\Model\Order::STATE_COMPLETE);
       } else {
         $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
       }
 	  
-	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
       $orderModel = $objectManager->get('Magento\Sales\Model\Order');
       $salesCollection = $orderModel->getCollection()
                     ->addFieldToFilter('status', $orderStatuses)
@@ -68,7 +68,7 @@ public function __construct(
       $pages = $salesCollection->getLastPageNumber();
       $success = true;
 	  
-	  do {
+      do {
         try {
             $offset++;
             $salesCollection->setCurPage($offset)->load();

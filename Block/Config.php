@@ -30,11 +30,11 @@ class Config
     {
         null;
     }
-	
-	public function getCustomOrderStatus($storeId = null)
-	{
-		return $this->_scopeConfig->getValue(self::YOTPO_CUSTOM_ORDER_STATUS, ScopeInterface::SCOPE_STORE, $storeId);
-	}
+
+    public function getCustomOrderStatus($storeId = null)
+    {
+        return $this->_scopeConfig->getValue(self::YOTPO_CUSTOM_ORDER_STATUS, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
     public function isWidgetEnabled()
     {        
