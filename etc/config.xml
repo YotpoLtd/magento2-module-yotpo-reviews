@@ -6,6 +6,7 @@
                 <settings>
                     <widget_enabled>1</widget_enabled>
                     <bottomline_enabled>1</bottomline_enabled>
+                    <custom_order_status>complete</custom_order_status>
                 </settings>
             </yotpo>
         </default>

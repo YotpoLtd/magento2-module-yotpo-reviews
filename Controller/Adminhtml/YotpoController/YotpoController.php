@@ -32,7 +32,7 @@ public function __construct(
 
 
     public function execute()
-    {  
+    { 
       try {
       $PostDataArr = $this->_request->getPost()->toArray(); 
       $storeId = $PostDataArr["store_id"];
@@ -50,12 +50,13 @@ public function __construct(
         return;
       }
       $offset = 0;
-      $orderStatuses = $this->_config->getCostumeOrderStatus();
+      $orderStatuses = $this->_config->getCustomOrderStatus($storeId);
       if ($orderStatuses == null) {
           $orderStatuses = array(\Magento\Sales\Model\Order::STATE_COMPLETE);
       } else {
-        $orderStatuses = array_map('strtolower', explode(' ', $orderStatuses));
+        $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
       }
+	  
       $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
       $orderModel = $objectManager->get('Magento\Sales\Model\Order');
       $salesCollection = $orderModel->getCollection()
@@ -66,6 +67,7 @@ public function __construct(
                     ->setPageSize(self::MAX_BULK_SIZE);
       $pages = $salesCollection->getLastPageNumber();
       $success = true;
+	  
       do {
         try {
             $offset++;
