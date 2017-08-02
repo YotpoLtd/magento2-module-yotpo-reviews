@@ -1,0 +1,8 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <body>
+		<!-- Add yotpo pixel for order conversion tracking     --> 
+	    <referenceContainer name="order.success.additional.info">
+			<block class="Yotpo\Yotpo\Block\Conversion" name="yotpo_conversion" template="conversion.phtml" cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>
