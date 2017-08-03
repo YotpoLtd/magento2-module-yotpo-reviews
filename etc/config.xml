@@ -6,6 +6,7 @@
                 <settings>
                     <widget_enabled>1</widget_enabled>
                     <bottomline_enabled>1</bottomline_enabled>
+                    <qabottomline_enabled>1</qabottomline_enabled>
                 </settings>
             </yotpo>
         </default>

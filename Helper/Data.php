@@ -19,7 +19,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function showBottomline($thisObj, $product = null, $print=true)
     {
         return $this->renderYotpoProductBlock($thisObj, 'bottomline', $product, $print);
-    }  
+    }
+
+    public function showQaBottomline($thisObj, $product = null, $print=true)
+    {
+        return $this->renderYotpoProductBlock($thisObj, 'qabottomline', $product, $print);
+    }   
 
     private function renderYotpoProductBlock($thisObj, $blockName, $product = null, $print=true)
     {

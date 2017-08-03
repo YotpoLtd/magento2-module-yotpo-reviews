@@ -62,7 +62,12 @@
                       <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
-                 <field id="yotpo_button" translate="button_label" sortOrder="5" showInDefault="0" showInWebsite="0" showInStore="1">
+                <field id="qabottomline_enabled" translate="label" type="select" sortOrder="5" showInDefault="0" showInWebsite="0" showInStore="1">
+                    <label>Show QA bottomline</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>                    
+                </field>
+                 <field id="yotpo_button" translate="button_label" sortOrder="6" showInDefault="0" showInWebsite="0" showInStore="1">
                      <label>Past orders</label>
                     <button_label>Generate reviews for my past orders</button_label>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>
