@@ -2,7 +2,7 @@
     <body>
 		<!-- Add yotpo pixel for order conversion tracking     --> 
 	    <referenceContainer name="order.success.additional.info">
-			<block class="Yotpo\Yotpo\Block\Conversion" name="yotpo_conversion" template="conversion.phtml" cacheable="false"/>
+			<block class="Yotpo\Yotpo\Block\Conversion" name="yotpo_conversion" template="conversion.phtml"/>
         </referenceContainer>
     </body>
 </page>
