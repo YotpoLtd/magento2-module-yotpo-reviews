@@ -15,15 +15,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->renderYotpoProductBlock($thisObj, 'widget_div', $product, $print);
     }  
     
-
     public function showBottomline($thisObj, $product = null, $print=true)
     {
         return $this->renderYotpoProductBlock($thisObj, 'bottomline', $product, $print);
     }  
+    
+    public function showQABottomline($thisObj, $product = null, $print=true)
+    {
+        return $this->renderYotpoProductBlock($thisObj, 'yotpo-qa-bottomline', $product, $print);
+    }
+    
+    public function showQuestions($thisObj, $product = null, $print=true)
+    {
+        return $this->renderYotpoProductBlock($thisObj, 'yotpo-questions', $product, $print);
+    }
 
     private function renderYotpoProductBlock($thisObj, $blockName, $product = null, $print=true)
     {
         $block = $thisObj->getLayout()->getBlock($blockName);
+//        echo '<pre>';
+//        print_r($block);
+//        echo '</pre>';
         if ($block == null) {
             $this->_logger->addDebug('can\'t find yotpo block');
             return;
