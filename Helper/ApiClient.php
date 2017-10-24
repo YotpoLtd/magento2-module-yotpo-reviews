@@ -42,13 +42,12 @@ class ApiClient
       }
       $product_data = array();
       $product_data['name'] = $full_product->getName();
-      $product_data['name'] = $full_product->getSku();
       $product_data['url'] = '';
       $product_data['image'] = '';
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
+         $product_data['image'] = $this->_imgHelper->init($full_product, 'product_thumbnail_image')->getUrl();
       } catch(\Exception $e) { 
        $this->_logger->addDebug('ApiClient prepareProductsData Exception'.json_encode($e)); }
       $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
