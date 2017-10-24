@@ -33,9 +33,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function renderYotpoProductBlock($thisObj, $blockName, $product = null, $print=true)
     {
         $block = $thisObj->getLayout()->getBlock($blockName);
-//        echo '<pre>';
-//        print_r($block);
-//        echo '</pre>';
         if ($block == null) {
             $this->_logger->addDebug('can\'t find yotpo block');
             return;
