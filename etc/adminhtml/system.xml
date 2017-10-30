@@ -49,7 +49,7 @@
                     <comment>
                       <![CDATA[
                       By choosing not to use the deafult position, you'll need to follow the instructions in the 
-                      <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
+                      <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-widget-manually-on-your-product-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
                 <field id="bottomline_enabled" translate="label" type="select" sortOrder="5" showInDefault="0" showInWebsite="0" showInStore="1">
@@ -59,7 +59,7 @@
                     <comment>
                       <![CDATA[
                       By choosing not to use the deafult position, you'll need to follow the instructions in the 
-                      <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
+                      <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-star-rating-manually-on-your-catalog-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
                 <field id="custom_order_status" translate="label" type="multiselect" sortOrder="4" showInDefault="0" showInWebsite="0" showInStore="1">
