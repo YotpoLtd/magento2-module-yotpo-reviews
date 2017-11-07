@@ -35,10 +35,10 @@ class ApiClient
     $products = $order->getAllVisibleItems(); //filter out simple products
     $products_arr = array();
     foreach ($products as $item) {
-      $full_product = $this->_productRepository->get($item->getSku()); 
-      $parentId = $item->getProduct()->getId(); 
-      if (!empty($parentId)) {
-              $full_product = $this->_productRepository->getById($parentId);
+      $full_product = $this->_productRepository->get($item->getSku());
+      $parent = $item->getProduct();
+      if ($parent && !empty($parent->getId())) {
+        $full_product = $this->_productRepository->getById($parent->getId());
       }
       $product_data = array();
       $product_data['name'] = $full_product->getName();
