@@ -12,6 +12,9 @@
 
        <referenceContainer name="product.info.main">
             <block  class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml" before="product.info.addto"/> 
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-qa-bottomline" as="other" template="yotpo-qa-bottomline.phtml" before="product.info.addto"/> 
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-questions" as="other" template="yotpo-questions.phtml" before="product.info.addto"/> 
+            
         </referenceContainer>  
 
 		<!-- Add yotpo widget div to product page  -->
