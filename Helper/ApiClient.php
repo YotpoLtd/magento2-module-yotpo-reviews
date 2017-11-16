@@ -43,13 +43,12 @@ class ApiClient
       $specs_data = array();
       $product_data = array();
       $product_data['name'] = $full_product->getName();
-      $product_data['name'] = $full_product->getSku();
       $product_data['url'] = '';
       $product_data['image'] = '';
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
+        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_thumbnail_image')->getUrl();
         if($full_product->getUpc()){
             $specs_data['upc'] = $full_product->getUpc();
             }
