@@ -40,6 +40,7 @@ class ApiClient
       if (!empty($parentId)) {
               $full_product = $this->_productRepository->getById($parentId);
       }
+      $specs_data = array();
       $product_data = array();
       $product_data['name'] = $full_product->getName();
       $product_data['name'] = $full_product->getSku();
@@ -50,17 +51,21 @@ class ApiClient
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
         $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
         if($full_product->getUpc()){
-            $productData['upc'] = $full_product->getUpc();
+            $specs_data['upc'] = $full_product->getUpc();
             }
         if($full_product->getIsbn()){
-            $productData['isbn'] = $full_product->getIsbn();
+            $specs_data['isbn'] = $full_product->getIsbn();
         }
         if($full_product->getBrand()){
-            $productData['brand'] = $full_product->getBrand();
+            $specs_data['brand'] = $full_product->getBrand();
         }
         if($full_product->getMpn()){
-            $productData['mpn'] = $full_product->getMpn();
+            $specs_data['mpn'] = $full_product->getMpn();
         }
+        if(!empty($specs_data)){
+            $product_data['specs'] = $specs_data;
+        }
+        
       } catch(\Exception $e) { 
        $this->_logger->addDebug('ApiClient prepareProductsData Exception'.json_encode($e)); }
       $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
