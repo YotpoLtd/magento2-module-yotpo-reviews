@@ -47,7 +47,7 @@ class ApiClient
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_thumbnail_image')->getUrl();
+        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
       } catch(\Exception $e) { 
        $this->_logger->addDebug('ApiClient prepareProductsData Exception'.json_encode($e)); }
       $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
