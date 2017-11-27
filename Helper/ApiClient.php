@@ -48,7 +48,7 @@ class ApiClient
       try 
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_thumbnail_image')->getUrl();
+        $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
             if($full_product->getUpc()){
                 $specs_data['upc'] = $full_product->getUpc();
                 }
