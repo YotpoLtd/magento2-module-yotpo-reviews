@@ -1,5 +1,4 @@
 .idea
 .DS_Store
-nbproject/project.xml
-nbproject/project.properties
-nbproject/private/private.properties
+nbproject/*.*
+nbproject/
