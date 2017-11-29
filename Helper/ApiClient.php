@@ -109,7 +109,7 @@ class ApiClient
   public function prepareOrderData($order) 
   {
     $data['email'] = $order->getCustomerEmail();
-    $customer_name = $order->getCustomerName();
+    $customer_name = $order->getCustomerFirstName().' '.$order->getCustomerLastName();
     if($customer_name == "Guest"){
         $billing_address = $order->getBillingAddress();
         $customer_name = $billing_address->getFirstname().' '.$billing_address->getLastname();
