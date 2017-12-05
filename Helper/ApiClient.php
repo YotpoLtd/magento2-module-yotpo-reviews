@@ -49,7 +49,10 @@ class ApiClient
       {
         $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
         $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
-            if($full_product->getUpc()){
+            if($full_product->getSku()) {
+                    $specs_data['external_sku'] = $full_product->getSku();
+                }
+			if($full_product->getUpc()){
                 $specs_data['upc'] = $full_product->getUpc();
                 }
             if($full_product->getIsbn()){
