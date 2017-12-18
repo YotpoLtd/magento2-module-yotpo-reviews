@@ -9,8 +9,7 @@ namespace Yotpo\Yotpo\Block\Rewrite\Product;
 
 class YotpoListProduct extends \Magento\Catalog\Block\Product\ListProduct
 {
-    
-    private $_yotpoHelper ='Yotpo\Yotpo\Helper\Data';
+        
     const SCOPE_STORE   = 'store';
     const YOTPO_BOTTOMLINE_CATEGORY_ENABLED = 'yotpo/settings/category_bottomline_enabled';
     
