@@ -45,7 +45,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if ($print == true) {
-            echo $block->toHtml();
             $block->setAttribute('fromHelper', false);
         } else {
             $ret = $block->toHtml();
