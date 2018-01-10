@@ -52,6 +52,11 @@
                       <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-widget-manually-on-your-product-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
                     </comment>                    
                 </field>
+				<field id="category_bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="0" showInWebsite="0" showInStore="1">
+                    <label>Enable Star Ratings On Category Pages</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
+                </field>
                 <field id="bottomline_enabled" translate="label" type="select" sortOrder="5" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Show bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
