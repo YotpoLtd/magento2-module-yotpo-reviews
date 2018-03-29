@@ -6,6 +6,11 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
 {
     const SCOPE_STORE   = 'store';
     const YOTPO_BOTTOMLINE_CATEGORY_ENABLED = 'yotpo/settings/category_bottomline_enabled';
+    const MAGENTO_DEFAULT_REVIEWS_ENABLED = 'yotpo/settings/mdr_enabled';
+    protected $_availableTemplates = [
+        self::FULL_VIEW => 'helper/yotposummary.phtml',
+        self::SHORT_VIEW => 'helper/summary_short.phtml',
+    ];
     
     public function getReviewsSummaryHtml(
         \Magento\Catalog\Model\Product $product,
@@ -14,14 +19,21 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
     ) {
         
         $enableBottomlineCategoryPage = $this->isBottomlineCategoryEnabled();
-	
+	$enableMagentoDefaultReviews = $this->isMagentoDefaultReviewsEnabled();
         if ($enableBottomlineCategoryPage) {
             return $this->showCategoryBottomLine($product);
-        } else {
+        } elseif(!$enableMagentoDefaultReviews) {
             return parent::getReviewsSummaryHtml($product, $templateType, $displayIfNoReviews);
+        } else{
+            return '';
         }
         
          
+    }
+    
+    public function isMagentoDefaultReviewsEnabled()
+    {        
+        return (bool)$this->_scopeConfig->getValue(self::MAGENTO_DEFAULT_REVIEWS_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
     public function isBottomlineCategoryEnabled()
