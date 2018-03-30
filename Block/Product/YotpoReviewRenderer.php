@@ -22,9 +22,9 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
 	$enableMagentoDefaultReviews = $this->isMagentoDefaultReviewsEnabled();
         if ($enableBottomlineCategoryPage) {
             return $this->showCategoryBottomLine($product);
-        } elseif(!$enableMagentoDefaultReviews) {
+        } elseif (!$enableMagentoDefaultReviews) {
             return parent::getReviewsSummaryHtml($product, $templateType, $displayIfNoReviews);
-        } else{
+        } else {
             return '';
         }
         
