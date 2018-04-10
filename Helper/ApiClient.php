@@ -69,7 +69,9 @@ class ApiClient
             } catch (\Exception $e) {
                 $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
             }
-            $product_data['description'] = $this->_escaper->escapeHtml(strip_tags($full_product->getDescription()));
+            $rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
+			$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
+			$product_data['description'] = $description;
             $product_data['price'] = $item->getPrice();
             $products_arr[$full_product->getId()] = $product_data;
         }
@@ -112,9 +114,9 @@ class ApiClient
   {
     $data['email'] = $order->getCustomerEmail();
     $customer_name = $order->getCustomerFirstName().' '.$order->getCustomerLastName();
-    if($customer_name == "Guest"){
+    if($customer_name ==' '){
         $billing_address = $order->getBillingAddress();
-        $customer_name = $billing_address->getFirstname().' '.$billing_address->getLastname();
+		$customer_name = $billing_address->getFirstname().' '.$billing_address->getLastname();
     }
     $data['customer_name'] = $customer_name;
     $data['order_id'] = $order->getIncrementId();
