@@ -114,7 +114,7 @@ class ApiClient
   {
     $data['email'] = $order->getCustomerEmail();
     $customer_name = $order->getCustomerFirstName().' '.$order->getCustomerLastName();
-    if($customer_name ==' '){
+    if(trim($customer_name) ==''){
         $billing_address = $order->getBillingAddress();
 		$customer_name = $billing_address->getFirstname().' '.$billing_address->getLastname();
     }
