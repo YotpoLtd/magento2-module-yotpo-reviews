@@ -74,7 +74,7 @@ All Magento extensions must implement the following directory structure:
 ###### Modules
 ```
 <repo_root>/
-    composer.json (metapackage, optional)
+    composer.json (metapackage, required)
     <Module1>
         composer.json
     <Module2>
@@ -84,7 +84,7 @@ All Magento extensions must implement the following directory structure:
 ```
 
 ###### Metapackage File
-In the case your extension consists of multiple modules, a `composer.json` file must be included with your submission at the root of your extension's directory. Declare the `type` field as `metapackage` and list each module as a dependency in the order they must be installed.
+A `composer.json` file must be included with your submission at the root of your extension's directory. Declare the `type` field as `metapackage` and list each module as a dependency in the order they must be installed.
 
 ```
 {
