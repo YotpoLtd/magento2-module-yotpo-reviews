@@ -13,8 +13,8 @@
        <referenceContainer name="product.info.main">
 			<referenceBlock name="product.info.review" remove="true" />
             <block  class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml" before="product.info.addto"/> 
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-qa-bottomline" as="other" template="yotpo-qa-bottomline.phtml" before="product.info.addto"/> 
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-questions" as="other" template="yotpo-questions.phtml" before="product.info.addto"/> 
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-qa-bottomline" as="other2" template="yotpo-qa-bottomline.phtml" before="product.info.addto"/> 
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo-questions" as="other3" template="yotpo-questions.phtml" before="product.info.addto"/> 
             
         </referenceContainer>  
 
