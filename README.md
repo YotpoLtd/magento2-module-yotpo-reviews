@@ -9,6 +9,10 @@ With BESS, our intention is to provide Magento Bundled Extension partners with a
 ## Table of Contents
 - [Install](#install)
 - [Usage](#usage)
+    - [Workflow](#workflow)
+    - [Working with Branches](#working-with-branches)
+    - [Directory Structure](#directory-structure)
+- [Support](#support)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -39,7 +43,7 @@ BESS only accepts submissions from this GitHub repository and does not offer sup
 You may choose to migrate and manage all of your extension's code from this new repository or only use it for submissions to Magento.
 
 ## Usage
-### BESS Workflow
+### Workflow
 ![BESS Workflow Diagram](images/BESS-Workflow-Phase1-20180327.png)
 
 1. Partners develop and test locally. When ready, developers push their feature branch to their new remote (this repository).
@@ -62,6 +66,8 @@ BESS repositories allow Partners to apply any branching strategy they wish to im
 - Release branches must follow this naming convention: `<sem-ver>-release`, where `<sem-ver>` corresponds to the Magento version the extension is compatible and being released with, e.g.: `2.3.0-release`. An extension may have one or more release branches.
 - New Bundled Extension version releases will only be packaged and published from the latest release branch state for each available version.
 - No pre-conditions are imposed on Feature branches.
+
+> **Note**: _Do not_ create a branch off the `readme` branch. It may lead to confusion and unexpected behavior. Instead, push a new branch directly to the repository.
 
 #### Branch protection
 Release branches that follow the naming convention above are automatically marked as `protected` in GitHub upon creation. This ensures new version releases follow the BESS process and have been appropriately tested and approved by Magento. This also protects these branches from being accidentally deleted or commited against.
@@ -88,7 +94,7 @@ A `composer.json` file must be included with your submission at the root of your
 
 ```
 {
-  "name": "magento-bundled-extension",
+  "name": "magento/bess-example-magento-2-module",
   "description": "Official Magento 2 Extension",
   "type": "metapackage",
   "version": "1.0.0",
@@ -96,14 +102,14 @@ A `composer.json` file must be included with your submission at the root of your
     "GPLv3"
   ],
   "require": {
-    "module1": "1.0.0",
-    "module2": "1.0.0",
-    "module3": "1.0.0"
+    "magento/module1": "1.0.0",
+    "magento/module2": "1.0.0",
+    "magento/module3": "1.0.0"
   }
 }
 ```
 
-> **Warning**: _Do not_ include paths in the names of your packages or it's dependencies, e.g.: "magento/PageBuilder". 
+> **Note**: Make sure your `metapackage` file complies with the `composer.json` [Schema](https://getcomposer.org/doc/04-schema.md#the-composer-json-schema). In particular, that the `name` property of the extension and the modules consist of the vendor and project name, separated by `/`, like in the example above.
 
 #### Example Directory
 ###### Repository root
