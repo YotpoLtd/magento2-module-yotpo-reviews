@@ -1,9 +1,20 @@
+<?php
+  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+  $product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
+  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+  $currencySymbol = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+  $currency = $currencySymbol->getStore()->getCurrentCurrencyCode();
+?>
+
 <?php if( $this->isRenderWidget()) { ?>
 	<div class="yotpo yotpo-main-widget"
 		 data-product-id="<?php echo $this->getProductId() ?>"
 		 data-name="<?php echo $this->getProductName() ?>"
 		 data-description="<?php echo $this->getProductDescription() ?>"
 		 data-url="<?php echo $this->getProductUrl() ?>"
-		 data-image-url="<?php echo $this->getProductImageUrl() ?>">	
+		 data-image-url="<?php echo $this->getProductImageUrl() ?>"
+                 data-price="<?php echo $product->getFinalPrice(); ?>"
+                 data-currency="<?php echo $currency ?>"
+                 >
 	</div>
-	<?php } ?>
+<?php } ?>
