@@ -7,7 +7,8 @@
  */
 namespace Yotpo\Yotpo\Helper;
 
-class RichSnippets {
+class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
+{
 
     private $_config;
     private $_model;
@@ -34,13 +35,15 @@ class RichSnippets {
             $product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
             $productId = $product->getId();
             $storeId = $this->_storeManager->getStore()->getId();
+            
             $snippet = $this->_model->getSnippetByProductIdAndStoreId($productId, $storeId);
-
+            
+            
             if (($snippet == null) || (!$snippet->isValid())) {
                 //no snippet for product or snippet isn't valid anymore. get valid snippet code from yotpo api
-
                 $res = $this->_helper->createApiGet("products/" . ($this->_config->getAppKey()) . "/richsnippet/" . $productId, 2);
 
+                print_r(json_encode($res));
                 if ($res["code"] != 200) {
                     //product not found or feature disabled.
                     return "";

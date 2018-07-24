@@ -1,10 +1,6 @@
 <?php
 namespace Yotpo\Yotpo\Model\ResourceModel;
 
-/**
- * Class Notification
- * @package Innovadeltech\Wishlist\Model\ResourceModel
- */
 class Richsnippet extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
     /**
