@@ -35,47 +35,47 @@ class ApiClient
         $products = $order->getAllItems(); //filter out simple products
         $products_arr = array();
         foreach ($products as $item) {
-            if($item->getData('product_type')!='configurable'){
-                $full_product = $this->_productRepository->get($item->getSku());
-                $parentId = $item->getProduct()->getId();
-                if (!empty($parentId)) {
-                    $full_product = $this->_productRepository->load($parentId);
-                }
-                $specs_data = array();
-                $product_data = array();
-                $product_data['name'] = $full_product->getName();
-                $product_data['url'] = '';
-                $product_data['image'] = '';
-                try {
-                    $product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-                    $product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
-                    if ($full_product->getUpc()) {
-                        $specs_data['upc'] = $full_product->getUpc();
-                    }
-                    if ($full_product->getIsbn()) {
-                        $specs_data['isbn'] = $full_product->getIsbn();
-                    }
-                    if ($full_product->getBrand()) {
-                        $specs_data['brand'] = $full_product->getBrand();
-                    }
-                    if ($full_product->getMpn()) {
-                        $specs_data['mpn'] = $full_product->getMpn();
-                    }
-                    if ($full_product->getSku()) {
-                        $specs_data['external_sku'] = $full_product->getSku();
-                    }
-                    if (!empty($specs_data)) {
-                        $product_data['specs'] = $specs_data;
-                    }
-                } catch (\Exception $e) {
-                    $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
-                }
-                $rawdescription = str_replace(array('\'', '"'), '', $full_product->getDescription());
-                $description = $this->_escaper->escapeHtml(strip_tags($rawdescription));
-                $product_data['description'] = $description;
-                $product_data['price'] = $item->getPrice();
-                $products_arr[$full_product->getId()] = $product_data;
-            }
+			if($item->getData('product_type')!='configurable'){
+				$full_product = $this->_productRepository->get($item->getSku());
+				$parentId = $item->getProduct()->getId();
+				if (!empty($parentId)) {
+					$full_product = $this->_productRepository->load($parentId);
+				}
+				$specs_data = array();
+				$product_data = array();
+				$product_data['name'] = $full_product->getName();
+				$product_data['url'] = '';
+				$product_data['image'] = '';
+				try {
+					$product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
+					$product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
+					if ($full_product->getUpc()) {
+						$specs_data['upc'] = $full_product->getUpc();
+					}
+					if ($full_product->getIsbn()) {
+						$specs_data['isbn'] = $full_product->getIsbn();
+					}
+					if ($full_product->getBrand()) {
+						$specs_data['brand'] = $full_product->getBrand();
+					}
+					if ($full_product->getMpn()) {
+						$specs_data['mpn'] = $full_product->getMpn();
+					}
+					if ($full_product->getSku()) {
+						$specs_data['external_sku'] = $full_product->getSku();
+					}
+					if (!empty($specs_data)) {
+						$product_data['specs'] = $specs_data;
+					}
+				} catch (\Exception $e) {
+					$this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
+				}
+				$rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
+				$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
+				$product_data['description'] = $description;
+				$product_data['price'] = $item->getPrice();
+				$products_arr[$full_product->getId()] = $product_data;
+			}
         }
         return $products_arr;
     }
