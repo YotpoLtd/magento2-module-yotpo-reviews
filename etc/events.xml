@@ -4,4 +4,7 @@
     <event name="sales_order_save_after">
         <observer name="sales_order_save_after_yotpo_observer" instance="Yotpo\Yotpo\Model\Observer\PurchaseObserver"/>
     </event>
+	<event name="layout_generate_blocks_after">
+        <observer name="remove_block" instance="Yotpo\Yotpo\Model\Observer\RemoveBlock" />
+    </event>
 </config>
