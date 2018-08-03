@@ -1,4 +1,4 @@
-# Bundled Extensions Example Repository _(ext-submit-example)_
+# Bundled Extensions Submission Service (BESS) Example Repository _(bess-example)_
 
 > Example Bundled Extension submission repository.
 
@@ -123,7 +123,7 @@ For more information, please see the Magento DevDocs reference, [here](http://de
 
 ## Support
 ### Architects
-For support or questions regarding your the development of your extension, like best practices or approval guidelines, you may contact your assigned architects directly at {{ext-repo-name}}@magento.com.
+For support or questions regarding your the development of your extension, like best practices or approval guidelines, you may contact your assigned architects directly at **{ext-repo-name}@magento.com**.
 
 ### Platform
-If you experience any issues with BESS itself, please reach out to Magento's DevOps Team at `dl-magento-devops@magento.com` with a description of your issue and accompanying build logs, if applicable.
+If you experience any issues with BESS itself, please reach out to Magento's DevOps Team at [BESS Support team](mailto:bess-support@magento.com) with a description of your issue and accompanying build logs, if applicable.
