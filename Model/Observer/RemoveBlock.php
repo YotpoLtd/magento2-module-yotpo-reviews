@@ -22,9 +22,6 @@ class RemoveBlock implements ObserverInterface {
         $layout = $observer->getLayout();
 
         $block = $layout->getBlock('reviews.tab');
-//        echo '<pre>';
-//        echo $block;
-//        echo '</pre>';
         if ($block) {
 
             $remove = $this->_scopeConfig->getValue(
