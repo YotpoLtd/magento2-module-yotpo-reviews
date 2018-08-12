@@ -14,7 +14,9 @@
 </div>
 <?php } ?>
 
-<?php 
-    if($this->isRenderBottomlineQna()){
-        echo $this->helper('Yotpo\Yotpo\Helper\Data')->showQABottomline($this,false,false);
-} ?>
+<?php	if($this->isRenderBottomlineQna()){ ?>
+        <div class="yotpo QABottomLine"
+			data-appkey="<?php echo $this->getAppKey() ?>"
+			data-product-id="<?php echo $this->getProductId() ?>">
+		</div>
+<?php } ?>
