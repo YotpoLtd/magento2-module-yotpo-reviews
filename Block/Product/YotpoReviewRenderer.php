@@ -8,8 +8,8 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
     const YOTPO_BOTTOMLINE_CATEGORY_ENABLED = 'yotpo/settings/category_bottomline_enabled';
     const MAGENTO_DEFAULT_REVIEWS_ENABLED = 'yotpo/settings/mdr_enabled';
     protected $_availableTemplates = [
-        self::FULL_VIEW => 'helper/yotposummary.phtml',
-        self::SHORT_VIEW => 'helper/summary_short.phtml',
+        self::FULL_VIEW => 'Magento_Review::helper/summary.phtml',
+        self::SHORT_VIEW => 'Magento_Review::summary_short.phtml',
     ];
     
     public function getReviewsSummaryHtml(
