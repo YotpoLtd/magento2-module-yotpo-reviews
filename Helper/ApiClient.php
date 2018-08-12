@@ -159,4 +159,18 @@ class ApiClient
     $data['orders'] = $orders;
     return $this->createApiPost("apps/".$appKey."/purchases/mass_create", $data);
   }
+  public function createApiGet($path, $timeout = self::DEFAULT_TIMEOUT) {
+        try {
+
+            $cfg = array('timeout' => $timeout);
+            $http = $this->_curlFactory->create();
+            $feed_url = self::YOTPO_UNSECURED_API_URL . "/" . $path;
+            $http->setConfig($cfg);
+            $http->write(\Zend_Http_Client::GET, $feed_url, '1.1', array('Content-Type: application/json'));
+            $resData = $http->read();
+            return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)));
+        } catch (Exception $e) {
+            $this->_logger->addDebug('error: ' . $e);
+        }
+    }
 }
