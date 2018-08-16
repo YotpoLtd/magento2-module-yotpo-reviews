@@ -27,8 +27,7 @@ class RemoveBlock implements ObserverInterface {
             $remove = $this->_scopeConfig->getValue(
                     'yotpo/settings/mdr_enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-            echo $remove;
-
+            
             if ($remove) {
 
                 $layout->unsetElement('reviews.tab');

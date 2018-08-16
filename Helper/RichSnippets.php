@@ -19,11 +19,13 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
             \Yotpo\Yotpo\Block\Config $config,
             \Yotpo\Yotpo\Model\Richsnippet $model,
             \Yotpo\Yotpo\Helper\ApiClient $helper,
+			\Psr\Log\LoggerInterface $logger,
             \Magento\Store\Model\StoreManagerInterface $storeManager     
             ) {
         $this->_config = $config;
         $this->_model = $model;
         $this->_helper = $helper;
+		$this->_logger = $logger;
         $this->_storeManager = $storeManager;
     }
 
@@ -43,7 +45,7 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
                 //no snippet for product or snippet isn't valid anymore. get valid snippet code from yotpo api
                 $res = $this->_helper->createApiGet("products/" . ($this->_config->getAppKey()) . "/richsnippet/" . $productId, 2);
 
-                print_r(json_encode($res));
+                
                 if ($res["code"] != 200) {
                     //product not found or feature disabled.
                     return "";
@@ -68,8 +70,8 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
                 return array("average_score" => $averageScore, "reviews_count" => $reviewsCount);
             }
             return array("average_score" => $snippet->getAverageScore(), "reviews_count" => $snippet->getReviewsCount());
-        } catch (Exception $e) {
-            Mage::log($e);
+        } catch (\Exception $e) {
+            $this->_logger->addDebug('error: ' . $e);
         }
         return array();
     return true;
