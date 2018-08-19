@@ -171,7 +171,7 @@ class ApiClient
             $http->write(\Zend_Http_Client::GET, $feed_url, '1.1', array('Content-Type: application/json'));
             $resData = $http->read();
             return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData)));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_logger->addDebug('error: ' . $e);
         }
     }
