@@ -51,7 +51,12 @@ class Yotpo extends \Magento\Framework\View\Element\Template
     public function isRenderBottomline()
     {
         return $this->_config->isBottomlineEnabled();
-    } 
+    }
+    
+    public function isRenderCategoryBottomline()
+    {
+        return $this->_config->isCategoryBottomlineEnabled();
+    }
     
     public function isRenderBottomlineQna()
     {
