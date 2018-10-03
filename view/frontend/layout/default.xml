@@ -7,12 +7,12 @@
 	    </referenceContainer>
 
         <referenceBlock name="content.aside">
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="widget_div" template="widget_div.phtml"/>
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_widget_div" template="widget_div.phtml"/>
         </referenceBlock> 
 
        <referenceContainer name="product.info.main">
          <referenceBlock name="reviews.tab" remove="true"/>
-            <block  class="Yotpo\Yotpo\Block\Yotpo" name="bottomline" as="other" template="bottomline.phtml" before="product.info.addto"/>
+            <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_bottomline" as="yotpo_other" template="bottomline.phtml" before="product.info.addto"/>
        </referenceContainer>
 
 		<!-- Add yotpo widget div to product page  -->
