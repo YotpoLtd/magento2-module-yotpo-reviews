@@ -9,7 +9,6 @@ class Config
     const YOTPO_WIDGET_ENABLED = 'yotpo/settings/widget_enabled';
     const YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
     const YOTPO_BOTTOMLINE_QNA_ENABLED = 'yotpo/settings/qna_enabled';
-    const YOTPO_BOTTOMLINE_CATEGORY_ENABLED = 'yotpo/settings/category_bottomline_enabled';
     
     const YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
 
@@ -47,12 +46,7 @@ class Config
     public function isBottomlineEnabled()
     {        
         return (bool)$this->_scopeConfig->getValue(self::YOTPO_BOTTOMLINE_ENABLED, ScopeInterface::SCOPE_STORE);
-    }
-    
-    public function isCategoryBottomlineEnabled()
-    {        
-        return (bool)$this->_scopeConfig->getValue(self::YOTPO_BOTTOMLINE_CATEGORY_ENABLED, ScopeInterface::SCOPE_STORE);
-    }
+    } 
     
     public function isBottomlineQnaEnabled()
     {        

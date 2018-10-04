@@ -7,7 +7,6 @@
     .product-info-main .product-reviews-summary{width:100%;}
 </style>
 <?php } ?>
-<?php if( !$this->isRenderCategoryBottomline()) { ?>
 
 <?php if( $this->isRenderBottomline()) { ?>
 <div class="yotpo bottomLine"
@@ -15,7 +14,7 @@
 	data-url="<?php echo $this->getProductUrl() ?>">
 </div>
 <?php } ?>
-<?php }?>
+
 <?php	if($this->isRenderBottomlineQna()){ ?>
         <div class="yotpo QABottomLine"
 			data-appkey="<?php echo $this->getAppKey() ?>"
