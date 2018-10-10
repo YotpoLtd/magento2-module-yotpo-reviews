@@ -18,12 +18,22 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
         $displayIfNoReviews = false
     ) {
         
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $storeManager = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
+        $cp = $objectManager->get('\Magento\Framework\App\Request\Http');
+		$currentPage = $cp->getFullActionName();
         $enableBottomlineCategoryPage = $this->isBottomlineCategoryEnabled();
-	$enableMagentoDefaultReviews = $this->isMagentoDefaultReviewsEnabled();
+		$enableMagentoDefaultReviews = $this->isMagentoDefaultReviewsEnabled();
+		
         if ($enableBottomlineCategoryPage) {
-            return $this->showCategoryBottomLine($product);
+			if (($currentPage ==='cms_index_index') || ($currentPage==='catalog_category_view')) {
+				return $this->showCategoryBottomLine($product);
+			}
+			
         } elseif (!$enableMagentoDefaultReviews) {
-            return parent::getReviewsSummaryHtml($product, $templateType, $displayIfNoReviews);
+            if (($currentPage ==='cms_index_index') || ($currentPage==='catalog_category_view')) {
+                return parent::getReviewsSummaryHtml($product, 'default', $displayIfNoReviews);
+            }			
         } else {
             return '';
         }
