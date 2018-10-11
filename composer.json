@@ -1,5 +1,5 @@
 {
-  "name": "yotpo/module-yotpo",
+  "name": "yotpo/module-review",
   "description": "Yotpo Reviews extension for Magento2",
   "version" : "2.4.1",
   "require": {
