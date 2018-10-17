@@ -42,7 +42,7 @@ class YotpoListProduct extends \Magento\Catalog\Block\Product\ListProduct
     }
     public function showCategoryBottomLine($product)
     {        
-        return '<div class="yotpo bottomLine" data-product-id="'.$product->getId().'"
+        return '<div class="yotpo bottomLine bottomline-position" data-product-id="'.$product->getId().'"
 	data-url="'.$product->getUrl().'">
         </div>';
     }
