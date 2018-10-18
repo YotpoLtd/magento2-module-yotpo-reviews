@@ -22,15 +22,12 @@ div.yotpo.QABottomLine
 {
 	width:100%;
 }
-
+.bottomLine
+{ 
+	padding-bottom:10px; 
+}
 .bottomline-position
 { 
 	display: inline-block; 
 	margin: 0 10px 1px 0;
-}
-.cms-index-index .product-item-actions{
-	margin-top:5px !important;
-}
-.page-products .product-item-actions{
-	margin-top: 0px !important;
 }

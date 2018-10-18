@@ -1,0 +1,11 @@
+<!--
+/**
+* @copyright Copyright (c) 2016 www.innovadeltech.com
+*/
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+		<css src="Yotpo_Yotpo::css/bottomline.css"/>			 
+        <css src="Innovadeltech_Socialshare::css/socialshare.css"/>
+    </head>    
+</page>

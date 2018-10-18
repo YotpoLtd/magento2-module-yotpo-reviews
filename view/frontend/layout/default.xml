@@ -1,7 +1,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+
     <body>
 		<head>
-			<css src="Yotpo_Yotpo::css/bottomline.css"/>			 
+			<css src="css/bottomline.css"/>			 
+			<css src="Yotpo_Yotpo::css/bottomline.css"/>			 			
 		</head>
 
 		<!-- Add js tag to all pages -->
