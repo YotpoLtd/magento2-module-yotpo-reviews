@@ -1,11 +1,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
 
     <body>
-		<head>
-			<css src="css/bottomline.css"/>			 
-			<css src="Yotpo_Yotpo::css/bottomline.css"/>			 			
-		</head>
-
+		
 		<!-- Add js tag to all pages -->
 		<referenceContainer name="content">
 	        <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo" template="widget_script.phtml"/>
