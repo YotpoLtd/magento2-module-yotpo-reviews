@@ -31,54 +31,92 @@ class ApiClient
 
  public function prepareProductsData($order) 
   {
-        $this->_storeManager->setCurrentStore($order->getStoreId());
-        $products = $order->getAllItems(); //filter out simple products
-        $products_arr = array();
-        foreach ($products as $item) {
-			if($item->getData('product_type')!='configurable'){
-				$full_product = $this->_productRepository->get($item->getSku());
-				$parentId = $item->getProduct()->getId();
-				if (!empty($parentId)) {
-					$full_product = $this->_productRepository->load($parentId);
-				}
-				$specs_data = array();
-				$product_data = array();
-				$product_data['name'] = $full_product->getName();
-				$product_data['url'] = '';
-				$product_data['image'] = '';
-				try {
-					$product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-					$product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
-					if ($full_product->getUpc()) {
-						$specs_data['upc'] = $full_product->getUpc();
-					}
-					if ($full_product->getIsbn()) {
-						$specs_data['isbn'] = $full_product->getIsbn();
-					}
-					if ($full_product->getBrand()) {
-						$specs_data['brand'] = $full_product->getBrand();
-					}
-					if ($full_product->getMpn()) {
-						$specs_data['mpn'] = $full_product->getMpn();
-					}
-					if ($full_product->getSku()) {
-						$specs_data['external_sku'] = $full_product->getSku();
-					}
-					if (!empty($specs_data)) {
-						$product_data['specs'] = $specs_data;
-					}
-				} catch (\Exception $e) {
-					$this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
-				}
-				$rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
-				$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
-				$product_data['description'] = $description;
-				$product_data['price'] = $item->getPrice();
-				$products_arr[$full_product->getId()] = $product_data;
-			}
+	$this->_storeManager->setCurrentStore($order->getStoreId());
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $conProduct = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable');
+    $bendledProduct = $objectManager->create('\Magento\Bundle\Model\Product\Type');
+    $productModel = $objectManager->create('\Magento\Catalog\Model\Product');
+    $productCollection = $objectManager->create('\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory');
+    $store = $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
+    $products = $order->getAllItems();
+    $products_arr = array();
+    foreach ($products as $item) {
+        $parentId = $item->getProduct()->getId();
+        if ($item->getData('product_type') === 'simple' || $item->getData('product_type') === 'grouped') {
+            $configurableProduct = $conProduct->getParentIdsByChild($item->getProduct()->getId());
+            $bundleProduct = $bendledProduct->getParentIdsByChild($item->getProduct()->getId());
+            if ($configurableProduct) {
+                $parentProduct = $productModel->load($parentId);
+                $productDetails = $productCollection->create()->addAttributeToSelect('*')
+                        ->addStoreFilter()
+                        ->addFieldToFilter('entity_id', ['in' => $configurableProduct[0]]);
+                foreach ($productDetails as $pdetail) {
+                    $productName = $pdetail->getName();
+                    $productUrl = $pdetail->getProductUrl();
+                    $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $pdetail->getImage();
+                    $sku = $pdetail->getSku();
+                    $upc = $pdetail->getUpc();
+                    $isbn = $pdetail->getIsbn();
+					$mpn = $pdetail->getMpn();
+                    $brand = $pdetail->getBrand();
+                }
+            } elseif ($bundleProduct) {
+                $parentProduct = $productModel->load($parentId);
+                $productDetails = $productCollection->create()->addAttributeToSelect('*')
+                        ->addStoreFilter()
+                        ->addFieldToFilter('entity_id', ['in' => $bundleProduct[0]]);
+                foreach ($productDetails as $pdetail) {
+                    $productName = $pdetail->getName();
+                    $productUrl = $pdetail->getProductUrl();
+                    $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $pdetail->getImage();
+                    $sku = $pdetail->getSku();
+                    $upc = $pdetail->getUpc();
+                    $isbn = $pdetail->getIsbn();
+                    $mpn = $pdetail->getMpn();
+                    $brand = $pdetail->getBrand();
+                }
+                $configurableProduct = 0;
+                $bundleProduct = 0;
+            }
+			$specs_data = array();
+            $product_data = array();
+            $product_data['name'] = $productName;
+            $product_data['url'] = '';
+            $product_data['image'] = '';
+            try {
+                $product_data['url'] = $productUrl;
+                $product_data['image'] = $imageUrl;
+                if ($upc) {
+                    $specs_data['upc'] = $upc;
+                }
+                if ($isbn) {
+                    $specs_data['isbn'] = $isbn;
+                }
+                if ($brand) {
+                    $specs_data['brand'] = $brand;
+                }
+                if ($mpn) {
+                    $specs_data['mpn'] = $mpn;
+                }
+                if ($sku) {
+                    $specs_data['external_sku'] = $sku;
+                }
+                if (!empty($specs_data)) {
+                    $product_data['specs'] = $specs_data;
+                }
+            } catch (\Exception $e) {
+                $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
+            }
+                $rawdescription = str_replace(array('\'', '"'), '', $parentProduct->getDescription());
+                $description = $this->_escaper->escapeHtml(strip_tags($rawdescription));
+                $product_data['description'] = $description;
+                $product_data['price'] = $parentProduct->getPrice();
+                $products_arr[$parentProduct->getId()] = $product_data;
+            }
         }
+
         return $products_arr;
-    }
+  }
 
   public function oauthAuthentication($storeId)
   {
