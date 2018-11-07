@@ -31,7 +31,7 @@ class ApiClient
 
  public function prepareProductsData($order) 
   {
-	$this->_storeManager->setCurrentStore($order->getStoreId());
+    $this->_storeManager->setCurrentStore($order->getStoreId());
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $configurableProduct = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable');
     $bundleProductModel = $objectManager->create('\Magento\Bundle\Model\Product\Type');
@@ -44,9 +44,10 @@ class ApiClient
     $products_arr = array();
     $product_data = array();
 	$specs_data = array();
+        $j = 0;
     foreach ($products as $item) {
-        unset($product_data);
-		unset($specs_data );
+//        unset($product_data);
+//	unset($specs_data );
 		try {
 			$productID = $item->getProduct()->getId();
 			if ($item->getData('product_type') == 'simple'){
@@ -102,6 +103,7 @@ class ApiClient
 			if (!empty($specs_data)) {
 				$product_data['specs'] = $specs_data;
 			}
+                        
 		} catch (\Exception $e) {
 			$this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
 		}
@@ -110,14 +112,15 @@ class ApiClient
 		$product_data['description'] = $description;
 		if($item->getData('product_type') == 'grouped'){
 			if(!isset($productPrice[$productID])){
-				$productPrice[$productID] = 0;
+				$productPrice[$productID] = 0.0000;
 			}
-			$productPrice[$productID] += (float) $item->getPrice();
+			$productPrice[$productID] +=  $item->getData('row_total_incl_tax');
 			$product_data['price'] = $productPrice[$productID];
 		}else{
-			$product_data['price'] = $item->getPrice();
+			$product_data['price'] = $item->getData('row_total_incl_tax');
 		}
-		$products_arr[$productID] = $product_data;
+		$products_arr[$j][$productID] = $product_data;
+                $j++;
 	}
 	return $products_arr;
   }
@@ -167,7 +170,21 @@ class ApiClient
     $data['platform'] = 'magento';
     $data['currency_iso'] = $order->getOrderCurrency()->getCode();
     $data['order_date'] = $order->getCreatedAt();        
-    $data['products'] = $this->prepareProductsData($order); 
+    
+    $productsDataArray = $this->prepareProductsData($order);
+//    print_r($productsDataArray);
+    $comma = "";
+    $productsJSON = '{';
+    echo count($productsDataArray);
+    for ($i = 0; $i < count($productsDataArray); $i++) {
+        $productsJSON .= json_encode($productsDataArray[$i]);
+         $productsJSON .= $comma;
+         $comma = ",";
+    }
+    
+    $productsJSON .= '}';
+    print_r($productsJSON);
+    $data['products'] = $productsJSON; 
     return $data;
   }
 
@@ -179,6 +196,7 @@ class ApiClient
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
+      print_r(json_encode($data));
       $resData = $http->read();
       return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
     }
