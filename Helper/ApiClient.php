@@ -29,12 +29,10 @@ class ApiClient
     $this->_imgHelper = $imgHelper;
   }
 
- public function prepareProductsData($order) 
+  public function prepareProductsData($order) 
   {
     $this->_storeManager->setCurrentStore($order->getStoreId());
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-    $configurableProduct = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable');
-    $bundleProductModel = $objectManager->create('\Magento\Bundle\Model\Product\Type');
     $groupedProductModel = $objectManager->create('\Magento\GroupedProduct\Model\Product\Type\Grouped');
     $productModel = $objectManager->create('\Magento\Catalog\Model\Product');
     $productCollection = $objectManager->create('\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory');
@@ -45,83 +43,83 @@ class ApiClient
     $product_data = array();
 	$specs_data = array();
         $j = 0;
-    foreach ($products as $item) {
-//        unset($product_data);
-//	unset($specs_data );
-		try {
-			$productID = $item->getProduct()->getId();
-			if ($item->getData('product_type') == 'simple'){
-				$_product = $productModel->load($productID);
-			}
-			if ($item->getData('product_type') == 'configurable' || $item->getData('product_type') == 'grouped' || $item->getData('product_type') == 'bundle'){
-				if($item->getData('product_type') == 'grouped'){
-					$productIDs = $groupedProductModel->getParentIdsByChild($item->getProduct()->getId()) ? $groupedProductModel->getParentIdsByChild($item->getProduct()->getId()) : 0;
-					$productID = $productIDs[0];
-				}
-				if($productCollection->create()->count()){
-					$productCollection->create()->clear();
-					$_product = $item->getProduct();
-				}
-				$_products = $productCollection->create()->addAttributeToSelect('*')->addStoreFilter()->addFieldToFilter('entity_id', ['in' => $productID]);
-				foreach($_products as $product){ // This is needed as we can't use object as array in collection way.
-					$_product = $product;
-					
-					break 1;
-				}
-			}
-			
-			$productName = $_product->getName();
-			$productUrl = $_product->getProductUrl();
-			$imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getImage();
-			$sku = $_product->getSku();
-			$upc = $_product->getUpc();
-			$isbn = $_product->getIsbn();
-			$mpn = $_product->getMpn();
-			$brand = $_product->getBrand();
+        foreach ($products as $item) {
+            try {
+                $productID = $item->getProduct()->getId();
+                if ($item->getData('product_type') == 'simple') {
+                    $_product = $productModel->load($productID);
+                }
+                if ($item->getData('product_type') == 'configurable' || $item->getData('product_type') == 'grouped' || $item->getData('product_type') == 'bundle') {
+                    if ($item->getData('product_type') == 'grouped') {
+                        $productIDs = $groupedProductModel->getParentIdsByChild($item->getProduct()->getId()) ? $groupedProductModel->getParentIdsByChild($item->getProduct()->getId()) : 0;
+                        $productID = $productIDs[0];
+                    }
+                    if ($productCollection->create()->count()) {
+                        $productCollection->create()->clear();
+                        $_product = $item->getProduct();
+                    }
+                    $_products = $productCollection->create()->addAttributeToSelect('*')->addStoreFilter()->addFieldToFilter('entity_id', ['in' => $productID]);
+                    foreach ($_products as $product) { // This is needed as we can't use object as array in collection way.
+                        $_product = $product;
 
-			
-			$product_data['name'] = $productName;
-			$product_data['url'] = '';
-			$product_data['image'] = '';
-			$product_data['url'] = $productUrl;
-			$product_data['image'] = $imageUrl;
-			if ($upc) {
-				$specs_data['upc'] = $upc;
-			}
-			if ($isbn) {
-				$specs_data['isbn'] = $isbn;
-			}
-			if ($brand) {
-				$specs_data['brand'] = $brand;
-			}
-			if ($mpn) {
-				$specs_data['mpn'] = $mpn;
-			}
-			if ($sku) {
-				$specs_data['external_sku'] = $sku;
-			}
-			if (!empty($specs_data)) {
-				$product_data['specs'] = $specs_data;
-			}
-                        
-		} catch (\Exception $e) {
-			$this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
-		}
-		$rawdescription = str_replace(array('\'', '"'), '', $_product->getDescription());
-		$description = $this->_escaper->escapeHtml(strip_tags($rawdescription));
-		$product_data['description'] = $description;
-		if($item->getData('product_type') == 'grouped'){
-			if(!isset($productPrice[$productID])){
-				$productPrice[$productID] = 0.0000;
-			}
-			$productPrice[$productID] +=  $item->getData('row_total_incl_tax');
-			$product_data['price'] = $productPrice[$productID];
-		}else{
-			$product_data['price'] = $item->getData('row_total_incl_tax');
-		}
-		$products_arr[$j][$productID] = $product_data;
-                $j++;
-	}
+                        break 1;
+                    }
+                }
+
+                $productName = $_product->getName();
+                $productUrl = $_product->getProductUrl();
+                $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getImage();
+                $sku = $_product->getSku();
+                $upc = $_product->getUpc();
+                $isbn = $_product->getIsbn();
+                $mpn = $_product->getMpn();
+                $brand = $_product->getBrand();
+
+
+                $product_data['name'] = $productName;
+                $product_data['url'] = '';
+                $product_data['image'] = '';
+                $product_data['url'] = $productUrl;
+                $product_data['image'] = $imageUrl;
+                if ($upc) {
+                    $specs_data['upc'] = $upc;
+                }
+                if ($isbn) {
+                    $specs_data['isbn'] = $isbn;
+                }
+                if ($brand) {
+                    $specs_data['brand'] = $brand;
+                }
+                if ($mpn) {
+                    $specs_data['mpn'] = $mpn;
+                }
+                if ($sku) {
+                    $specs_data['external_sku'] = $sku;
+                }
+                if (!empty($specs_data)) {
+                    $product_data['specs'] = $specs_data;
+                }
+            } catch (\Exception $e) {
+                $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
+            }
+            $rawdescription = str_replace(array('\'', '"'), '', $_product->getDescription());
+            $description = $this->_escaper->escapeHtml(strip_tags($rawdescription));
+            $product_data['description'] = $description;
+            if ($item->getData('product_type') == 'grouped') {
+                if (!isset($productPrice[$productID])) {
+                    $productPrice[$productID] = 0.0000;
+                }
+                $productPrice[$productID] += $item->getData('row_total_incl_tax');
+                $product_data['price'] = $productPrice[$productID];
+            } else {
+                if (!isset($productPrice[$productID])) {
+                    $productPrice[$productID] = 0.0000;
+                }
+                $productPrice[$productID] += $item->getData('row_total_incl_tax');
+                $product_data['price'] = $productPrice[$productID];
+            }
+            $products_arr[$productID] = $product_data;
+        }
 	return $products_arr;
   }
 
