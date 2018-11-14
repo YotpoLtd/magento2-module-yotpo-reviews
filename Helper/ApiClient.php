@@ -180,9 +180,9 @@ class ApiClient
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
-      print_r(json_encode($data));
-      $resData = $http->read();
-      return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
+	  $this->_logger->addDebug('Yotpo: json request - ' . json_encode($data));
+      $resData = $http->read();  
+	  return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
     }
     catch(\Exception $e)
     {
