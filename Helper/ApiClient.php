@@ -168,21 +168,7 @@ class ApiClient
     $data['platform'] = 'magento';
     $data['currency_iso'] = $order->getOrderCurrency()->getCode();
     $data['order_date'] = $order->getCreatedAt();        
-    
-    $productsDataArray = $this->prepareProductsData($order);
-//    print_r($productsDataArray);
-    $comma = "";
-    $productsJSON = '{';
-    echo count($productsDataArray);
-    for ($i = 0; $i < count($productsDataArray); $i++) {
-        $productsJSON .= json_encode($productsDataArray[$i]);
-         $productsJSON .= $comma;
-         $comma = ",";
-    }
-    
-    $productsJSON .= '}';
-    print_r($productsJSON);
-    $data['products'] = $productsJSON; 
+    $data['products'] = $this->prepareProductsData($order); 
     return $data;
   }
 
