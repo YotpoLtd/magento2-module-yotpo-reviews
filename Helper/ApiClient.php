@@ -29,56 +29,86 @@ class ApiClient
     $this->_imgHelper = $imgHelper;
   }
 
- public function prepareProductsData($order) 
+  public function prepareProductsData($order) 
   {
-        $this->_storeManager->setCurrentStore($order->getStoreId());
-        $products = $order->getAllItems(); //filter out simple products
-        $products_arr = array();
-        foreach ($products as $item) {
-			if($item->getData('product_type')!='configurable'){
-				$full_product = $this->_productRepository->get($item->getSku());
-				$parentId = $item->getProduct()->getId();
-				if (!empty($parentId)) {
-					$full_product = $this->_productRepository->load($parentId);
-				}
-				$specs_data = array();
-				$product_data = array();
-				$product_data['name'] = $full_product->getName();
-				$product_data['url'] = '';
-				$product_data['image'] = '';
-				try {
-					$product_data['url'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-					$product_data['image'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
-					if ($full_product->getUpc()) {
-						$specs_data['upc'] = $full_product->getUpc();
-					}
-					if ($full_product->getIsbn()) {
-						$specs_data['isbn'] = $full_product->getIsbn();
-					}
-					if ($full_product->getBrand()) {
-						$specs_data['brand'] = $full_product->getBrand();
-					}
-					if ($full_product->getMpn()) {
-						$specs_data['mpn'] = $full_product->getMpn();
-					}
-					if ($full_product->getSku()) {
-						$specs_data['external_sku'] = $full_product->getSku();
-					}
-					if (!empty($specs_data)) {
-						$product_data['specs'] = $specs_data;
-					}
-				} catch (\Exception $e) {
-					$this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
-				}
-				$rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
-				$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
-				$product_data['description'] = $description;
-				$product_data['price'] = $item->getPrice();
-				$products_arr[$full_product->getId()] = $product_data;
-			}
+    $this->_storeManager->setCurrentStore($order->getStoreId());
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $groupedProductModel = $objectManager->create('\Magento\GroupedProduct\Model\Product\Type\Grouped');
+    $productModel = $objectManager->create('\Magento\Catalog\Model\Product');
+    $productCollection = $objectManager->create('\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory');
+    $store = $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
+    
+    $productDataArray = array();
+    $productData = array();
+    $specsData = array();
+    $items = $order->getAllVisibleItems();
+    foreach ($items as $item) {
+        try {
+            $productID = $item->getProduct()->getId();
+            $productType = $item->getData('product_type');
+            if ($productType == 'simple') {
+                $_product = $productModel->load($productID);
+            } elseif ($productType == 'configurable' || $productType == 'grouped' || $productType == 'bundle') {
+                if ($productType == 'grouped') {
+                    $productIDs = $groupedProductModel->getParentIdsByChild($item->getProduct()->getId());
+                    $productID = $productIDs[0];
+                }
+                $_products = $productCollection->create()->addAttributeToSelect('*')->addStoreFilter()->addFieldToFilter('entity_id', ['in' => $productID]);
+                foreach ($_products as $product) { // This is needed as we can't use object as array in collection way.
+                    $_product = $product;
+
+                    break 1;
+                }
+            }
+
+            $productName = $_product->getName();
+            $productUrl = $_product->getProductUrl();
+            $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getImage();
+            $sku = $_product->getSku();
+            $upc = $_product->getUpc();
+            $isbn = $_product->getIsbn();
+            $mpn = $_product->getMpn();
+            $brand = $_product->getBrand();
+
+
+            $productData['name'] = $productName;
+            $productData['url'] = '';
+            $productData['image'] = '';
+            $productData['url'] = $productUrl;
+            $productData['image'] = $imageUrl;
+            if ($upc) {
+                $specsData['upc'] = $upc;
+            }
+            if ($isbn) {
+                $specsData['isbn'] = $isbn;
+            }
+            if ($brand) {
+                $specsData['brand'] = $brand;
+            }
+            if ($mpn) {
+                $specsData['mpn'] = $mpn;
+            }
+            if ($sku) {
+                $specsData['external_sku'] = $sku;
+            }
+            if (!empty($specsData)) {
+                $productData['specs'] = $specsData;
+            }
+        } catch (\Exception $e) {
+            $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
         }
-        return $products_arr;
+        $rawDescription = str_replace(array('\'', '"'), '', $_product->getDescription());
+        $description = $this->_escaper->escapeHtml(strip_tags($rawDescription));
+        $productData['description'] = $description;
+        if (!isset($productPrice[$productID])) {
+            $productPrice[$productID] = 0.0000;
+        }
+        $productPrice[$productID] += $item->getData('row_total_incl_tax');
+        $productData['price'] = $productPrice[$productID];
+        $productDataArray[$productID] = $productData;
     }
+    return $productDataArray;
+  }
 
   public function oauthAuthentication($storeId)
   {
@@ -137,8 +167,9 @@ class ApiClient
       $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
-      $resData = $http->read();
-      return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
+	  $this->_logger->addDebug('Yotpo: json request - ' . json_encode($data));
+      $resData = $http->read();  
+	  return array("code" => \Zend_Http_Response::extractCode($resData), "body" => json_decode(\Zend_Http_Response::extractBody($resData), true));
     }
     catch(\Exception $e)
     {
