@@ -52,7 +52,7 @@ class YotpoReviewRenderer extends \Magento\Review\Block\Product\ReviewRenderer
     }
     public function showCategoryBottomLine($product)
     {        
-        return '<div style="float:left; padding-bottom:10px;" class="yotpo bottomLine" data-product-id="'.$product->getId().'"
+        return '<div class="yotpo bottomLine bottomline-position" data-product-id="'.$product->getId().'"
 	data-url="'.$product->getUrl().'">
         </div>';
     }
