@@ -4,10 +4,6 @@ namespace Yotpo\Yotpo\Helper;
 
 class ApiClient 
 {
-
-  const YOTPO_OAUTH_TOKEN_URL   = "https://api.yotpo.com/oauth/token";
-  const YOTPO_SECURED_API_URL   = "https://api.yotpo.com";
-  const YOTPO_UNSECURED_API_URL = "http://api.yotpo.com";
   const DEFAULT_TIMEOUT = 30;
  
   public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager, 
@@ -27,6 +23,8 @@ class ApiClient
     $this->_logger = $logger;
     $this->_config = $config;
     $this->_imgHelper = $imgHelper;
+    $this->_yotpo_secured_api_url = getenv("TEST_ENV_API") ?: "https://api.yotpo.com"; 
+    $this->_yotpo_unsecured_api_url = getenv("TEST_ENV_API") ?: "http://api.yotpo.com";	  
   }
 
   public function prepareProductsData($order) 
@@ -112,6 +110,10 @@ class ApiClient
 
   public function oauthAuthentication($storeId)
   {
+
+	$this->_logger->addDebug('*****yotpo_secured - TEST_ENV****' .$this->_yotpo_secured_api_url);
+	$this->_logger->addDebug('*****yotpo_unsecured - TEST_ENV1****' .$this->_yotpo_unsecured_api_url);
+	  
     $app_key = $this->_config->getAppKey($storeId);
     $secret = $this->_config->getSecret($storeId);
     if($app_key == null|| $secret == null) {
@@ -164,7 +166,7 @@ class ApiClient
     {
       $cfg = array('timeout' => $timeout);
       $http = $this->_curlFactory->create();
-      $feed_url = self::YOTPO_SECURED_API_URL."/".$path;
+      $feed_url = $this->_yotpo_secured_api_url."/".$path;
       $http->setConfig($cfg);
       $http->write(\Zend_Http_Client::POST, $feed_url, '1.1', array('Content-Type: application/json'), json_encode($data));
 	  $this->_logger->addDebug('Yotpo: json request - ' . json_encode($data));
@@ -197,7 +199,7 @@ class ApiClient
 
             $cfg = array('timeout' => $timeout);
             $http = $this->_curlFactory->create();
-            $feed_url = self::YOTPO_UNSECURED_API_URL . "/" . $path;
+            $feed_url =  $this->_yotpo_unsecured_api_url . "/" . $path;
             $http->setConfig($cfg);
             $http->write(\Zend_Http_Client::GET, $feed_url, '1.1', array('Content-Type: application/json'));
             $resData = $http->read();
