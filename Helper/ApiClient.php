@@ -110,10 +110,6 @@ class ApiClient
 
   public function oauthAuthentication($storeId)
   {
-
-	$this->_logger->addDebug('*****yotpo_secured - TEST_ENV****' .$this->_yotpo_secured_api_url);
-	$this->_logger->addDebug('*****yotpo_unsecured - TEST_ENV1****' .$this->_yotpo_unsecured_api_url);
-	  
     $app_key = $this->_config->getAppKey($storeId);
     $secret = $this->_config->getSecret($storeId);
     if($app_key == null|| $secret == null) {
