@@ -37,7 +37,7 @@ class ApiClient
     $productModel = $objectManager->create('\Magento\Catalog\Model\Product');
     $productCollection = $objectManager->create('\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory');
     $store = $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore();
-    
+    $storeUrl = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK);
     $productDataArray = array();
     $productData = array();
     $specsData = array();
@@ -60,9 +60,12 @@ class ApiClient
                     break 1;
                 }
             }
-
+            $extension = substr(strrchr($_product->getProductUrl(),'.'),0);
+            if(empty($extension)){
+                $extension = '';
+            } 
             $productName = $_product->getName();
-            $productUrl = $_product->getProductUrl();
+            $productUrl = $storeUrl.$_product->getUrlKey().$extension;
             $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getImage();
             $sku = $_product->getSku();
             $upc = $_product->getUpc();
