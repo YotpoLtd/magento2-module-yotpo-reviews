@@ -46,7 +46,7 @@ class ApiClient
             $productType = $item->getData('product_type');
             if ($productType == 'simple') {
                 $_product = $productModel->load($productID);
-            } elseif ($productType == 'configurable' || $productType == 'grouped' || $productType == 'bundle') {
+            } elseif ($productType == 'configurable' || $productType == 'grouped' || $productType == 'bundle' || $productType == 'downloadable' || $productType == 'virtual') {
                 if ($productType == 'grouped') {
                     $productIDs = $groupedProductModel->getParentIdsByChild($item->getProduct()->getId());
                     $productID = $productIDs[0];
