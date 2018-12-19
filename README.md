@@ -110,6 +110,8 @@ A `composer.json` file must be included with your submission at the root of your
 ```
 
 > **Note**: Make sure your `metapackage` file complies with the `composer.json` [Schema](https://getcomposer.org/doc/04-schema.md#the-composer-json-schema). In particular, that the `name` property of the extension and the modules consist of the vendor and project name, separated by `/`, like in the example above.
+> 
+> If your Bundled Extension is comprised by more than one Extension Module, make sure to add each Module Name and its version number under the `require` section. This way, internal dependencies will be resolved upon running Smoke Tests in BESS.
 
 #### Example Directory
 ###### Repository root
