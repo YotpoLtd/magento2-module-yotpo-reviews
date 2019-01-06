@@ -25,7 +25,7 @@ php bin/magento cache:flush
 ```
 
 ## Install manually under app/code
-Download & place the contents of this repository under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Loyalty  
+Download & place the contents of this repository under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Yotpo  
 Then, run the following commands under your Magento 2 root dir:
 ```
 php bin/magento maintenance:enable
