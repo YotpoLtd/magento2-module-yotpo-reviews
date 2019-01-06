@@ -131,7 +131,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             foreach ($order->getAllVisibleItems() as $orderItem) {
                 try {
                     $product = $orderItem->getProduct();
-                    $productDataArray[$product->getId()] = [
+                    $productsData[$product->getId()] = [
                         'name'        => $product->getName(),
                         'url'         => $product->getProductUrl(),
                         'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
