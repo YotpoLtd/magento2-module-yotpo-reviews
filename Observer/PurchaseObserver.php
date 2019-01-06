@@ -38,6 +38,7 @@ class PurchaseObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         try {
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver [TRIGGERED]', "info");
             $order = $observer->getEvent()->getOrder();
             $storeId = $order->getStoreId();
             if (
@@ -45,18 +46,23 @@ class PurchaseObserver implements ObserverInterface
                 !$this->_yotpoHelper->isAppKeyAndSecretSet($storeId) ||
                 $order->getStatus() !== Order::STATE_COMPLETE
             ) {
+                $this->_yotpoHelper->log('Yotpo PurchaseObserver [SKIPPING]', "info");
                 return $this;
             }
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver - preparing order data...', "info");
             $data = $this->_yotpoApi->prepareOrderData($order);
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver - authenticating...', "info");
             $data['utoken'] = $this->_yotpoApi->oauthAuthentication($storeId);
             if ($data['utoken'] == null) {
                 //Failed to get access token to api
-                $this->_yotpoHelper->log('Yotpo PurchaseObserver error - access token recieved from yotpo api is null', "error");
+                $this->_yotpoHelper->log('Yotpo PurchaseObserver [ERROR] - access token recieved from yotpo api is null', "error");
                 return $this;
             }
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver - creating purchases...', "info");
             $this->_yotpoApi->createPurchases($data, $storeId);
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver [DONE]', "info");
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo PurchaseObserver - Failed to send mail after purchase. Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("Yotpo PurchaseObserver - Failed to send mail after purchase. [EXCEPTION]: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
         return $this;
     }
