@@ -10,7 +10,7 @@
             <tab>yotpo</tab>
             <resource>Yotpo_Yotpo::config</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Yotpo Widget Configurations</label>
+                <label><![CDATA[Yotpo Widget Configurations <div style="float:right;">ver. 2.7.0</div>]]></label>
                 <comment>
                     <![CDATA[
                         <p>Please enter in your <font color="red">Api App Key</font>  and <font color="red">Secret</font> in the fields below to finish the installation.</p>
