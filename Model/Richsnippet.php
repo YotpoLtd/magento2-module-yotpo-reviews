@@ -10,17 +10,17 @@ class Richsnippet extends \Magento\Framework\Model\AbstractModel
 
     public function isValid()
     {
-        $expirationTime = strtotime($this->getExpirationTime());
-        return ($expirationTime > time());
+        return (strtotime($this->getExpirationTime()) > time());
     }
 
     public function getSnippetByProductIdAndStoreId($product_id, $store_id)
     {
-        $col = $this->getCollection()->addFieldToFilter('store_id', $store_id);
-        if ($col->getSize() == 0) {
-            return null;
+        $colection = $this->getCollection()
+            ->addFieldToFilter('store_id', $store_id)
+            ->addFieldToFilter('product_id', $product_id)
+            ->setPageSize(1);
+        if ($colection->count()) {
+            return $colection->getFirstItem();
         }
-        $snippet = $col->getItemByColumnValue('product_id', $product_id);
-        return $snippet;
     }
 }

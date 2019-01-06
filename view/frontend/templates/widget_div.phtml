@@ -1,20 +1,22 @@
 <?php
-  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-  $product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
-  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-  $currencySymbol = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
-  $currency = $currencySymbol->getStore()->getCurrentCurrencyCode();
+/**
+ * @var $block \Yotpo\Yotpo\Block\Yotpo
+ */
 ?>
-
-<?php if( $this->isRenderWidget()) { ?>
+<?php if (!($block->isEnabled() && $this->isRenderWidget() && $block->hasProduct())) {
+    return;
+}
+?>
+<!-- Yotpo - Widget Div -->
+<?php if ($this->isRenderWidget()): ?>
 	<div class="yotpo yotpo-main-widget"
-		 data-product-id="<?php echo $this->getProductId() ?>"
-		 data-name="<?php echo $this->getProductName() ?>"
-		 data-description="<?php echo $this->getProductDescription() ?>"
-		 data-url="<?php echo $this->getProductUrl() ?>"
-		 data-image-url="<?php echo $this->getProductImageUrl() ?>"
-                 data-price="<?php echo $product->getFinalPrice(); ?>"
-                 data-currency="<?php echo $currency ?>"
-                 >
-	</div>
-<?php } ?>
+		 data-product-id="<?php echo $block->getProductId(); ?>"
+		 data-name="<?php echo $block->getProductName(); ?>"
+		 data-description="<?php echo $block->getProductDescription(); ?>"
+		 data-url="<?php echo $block->getProductUrl(); ?>"
+		 data-image-url="<?php echo $block->getProductImageUrl(); ?>"
+         data-price="<?php echo $block->getProductFinalPrice(); ?>"
+         data-currency="<?php echo $block->getCurrentCurrencyCode(); ?>">
+     </div>
+<?php endif; ?>
+<!--/ Yotpo - Widget Div -->

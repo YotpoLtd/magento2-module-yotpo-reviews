@@ -1,4 +1,5 @@
 <?php
+
 namespace Yotpo\Yotpo\Setup;
 
 use Magento\Framework\Setup\InstallSchemaInterface;
@@ -17,7 +18,7 @@ class InstallSchema implements InstallSchemaInterface
      * @param SchemaSetupInterface $setup
      * @param ModuleContextInterface $context
      */
-     protected $_resource;
+    protected $_resource;
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -32,37 +33,37 @@ class InstallSchema implements InstallSchemaInterface
                 'rich_snippet_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
-                array('identity' => true, 'nullable' => false, 'primary' => true),
+                ['identity' => true, 'nullable' => false, 'primary' => true],
                 'Id'
             )->addColumn(
                 'product_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
-                array('nullable' => false),
+                ['nullable' => false],
                 'Product Id'
             )->addColumn(
                 'store_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
-                array('nullable' => false),
+                ['nullable' => false],
                 'Store Id'
             )->addColumn(
                 'average_score',
                 \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
                 null,
-                array('nullable' => false),
+                ['nullable' => false],
                 'Average Score'
             )->addColumn(
                 'reviews_count',
                 \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
                 null,
-                array('nullable' => false),
+                ['nullable' => false],
                 'Reviews Count'
             )->addColumn(
                 'expiration_time',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
                 null,
-                array('nullable' => false),
+                ['nullable' => false],
                 'Expiry Time'
             );
         $installer->getConnection()->createTable($table);

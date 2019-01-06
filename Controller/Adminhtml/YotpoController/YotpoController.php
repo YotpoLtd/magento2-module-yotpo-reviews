@@ -1,111 +1,113 @@
 <?php
 
 namespace Yotpo\Yotpo\Controller\Adminhtml\YotpoController;
- 
+
+use Magento\Backend\App\Action\Context;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
+use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+
 class YotpoController extends \Magento\Backend\App\Action
 {
+    //max amount of orders to export
+    const MAX_ORDERS_TO_EXPORT = 5000;
+    const MAX_BULK_SIZE        = 200;
 
-//max amount of orders to export
-const MAX_ORDERS_TO_EXPORT = 5000;
-const MAX_BULK_SIZE        = 200;
+    /**
+     * @var YotpoHelper
+     */
+    protected $_yotpoHelper;
 
-protected $_messageManager;
+    /**
+     * @var YotpoApiClient
+     */
+    protected $_yotpoApi;
 
-public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Request\Http $request,
-        \Magento\Framework\App\Response\Http $response,
-        \Yotpo\Yotpo\Block\Config $config,
-        \Yotpo\Yotpo\Helper\ApiClient $api,
-        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
-        \Psr\Log\LoggerInterface $logger
+    /**
+     * @var OrderCollectionFactory
+     */
+    protected $_orderCollectionFactory;
+
+    /**
+     * @var ManagerInterface
+     */
+    protected $_messageManager;
+
+    /**
+     * @method __construct
+     * @param  Context                $context
+     * @param  YotpoHelper            $yotpoHelper
+     * @param  YotpoApiClient         $yotpoApi
+     * @param  OrderCollectionFactory $orderCollectionFactory
+     */
+    public function __construct(
+        Context $context,
+        YotpoHelper $yotpoHelper,
+        YotpoApiClient $yotpoApi,
+        OrderCollectionFactory $orderCollectionFactory
     ) {
-        $this->_request = $request;
-        $this->_response = $response; 
-        $this->_config = $config;
-        $this->_api = $api;
-        $this->_logger = $logger;
-        $this->_messageManager = $context->getMessageManager();          
-        $this->_resultRedirectFactory = $resultRedirectFactory;   
+        $this->_yotpoHelper = $yotpoHelper;
+        $this->_yotpoApi = $yotpoApi;
+        $this->_orderCollectionFactory = $orderCollectionFactory;
+        $this->_messageManager = $context->getMessageManager();
         parent::__construct($context);
     }
 
-
     public function execute()
-    { 
-      try {
-      $PostDataArr = $this->_request->getPost()->toArray(); 
-      $storeId = $PostDataArr["store_id"];
-      $appKey = $this->_config->getAppKey($storeId);
-      $secret = $this->_config->getSecret($storeId);
-      if(($secret == null) || ($appKey == null))
-      {
-        $this->_messageManager->addError(__('Please make sure you insert your APP KEY and SECRET and save configuration before trying to export past orders'));
-        return;
-      }
-      $token = $this->_api->oauthAuthentication($storeId);
-      if ($token == null) 
-      {                
-        $this->_messageManager->addError(__("Please make sure the APP KEY and SECRET you've entered are correct"));
-        return;
-      }
-      $offset = 0;
-      $orderStatuses = $this->_config->getCustomOrderStatus($storeId);
-      if ($orderStatuses == null) {
-          $orderStatuses = array(\Magento\Sales\Model\Order::STATE_COMPLETE);
-      } else {
-        $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
-      }
-	  
-      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-      $orderModel = $objectManager->get('Magento\Sales\Model\Order');
-      $salesCollection = $orderModel->getCollection()
-                    ->addFieldToFilter('status', $orderStatuses)
-                    ->addFieldToFilter('store_id', $storeId)
-                    ->addAttributeToFilter('created_at', array('gteq' => $this->_config->getTimeFrame())) 
-                    ->addAttributeToSort('created_at', 'DESC')
-                    ->setPageSize(self::MAX_BULK_SIZE);
-      $pages = $salesCollection->getLastPageNumber();
-      $success = true;
-	  
-      do {
+    {
         try {
-            $offset++;
-            $salesCollection->setCurPage($offset)->load();
-            $orders = array();
-            foreach($salesCollection as $order)
-            {
-                $order_data = $this->_api->prepareOrderData($order);
-                if (!$order->getCustomerIsGuest()) {
-                    $order_data["user_reference"] = $order->getCustomerId();
-                }
-                $orders[] = $order_data;
+            $success = true;
+            $storeId = $this->getRequest()->getParam("store_id");
+            $appKey = $this->_yotpoHelper->getAppKey($storeId);
+            $secret = $this->_yotpoHelper->getSecret($storeId);
+            if (!($secret && $appKey)) {
+                $this->_messageManager->addError(__('Please make sure you insert your APP KEY and SECRET and save configuration before trying to export past orders'));
+                return;
             }
-            if (count($orders) > 0) 
-            {
-              $resData = $this->_api->massCreatePurchases($orders, $token, $storeId);
-              $success = ($resData['code'] != 200) ? false : $success;
-            }      
-          } catch (\Exception $e) {
-              $this->_logger->addDebug('Failed to export past orders. Error: '.$e);    
-          }
-        $salesCollection->clear();
-        } while ($offset <= (self::MAX_ORDERS_TO_EXPORT / self::MAX_BULK_SIZE) && $offset < $pages);
-        } catch(\Exception $e) {
-            $this->_logger->addDebug('Failed to export past orders. Error: '.$e);
-        }
-        if($success)
-        {
-          $this->_messageManager->addSuccess(__("Past orders were exported successfully. Emails will be sent to your customers within 24 hours, and you will start to receive reviews."));
-          $this->_logger->addDebug("Past orders were exported successfully."); 
-        }
-        else
-        {
-          $this->_messageManager->addError(__("An error occured, please try again later."));
-          $this->_logger->addDebug("Failed to export past orders."); 
-        }
-        $this->_response->setBody(1);
-        return;  
-    }
+            $token = $this->_yotpoApi->oauthAuthentication($storeId);
+            if ($token == null) {
+                $this->_messageManager->addError(__("Please make sure the APP KEY and SECRET you've entered are correct"));
+                return;
+            }
 
+            $ordersCollection = $this->_orderCollectionFactory->create()
+                ->addAttributeToFilter('status', $this->_yotpoHelper->getCustomOrderStatus(null, $storeId))
+                ->addAttributeToFilter('store_id', $storeId)
+                ->addAttributeToFilter('created_at', ['gteq' => $this->_yotpoHelper->getTimeFrame()])
+                ->addAttributeToSort('created_at', 'DESC')
+                ->setPageSize(self::MAX_BULK_SIZE);
+
+            $pages = $ordersCollection->getLastPageNumber();
+            $success = true;
+            $offset = 0;
+            do {
+                try {
+                    $offset++;
+                    $ordersCollection->setCurPage($offset)->load();
+                    $orders = [];
+                    foreach ($ordersCollection as $order) {
+                        $orders[] = $this->_yotpoApi->prepareOrderData($order);
+                    }
+                    if (count($orders) > 0) {
+                        $resData = $this->_yotpoApi->massCreatePurchases($orders, $token, $storeId);
+                        $success = ($resData['status'] != 200) ? false : $success;
+                    }
+                } catch (\Exception $e) {
+                    $this->_yotpoHelper->log("Yotpo Exception - Failed to export past orders: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                }
+                $ordersCollection->clear();
+            } while ($offset <= (self::MAX_ORDERS_TO_EXPORT / self::MAX_BULK_SIZE) && $offset < $pages);
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("Yotpo Exception - Failed to export past orders. " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+        if ($success) {
+            $this->_messageManager->addSuccess(__("Past orders were exported successfully. Emails will be sent to your customers within 24 hours, and you will start to receive reviews."));
+            $this->_yotpoHelper->log("Yotpo - Past orders were exported successfully", "info");
+        } else {
+            $this->_messageManager->addError(__("An error occured, please try again later."));
+            $this->_yotpoHelper->log("Yotpo Exception - Failed to export past orders. " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+        $this->getResponse()->setBody(1);
+        return;
+    }
 }

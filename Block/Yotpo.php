@@ -1,75 +1,136 @@
 <?php
 namespace Yotpo\Yotpo\Block;
+
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\Template\Context;
+use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+
 class Yotpo extends \Magento\Framework\View\Element\Template
 {
+    /**
+     * @var YotpoHelper
+     */
+    protected $_yotpoHelper;
+
+    /**
+     * @method __construct
+     * @param  Context     $context
+     * @param  YotpoHelper $yotpoHelper
+     * @param  Registry    $registry
+     * @param  array       $data
+     */
     public function __construct(
-    \Magento\Framework\View\Element\Template\Context $context,
-    \Magento\Framework\Registry $registry,
-    \Magento\Catalog\Helper\Image $imageHelper,
-    \Yotpo\Yotpo\Block\Config $config,
-    array $data = []
+        Context $context,
+        YotpoHelper $yotpoHelper,
+        array $data = []
     ) {
-        $this->_coreRegistry = $registry;
-        $this->_config = $config;
-        $this->_imageHelper = $imageHelper;
+        $this->_yotpoHelper = $yotpoHelper;
         parent::__construct($context, $data);
     }
 
+    /**
+     * @method isEnabled
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->_yotpoHelper->isEnabled() && $this->_yotpoHelper->isAppKeyAndSecretSet();
+    }
+
+    /**
+     * @method getAppKey
+     * @return string|null
+     */
+    public function getAppKey()
+    {
+        return $this->_yotpoHelper->getAppKey();
+    }
+
     public function getProduct()
-	{
-		if (!$this->hasData('product')) {
-            $this->setData('product', $this->_coreRegistry->registry('current_product'));
+    {
+        return $this->_yotpoHelper->getCurrentProduct();
+    }
+
+    public function hasProduct()
+    {
+        return $this->getProduct() && $this->getProduct()->getId();
+    }
+
+    public function getProductId()
+    {
+        if (!$this->hasProduct()) {
+            return null;
         }
-        return $this->getData('product');
+        return $this->getProduct()->getId();
     }
 
-    public function getProductId() {
-    	return $this->getProduct()->getId();
-    }
-
-    public function getProductName() {
-        $productName = $this->escapeString($this->getProduct()->getName());
-        return htmlspecialchars($productName);
+    public function getProductName()
+    {
+        if (!$this->hasProduct()) {
+            return null;
+        }
+        return $this->escapeString($this->getProduct()->getName());
     }
 
     public function getProductDescription()
     {
+        if (!$this->hasProduct()) {
+            return null;
+        }
         return $this->escapeString($this->getProduct()->getShortDescription());
     }
 
     public function getProductUrl()
     {
+        if (!$this->hasProduct()) {
+            return null;
+        }
         return $this->getProduct()->getProductUrl();
-    }    
+    }
 
-    public function isRenderWidget()
+    public function getProductFinalPrice()
     {
-        return $this->getProduct() != null && 
-        ($this->_config->isWidgetEnabled() || $this->getData('fromHelper'));
-    }    
-
-    public function isRenderBottomline()
-    {
-        return $this->_config->isBottomlineEnabled();
-    } 
-    
-    public function isRenderBottomlineQna()
-    {
-        return $this->_config->isBottomlineQnaEnabled();
-    } 
+        if (!$this->hasProduct()) {
+            return null;
+        }
+        return $this->getProduct()->getFinalPrice();
+    }
 
     public function getProductImageUrl()
     {
-        return $this->_imageHelper->init($this->getProduct(), 'product_page_image_large')->getUrl();
-    } 
-    
-    private function isProductPage()
-    {
-        return $this->getProduct() != null;
+        if (!$this->hasProduct()) {
+            return null;
+        }
+        return $this->_yotpoHelper->getProductMainImageUrl($this->getProduct());
     }
 
-    private function escapeString($str)
+    public function getCurrentCurrencyCode()
+    {
+        return $this->_yotpoHelper->getStoreManager()->getStore()->getCurrentCurrency()->getCode();
+    }
+
+    public function isRenderWidget()
+    {
+        return $this->hasProduct() && ($this->_yotpoHelper->isWidgetEnabled() || $this->getData('fromHelper'));
+    }
+
+    public function isRenderBottomline()
+    {
+        return $this->_yotpoHelper->isBottomlineEnabled();
+    }
+
+    public function isRenderBottomlineQna()
+    {
+        return $this->_yotpoHelper->isBottomlineQnaEnabled();
+    }
+
+    public function escapeString($str)
     {
         return $this->_escaper->escapeHtml(strip_tags($str));
+    }
+
+    public function getYotpoWidgetUrl()
+    {
+        return $this->_yotpoHelper->getYotpoWidgetUrl();
     }
 }

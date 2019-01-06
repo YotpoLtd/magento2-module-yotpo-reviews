@@ -1,4 +1,15 @@
+<?php
+/**
+ * @var $block \Yotpo\Yotpo\Block\Yotpo
+ */
+?>
+<?php if (!($block->isEnabled() && $block->hasProduct())) {
+    return;
+}
+?>
+<!-- Yotpo - QNA Bottom Line -->
 <div class="yotpo QABottomLine"
-    data-appkey="<?php echo $this->getAppKey() ?>"
-    data-product-id="<?php echo $this->getProductId() ?>">
+    data-appkey="<?php echo $block->getAppKey() ?>"
+    data-product-id="<?php echo $block->getProductId() ?>">
 </div>
+<!--/ Yotpo - QNA Bottom Line -->

@@ -1,98 +1,108 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
-    <system>
-        <tab id="yotpo" translate="label" sortOrder="100">
-            <label>Yotpo</label>
-        </tab>
-        <section id="yotpo" translate="label" sortOrder="130" showInDefault="0" showInWebsite="0" showInStore="1">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="yotpo" translate="label" sortOrder="400">
+            <label><![CDATA[<span class='yotpo-icon'></span>Yotpo]]></label>
+		</tab>
+        <section id="yotpo" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Yotpo Product Reviews Software</label>
             <tab>yotpo</tab>
-            <resource>Yotpo_Yotpo::settings</resource>
-            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+            <resource>Yotpo_Yotpo::config</resource>
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Yotpo Widget Configurations</label>
-                                        <comment>
-                <![CDATA[
-                    <p>Please enter in your <font color="red">Api App Key</font>  and <font color="red">Secret</font> in the fields below to finish the installation.</p>
-                        <p>If you need help the Yotpo support team is here 24/7, don't hesitate to 
-                            <a href="https://yotposupport.zendesk.com/account/dropboxes/20158038#/dropbox/suggestions/ask" target="_blank" title="yotpo-support">contact us.</a>
-                              </p>
-                    <p>Click <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features" target="_blank" 
-                      title="yotpo">here</a> for the advanced customization guide. 
-                    </p><br/>
-                    <p style="font-size:18px;">Dont have an App Key? <a style="font-size:18px;" href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" 
-                      title="yotpo">Click here to sign up / sign in</a></p>
-                ]]>
-            </comment>
-                <field id="app_key" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="1">
+                <comment>
+                    <![CDATA[
+                        <p>Please enter in your <font color="red">Api App Key</font>  and <font color="red">Secret</font> in the fields below to finish the installation.</p>
+                            <p>If you need help the Yotpo support team is here 24/7, don't hesitate to
+                                <a href="https://yap.yotpo.com/#/?modal=contact_support" target="_blank" title="yotpo-support">contact us.</a>
+                                  </p>
+                        <p>Click <a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#manually-adding-yotpos-reviews-widget-to-your-product-page" target="_blank"
+                          title="yotpo">here</a> for the advanced customization guide.
+                        </p><br/>
+                        <p style="font-size:18px;">Dont have an App Key? <a style="font-size:18px;" href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank"
+                          title="yotpo">Click here to sign up / sign in</a></p>
+                    ]]>
+                </comment>
+				<field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="app_key" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>App key</label>
-                    <validate>required-entry</validate>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
-                    <comment><![CDATA[Get your appkey at your yotpo account setting page. Click
-                        <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" title="yotpo-sign-up">here</a>
-                        to sign in to yotpo]]>
-                    </comment>                    
+                    <comment>
+                        <![CDATA[
+                            Get your appkey at your yotpo account setting page. Click
+                            <a href="https://my.yotpo.com/register?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_signin_link" target="_blank" title="yotpo-sign-up">here</a>
+                            to sign in to yotpo
+                        ]]>
+                    </comment>
                 </field>
-                <field id="secret" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Secret</label>
-                    <validate>required-entry</validate>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
-                    <comment><![CDATA[Get your secret at your yotpo account setting page. Click
-                        <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>
-                        to sign in to yotpo]]>
-                    </comment>                    
+                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\Secret</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Get your secret at your yotpo account setting page. Click
+                            <a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="yotpo-sign-up">here</a>
+                            to sign in to yotpo
+                        ]]>
+                    </comment>
                 </field>
-                <field id="widget_enabled" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="widget_enabled" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Default Widget Position</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
-                      <![CDATA[
-                      By choosing not to use the deafult position, you'll need to follow the instructions in the 
-                      <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-widget-manually-on-your-product-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
-                    </comment>                    
+                        <![CDATA[
+                            By choosing not to use the deafult position, you'll need to follow the instructions in the
+                            <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-widget-manually-on-your-product-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>
+                        ]]>
+                    </comment>
                 </field>
-				<field id="category_bottomline_enabled" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="1">
+				<field id="category_bottomline_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Star Ratings On Category Pages</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                 </field>
-                <field id="bottomline_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="1">
-                    <label>Show bottomline</label>
+                <field id="bottomline_enabled" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show Bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
-                      <![CDATA[
-                      By choosing not to use the deafult position, you'll need to follow the instructions in the 
-                      <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-star-rating-manually-on-your-catalog-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
-                    </comment>                    
+                        <![CDATA[
+                            By choosing not to use the deafult position, you'll need to follow the instructions in the
+                            <br/><a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo#to-insert-the-star-rating-manually-on-your-catalog-page" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>
+                        ]]>
+                    </comment>
                 </field>
-                <field id="qna_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="1">
-                    <label>Show bottomline Questions Answers</label>
+                <field id="qna_enabled" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show Bottomline Questions Answers</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
-                    <comment>
-                      <![CDATA[
-                      By choosing not to use the deafult position, you'll need to follow the instructions in the 
-                      <br/><a href="http://support.yotpo.com/entries/22635391-advanced-magento-features?utm_source=customers_magento_admin&utm_medium=link&utm_campaign=magento_admin_advanced_magento_features" target="_blank" title="advanced-cusomization-guide">advanced customizations guide</a>]]>
-                    </comment>                    
                 </field>
-				<field id="mdr_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="1">
+				<field id="mdr_enabled" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Hide Default Magento Reviews And Ratings</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                 </field>
-                <field id="custom_order_status" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="1">
-                <label>Export Order After Purchase</label>
-                <source_model>Magento\Sales\Model\ResourceModel\Order\Status\Collection</source_model>
-                <comment>
-                      <![CDATA[
-                              Customize the order status that will trigger the order export after purchase. You can choose multiple statuses by holding ctrl button.
-                              ]]>
-                    </comment>  
+                <field id="custom_order_status" translate="label" type="multiselect" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+	                <label>Export Order After Purchase</label>
+	                <source_model>Magento\Sales\Model\ResourceModel\Order\Status\Collection</source_model>
+	                <comment>
+	                    <![CDATA[
+	                        Customize the order status that will trigger the order export after purchase. You can choose multiple statuses by holding ctrl button.
+	                    ]]>
+	                </comment>
                 </field>
-                 <field id="yotpo_button" translate="button_label" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="1">
-                     <label>Past orders</label>
+				<field id="debug_mode_active" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Debug Mode Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<tooltip>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</tooltip>
+                </field>
+                <field id="yotpo_button" translate="button_label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Past orders</label>
                     <button_label>Generate reviews for my past orders</button_label>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>
                 </field>

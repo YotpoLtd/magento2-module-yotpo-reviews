@@ -2,9 +2,9 @@
 
 namespace Yotpo\Yotpo\Model\Config\Backend;
 
-use Magento\Framework\App\Config\Value;
+use Magento\Config\Model\Config\Backend\Encrypted;
 
-class ValidateSettings extends Value
+class Secret extends Encrypted
 {
     /**
      * @var \Magento\Framework\Model\Context
@@ -17,6 +17,7 @@ class ValidateSettings extends Value
      * @param  \Magento\Framework\Registry                              $registry
      * @param  \Magento\Framework\App\Config\ScopeConfigInterface       $config
      * @param  \Magento\Framework\App\Cache\TypeListInterface           $cacheTypeList
+     * @param  \Magento\Framework\Encryption\EncryptorInterface         $encryptor
      * @param  \Magento\Framework\Model\ResourceModel\AbstractResource  $resource
      * @param  \Magento\Framework\Data\Collection\AbstractDb            $resourceCollection
      * @param  array                                                    $data
@@ -26,12 +27,13 @@ class ValidateSettings extends Value
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->_context = $context;
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
+        parent::__construct($context, $registry, $config, $cacheTypeList, $encryptor, $resource, $resourceCollection, $data);
     }
 
     public function afterSave()

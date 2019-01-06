@@ -1,26 +1,31 @@
 <?php
+/**
+ * @var $block \Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton
+ */
 ?>
-
+<!-- Yotpo Button (Generate reviews for my past orders) -->
 <script type="text/javascript">
     //<![CDATA[
-    function exportOrders() {debugger;
-    var params = {
+    function exportOrders() {//debugger;
+        new Ajax.Request('<?php echo $this->getAjaxExportUrl() ?>' , {
+            parameters: {
                 form_key : FORM_KEY,
                 store_id : '<?php echo $this->getStoreId() ?>'
-            };
-    var url = '<?php echo $this->getAjaxExportUrl() ?>';
-    new Ajax.Request(url , {
-                parameters:params,
-                method:'post',
-                onComplete:function(transport) {
-                   location.reload();
-                }
+            },
+            method:'post',
+            onComplete:function(transport) {
+                location.reload();
+            },
+            onFailure: function(transport){
+                console.log(transport.responseText);
+                alert("An error occured while trying to export past orders!");
+                location.reload();
+            }
         });
     }
     //]]>
 </script>
 
 <?php echo $this->getButtonHtml(); ?>
-<p style="color: #303030;
-    font-size: 12px;
-    margin: 5px 0;">Please be patient, this may take a while. </p>
+<p style="color:#303030;font-size:12px;margin: 5px 0;">Please be patient, this may take a while.</p>
+<!--/ Yotpo Button (Generate reviews for my past orders) -->

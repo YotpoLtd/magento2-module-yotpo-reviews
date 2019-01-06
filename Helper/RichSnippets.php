@@ -1,52 +1,66 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 namespace Yotpo\Yotpo\Helper;
+
+use Magento\Framework\App\Helper\Context;
+use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
+use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Richsnippet;
 
 class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    /**
+     * @var YotpoHelper
+     */
+    protected $_yotpoHelper;
 
-    private $_config;
-    private $_model;
-    private $_helper;
-    protected $_storeManager;    
+    /**
+     * @var YotpoApiClient
+     */
+    protected $_yotpoApi;
 
+    /**
+     * @var Richsnippet
+     */
+    protected $_richsnippents;
+
+    /**
+     * @method __construct
+     * @param  Context        $context
+     * @param  YotpoHelper    $yotpoHelper
+     * @param  YotpoApiClient $yotpoApi
+     * @param  Richsnippet    $richsnippents
+     */
     public function __construct(
-            \Yotpo\Yotpo\Block\Config $config,
-            \Yotpo\Yotpo\Model\Richsnippet $model,
-            \Yotpo\Yotpo\Helper\ApiClient $helper,
-			\Psr\Log\LoggerInterface $logger,
-            \Magento\Store\Model\StoreManagerInterface $storeManager     
-            ) {
-        $this->_config = $config;
-        $this->_model = $model;
-        $this->_helper = $helper;
-		$this->_logger = $logger;
-        $this->_storeManager = $storeManager;
+        Context $context,
+        YotpoHelper $yotpoHelper,
+        YotpoApiClient $yotpoApi,
+        Richsnippet $richsnippents
+    ) {
+        $this->_yotpoHelper = $yotpoHelper;
+        $this->_yotpoApi = $yotpoApi;
+        $this->_richsnippents = $richsnippents;
+        parent::__construct($context);
     }
 
-    public function getRichSnippet() {
-
+    /**
+     * @method getRichSnippet
+     * @return array
+     */
+    public function getRichSnippet()
+    {
         try {
-            
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
+            $product = $this->_yotpoHelper->getCurrentProduct();
+
             $productId = $product->getId();
             $storeId = $this->_storeManager->getStore()->getId();
-            
             $snippet = $this->_model->getSnippetByProductIdAndStoreId($productId, $storeId);
-            
-            
-            if (($snippet == null) || (!$snippet->isValid())) {
-                //no snippet for product or snippet isn't valid anymore. get valid snippet code from yotpo api
-                $res = $this->_helper->createApiGet("products/" . ($this->_config->getAppKey()) . "/richsnippet/" . $productId, 2);
 
-                
-                if ($res["code"] != 200) {
+            if (!$snippet || !$snippet->isValid()) {
+                //no snippet for product or snippet isn't valid anymore. get valid snippet code from yotpo api
+                $res = $this->_yotpoApi->sendApiRequest("products/" . ($this->_yotpoHelper->getAppKey()) . "/richsnippet/" . $productId, "get", 2);
+
+                if ($res["status"] != 200) {
                     //product not found or feature disabled.
                     return "";
                 }
@@ -67,15 +81,18 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
                 $snippet->setExpirationTime(date('Y-m-d H:i:s', time() + $ttl));
                 $snippet->save();
 
-                return array("average_score" => $averageScore, "reviews_count" => $reviewsCount);
+                return [
+                    "average_score" => $averageScore,
+                    "reviews_count" => $reviewsCount
+                ];
             }
-            return array("average_score" => $snippet->getAverageScore(), "reviews_count" => $snippet->getReviewsCount());
+            return [
+                "average_score" => $snippet->getAverageScore(),
+                "reviews_count" => $snippet->getReviewsCount()
+            ];
         } catch (\Exception $e) {
-            $this->_logger->addDebug('error: ' . $e);
+            $this->_yotpoHelper->log("Yotpo RichSnippets Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
-        return array();
-    return true;
-        
+        return [];
     }
-
 }
