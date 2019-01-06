@@ -1,6 +1,6 @@
 <?php
 
-namespace Yotpo\Yotpo\Model\Observer;
+namespace Yotpo\Yotpo\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;

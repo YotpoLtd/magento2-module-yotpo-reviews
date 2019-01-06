@@ -30,7 +30,6 @@
                 </field>
                 <field id="app_key" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>App key</label>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
                         <![CDATA[
                             Get your appkey at your yotpo account setting page. Click
@@ -41,7 +40,7 @@
                 </field>
                 <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Secret</label>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\Secret</backend_model>
+					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <comment>
                         <![CDATA[
                             Get your secret at your yotpo account setting page. Click
@@ -53,7 +52,6 @@
                 <field id="widget_enabled" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Default Widget Position</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
                         <![CDATA[
                             By choosing not to use the deafult position, you'll need to follow the instructions in the
@@ -64,12 +62,10 @@
 				<field id="category_bottomline_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Star Ratings On Category Pages</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                 </field>
                 <field id="bottomline_enabled" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Show Bottomline</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                     <comment>
                         <![CDATA[
                             By choosing not to use the deafult position, you'll need to follow the instructions in the
@@ -80,12 +76,10 @@
                 <field id="qna_enabled" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Show Bottomline Questions Answers</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                 </field>
 				<field id="mdr_enabled" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Hide Default Magento Reviews And Ratings</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Yotpo\Yotpo\Model\Config\Backend\ValidateSettings</backend_model>
                 </field>
                 <field id="custom_order_status" translate="label" type="multiselect" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
 	                <label>Export Order After Purchase</label>
