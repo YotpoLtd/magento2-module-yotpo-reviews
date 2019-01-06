@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Yotpo_Yotpo" active="true" setup_version="2.7.0" />
+    <module name="Yotpo_Yotpo" setup_version="2.7.0" />
 </config>
