@@ -257,16 +257,25 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method createPurchases
-     * @param  Order  $order
+     * @param  array  $order  Order prepared by $this->prepareOrderData()
+     * @param  string $token
      * @param  int    $storeId
      * @return mixed
      */
-    public function createPurchases(Order $order, $storeId = null)
+    public function createPurchases(array $orderData, string $token, $storeId = null)
     {
-        return $this->sendApiRequest("apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases", $order);
+        $orderData['utoken'] = $token;
+        return $this->sendApiRequest("apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases", $orderData);
     }
 
-    public function massCreatePurchases($orders, $token, $storeId)
+    /**
+     * @method massCreatePurchases
+     * @param  array   $orders  Array of orders prepared by $this->prepareOrderData()
+     * @param  string  $token
+     * @param  mixed   $storeId
+     * @return mixed
+     */
+    public function massCreatePurchases(array $orders, string $token, $storeId = null)
     {
         return $this->sendApiRequest("apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create", [
             'utoken'   => $token,

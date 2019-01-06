@@ -310,7 +310,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->_orderStatuses = array_map('strtolower', explode(',', $this->_orderStatuses));
             }
         }
-        return $orderStatuses;
+        return $this->_orderStatuses;
     }
 
     /**

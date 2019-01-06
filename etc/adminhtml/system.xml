@@ -84,6 +84,8 @@
                 <field id="custom_order_status" translate="label" type="multiselect" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
 	                <label>Export Order After Purchase</label>
 	                <source_model>Magento\Sales\Model\ResourceModel\Order\Status\Collection</source_model>
+					<validate>validate-select</validate>
+					<can_be_empty>0</can_be_empty>
 	                <comment>
 	                    <![CDATA[
 	                        Customize the order status that will trigger the order export after purchase. You can choose multiple statuses by holding ctrl button.

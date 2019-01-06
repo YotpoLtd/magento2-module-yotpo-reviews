@@ -77,7 +77,7 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function getAjaxExportUrl()
     {
-        return $this->getUrl('massmap/yotpocontroller/yotpocontroller/', ['_secure' => $this->getRequest()->isSecure()]);
+        return $this->getUrl('yotpo_yotpo/ajax/massmap/', ['_secure' => $this->getRequest()->isSecure()]);
     }
 
     public function getStoreId()

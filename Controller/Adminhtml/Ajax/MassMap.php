@@ -1,13 +1,13 @@
 <?php
 
-namespace Yotpo\Yotpo\Controller\Adminhtml\YotpoController;
+namespace Yotpo\Yotpo\Controller\Adminhtml\Ajax;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
-class YotpoController extends \Magento\Backend\App\Action
+class MassMap extends \Magento\Backend\App\Action
 {
     //max amount of orders to export
     const MAX_ORDERS_TO_EXPORT = 5000;
@@ -71,11 +71,13 @@ class YotpoController extends \Magento\Backend\App\Action
             }
 
             $ordersCollection = $this->_orderCollectionFactory->create()
-                ->addAttributeToFilter('status', $this->_yotpoHelper->getCustomOrderStatus(null, $storeId))
-                ->addAttributeToFilter('store_id', $storeId)
+                ->addAttributeToFilter('status', $this->_yotpoHelper->getCustomOrderStatus($storeId))
                 ->addAttributeToFilter('created_at', ['gteq' => $this->_yotpoHelper->getTimeFrame()])
                 ->addAttributeToSort('created_at', 'DESC')
                 ->setPageSize(self::MAX_BULK_SIZE);
+            if ($storeId) {
+                $ordersCollection->addAttributeToFilter('store_id', $storeId);
+            }
 
             $pages = $ordersCollection->getLastPageNumber();
             $success = true;
