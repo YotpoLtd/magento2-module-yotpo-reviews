@@ -136,7 +136,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                         'url'         => $product->getProductUrl(),
                         'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
                         'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
-                        'price'       => $item->getData('row_total_incl_tax'),
+                        'price'       => $orderItem->getData('row_total_incl_tax'),
                         'specs'       => array_filter([
                             'external_sku' => $product->getSku(),
                             'upc'          => $product->getUpc(),
