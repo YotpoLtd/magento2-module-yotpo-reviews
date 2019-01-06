@@ -40,7 +40,7 @@ class Page
         ResponseInterface $response
     ) {
         if ($this->_yotpoHelper->isEnabled() && in_array($this->_context->getRequest()->getFullActionName(), ['catalog_category_view', 'catalog_product_view', 'cms_index_index'])) {
-            $subject->getConfig()->addBodyClass('yotpo_yotpo_is_enabled');
+            $subject->getConfig()->addBodyClass('yotpo-yotpo-is-enabled');
         }
         return [$response];
     }
