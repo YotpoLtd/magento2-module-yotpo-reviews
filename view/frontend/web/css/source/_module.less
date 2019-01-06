@@ -25,18 +25,18 @@
         margin: 0 10px 1px 0;
     }
 
-    .cms-index-index .product-item-actions {
+    &.cms-index-index .product-item-actions {
         margin-top: 5px !important;
     }
-}
 
-.yotpo-yotpo-is-enabled.cms-index-index,
-.yotpo-yotpo-is-enabled.catalog-category-view,
-.yotpo-yotpo-is-enabled.catalog-product-view {
-    .page-products .product-item-actions {
-        margin-top: 0px !important;
-    }
-    .product-info-main .product-reviews-summary {
-        width: 100%;
+    &.catalog-category-view, &.catalog-product-view{
+        &.page-products{
+            .product-item-actions {
+                margin-top: 0px !important;
+            }
+        }
+        .product-info-main .product-reviews-summary {
+            width: 100%;
+        }
     }
 }
