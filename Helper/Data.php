@@ -36,6 +36,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
     protected $_yotpo_widget_url = '//staticw2.yotpo.com/';
+    protected $_allStoreIds = null;
 
     /**
      * @var Product
@@ -542,5 +543,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $this->_product;
+    }
+
+    /**
+     * @method getAllStoreIds
+     * @param  boolean        $withDefault
+     * @return array
+     */
+    public function getAllStoreIds($withDefault = false)
+    {
+        if (is_null($this->_allStoreIds)) {
+            $this->_allStoreIds = [];
+            foreach ($this->_storeManager->getStores($withDefault) as $store) {
+                $this->_allStoreIds[] = $store->getId();
+            }
+        }
+        return $this->_allStoreIds;
     }
 }

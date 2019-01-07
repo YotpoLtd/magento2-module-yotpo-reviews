@@ -6,26 +6,34 @@
 <!-- Yotpo Button (Generate reviews for my past orders) -->
 <script type="text/javascript">
     //<![CDATA[
-    function exportOrders() {//debugger;
-        new Ajax.Request('<?php echo $this->getAjaxExportUrl() ?>' , {
-            parameters: {
-                form_key : FORM_KEY,
-                store_id : '<?php echo $this->getStoreId() ?>'
-            },
-            method:'post',
-            onComplete:function(transport) {
-                location.reload();
-            },
-            onFailure: function(transport){
-                console.log(transport.responseText);
-                alert("An error occured while trying to export past orders!");
-                location.reload();
-            }
+    (function  () {
+        require([
+            "jquery"
+        ],function($) {
+            window.yotpoExportOrders = function(){//debugger;
+                $.ajax({
+                    url: '<?php echo $block->getAjaxExportUrl() ?>',
+                    type: 'POST',
+                    data: {
+                        form_key : FORM_KEY,
+                        stores: <?php echo json_encode($block->getStoreIds(), true); ?>
+                    },
+                    showLoader: true
+                }).done(function (response) {
+                    console.log(response);
+                    location.reload();
+                }).fail(function (response) {
+                    console.log(response);
+                    alert("An error occured while trying to export past orders!");
+                    location.reload();
+                });
+            };
+            document.getElementById("yotpo-export-button").style.display = "block";
         });
-    }
+    })();
     //]]>
 </script>
 
-<?php echo $this->getButtonHtml(); ?>
+<?php echo $block->getButtonHtml(); ?>
 <p style="color:#303030;font-size:12px;margin: 5px 0;">Please be patient, this may take a while.</p>
 <!--/ Yotpo Button (Generate reviews for my past orders) -->

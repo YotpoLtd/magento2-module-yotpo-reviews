@@ -126,8 +126,6 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
         $productsData = [];
 
         try {
-            $this->_yotpoHelper->emulateFrontendArea($order->getStoreId(), true);
-
             foreach ($order->getAllVisibleItems() as $orderItem) {
                 try {
                     $product = $orderItem->getProduct();
@@ -149,8 +147,6 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
                 }
             }
-
-            $this->_yotpoHelper->stopEnvironmentEmulation();
         } catch (\Exception $e) {
             $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
@@ -222,6 +218,27 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $orderData;
+    }
+
+    /**
+     * @method prepareOrdersData
+     * @param  \Magento\Sales\Model\ResourceModel\Order\Collection  $ordersCollection
+     * @return array
+     */
+    public function prepareOrdersData(\Magento\Sales\Model\ResourceModel\Order\Collection $ordersCollection)
+    {
+        $ordersData = [];
+
+        try {
+            foreach ($ordersCollection as $order) {
+                $ordersData[] = $this->prepareOrderData($order);
+            }
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("Yotpo ApiClient prepareOrdersData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            return [];
+        }
+
+        return $ordersData;
     }
 
     /**

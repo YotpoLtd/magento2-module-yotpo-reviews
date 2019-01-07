@@ -38,14 +38,15 @@ class PurchaseObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         try {
-            $this->_yotpoHelper->log('Yotpo PurchaseObserver [TRIGGERED]', "info");
             $order = $observer->getEvent()->getOrder();
             $storeId = $order->getStoreId();
+            $this->_yotpoHelper->emulateFrontendArea($storeId, true);
+            $this->_yotpoHelper->log('Yotpo PurchaseObserver [TRIGGERED]: Order ID: ' . $order->getId() . ', Store ID: ' . $storeId, "info");
 
             if (
                 !$this->_yotpoHelper->isEnabled() ||
-                !$this->_yotpoHelper->isAppKeyAndSecretSet($storeId) ||
-                !in_array($order->getStatus(), $this->_yotpoHelper->getCustomOrderStatus($storeId))
+                !$this->_yotpoHelper->isAppKeyAndSecretSet() ||
+                !in_array($order->getStatus(), $this->_yotpoHelper->getCustomOrderStatus())
             ) {
                 $this->_yotpoHelper->log('Yotpo PurchaseObserver [SKIPPING]', "info");
                 return $this;
@@ -59,7 +60,7 @@ class PurchaseObserver implements ObserverInterface
             }
 
             $this->_yotpoHelper->log('Yotpo PurchaseObserver - authenticating...', "info");
-            $token = $this->_yotpoApi->oauthAuthentication($storeId);
+            $token = $this->_yotpoApi->oauthAuthentication();
             if ($token == null) {
                 //Failed to get access token to api
                 $this->_yotpoHelper->log('Yotpo PurchaseObserver [ERROR] - access token recieved from yotpo api is null. export failed!', "error");
@@ -67,12 +68,14 @@ class PurchaseObserver implements ObserverInterface
             }
 
             $this->_yotpoHelper->log('Yotpo PurchaseObserver - creating purchases...', "info");
-            $this->_yotpoApi->createPurchases($orderData, $token, $storeId);
+            $this->_yotpoApi->createPurchases($orderData, $token);
 
             $this->_yotpoHelper->log('Yotpo PurchaseObserver [DONE]', "info");
         } catch (\Exception $e) {
             $this->_yotpoHelper->log("Yotpo PurchaseObserver - Failed to send mail after purchase. [EXCEPTION]: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
+        $this->_yotpoHelper->stopEnvironmentEmulation();
+
         return $this;
     }
 }

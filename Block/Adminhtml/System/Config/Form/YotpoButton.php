@@ -89,6 +89,21 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
         }
     }
 
+    public function getStoreIds()
+    {
+        if (($_storeId = $this->getRequest()->getParam("store", 0))) {
+            $stores = [$_storeId];
+        } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
+            $stores = $this->_storeManager->getWebsite($websiteId)->getStoreIds();
+        } else {
+            $stores = [];
+            foreach ($this->_storeManager->getStores(true) as $store) {
+                $stores[] = $store->getId();
+            }
+        }
+        return array_values($stores);
+    }
+
     /**
      * Generate button html
      *
@@ -99,9 +114,9 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
         return $this->getLayout()
             ->createBlock('Magento\Backend\Block\Widget\Button')
             ->setData([
-                'id'        => 'yotpo_button',
+                'id'        => 'yotpo-export-button',
                 'label'     => __('Generate reviews for my past orders'),
-                'onclick'   => 'javascript:exportOrders(); return false;',
+                'onclick'   => 'javascript:window.yotpoExportOrders(); return false;',
             ])
             ->toHtml();
     }
