@@ -253,7 +253,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     public function sendApiRequest($path, array $data, $method = "post", $timeout = self::DEFAULT_TIMEOUT, $contentType = 'application/json')
     {
         try {
-            $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - request: ", "info", ["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]);
+            $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - request: ", "info", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
 
             $this->_curl->setHeaders([
                 'Content-Type' => $contentType
