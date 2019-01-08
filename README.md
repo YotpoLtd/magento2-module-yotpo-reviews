@@ -1,11 +1,13 @@
- Magento 2 Yotpo Extension
-==========================
+# Magento 2 [Yotpo](https://www.yotpo.com/) Extension
+
+---
 
 This library includes the files of the Yotpo Reviews extension.
 The directories hierarchy is as positioned in a standard magento 2 project library
 
 This library will also include different version packages as magento 2 extensions
 
+---
 
 ## Requirements
 
@@ -25,8 +27,9 @@ php bin/magento cache:flush
 ```
 
 ## Install manually under app/code
-Download & place the contents of this repository under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Yotpo  
-Then, run the following commands under your Magento 2 root dir:
+1. Download & place the contents of [Yotpo's Core Module](https://github.com/YotpoLtd/magento2-module-yotpo-core) under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Core.
+2. Download & place the contents of this repository under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Yotpo  
+3. Run the following commands under your Magento 2 root dir:
 ```
 php bin/magento maintenance:enable
 php bin/magento setup:upgrade

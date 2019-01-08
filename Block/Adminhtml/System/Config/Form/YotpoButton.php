@@ -115,7 +115,7 @@ class YotpoButton extends \Magento\Config\Block\System\Config\Form\Field
             ->createBlock('Magento\Backend\Block\Widget\Button')
             ->setData([
                 'id'        => 'yotpo-export-button',
-                'label'     => __('Generate reviews for my past orders'),
+                'label'     => __('Collect reviews from past orders'),
                 'onclick'   => 'javascript:window.yotpoExportOrders(); return false;',
             ])
             ->toHtml();

@@ -3,7 +3,8 @@
     "description": "Yotpo Reviews extension for Magento2",
     "version": "2.7.0",
     "require": {
-        "php": "~5.5.0|~5.6.0|^7.0"
+        "php": "~5.5.0|~5.6.0|^7.0",
+        "yotpo/magento2-module-yotpo-core": "*"
     },
     "type": "magento2-module",
     "autoload": {

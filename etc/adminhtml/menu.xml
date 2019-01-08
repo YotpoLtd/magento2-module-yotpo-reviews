@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Yotpo_Yotpo::configuration" title="Reviews &amp; Visual Marketing" module="Yotpo_Yotpo" sortOrder="10" parent="Yotpo_Core::configuration" action="adminhtml/system_config/edit/section/yotpo" resource="Yotpo_Yotpo::config" />
+    </menu>
+</config>
