@@ -62,7 +62,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 					<tooltip>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</tooltip>
                 </field>
-                <field id="yotpo_button" translate="label button_label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="yotpo_button" translate="label button_label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Past orders</label>
                     <button_label>Generate reviews for my past orders</button_label>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>
