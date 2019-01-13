@@ -24,7 +24,7 @@ class Save implements ObserverInterface
     protected $_cacheTypeList;
 
     /**
-     * @param TypeListInterface $cacheTypeList
+     * @param TypeListInterface         $cacheTypeList
      * @param ReinitableConfigInterface $config
      */
     public function __construct(

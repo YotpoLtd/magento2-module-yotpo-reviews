@@ -33,10 +33,10 @@ class ReviewRenderer
      * Get review summary html
      *
      * @param \Magento\Review\Block\Product\ReviewRenderer $reviewRendererBlock
-     * @param callable $proceed
-     * @param Product $product
-     * @param string $templateType
-     * @param bool $displayIfNoReviews
+     * @param callable                                     $proceed
+     * @param Product                                      $product
+     * @param string                                       $templateType
+     * @param bool                                         $displayIfNoReviews
      *
      * @return string
      */

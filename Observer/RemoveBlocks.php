@@ -22,7 +22,9 @@ class RemoveBlocks implements ObserverInterface
     public function execute(Observer $observer)
     {
 
-        /** @var \Magento\Framework\View\Layout $layout */
+        /**
+ * @var \Magento\Framework\View\Layout $layout 
+*/
         $layout = $observer->getLayout();
 
         if ($this->_yotpoHelper->isEnabled() && $this->_yotpoHelper->isMdrEnabled() && $layout->getBlock('reviews.tab')) {

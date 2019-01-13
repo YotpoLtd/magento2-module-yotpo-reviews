@@ -24,11 +24,11 @@ class ListProduct
     /**
      * Get product reviews summary
      *
-     * @param \Magento\Catalog\Block\Product\ListProduct $listProductBlock
-     * @param callable $proceed
-     * @param Product $product
-     * @param bool $templateType
-     * @param bool $displayIfNoReviews
+     * @param  \Magento\Catalog\Block\Product\ListProduct $listProductBlock
+     * @param  callable                                   $proceed
+     * @param  Product                                    $product
+     * @param  bool                                       $templateType
+     * @param  bool                                       $displayIfNoReviews
      * @return string
      */
     public function aroundGetReviewsSummaryHtml(

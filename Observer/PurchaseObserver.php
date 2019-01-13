@@ -43,10 +43,9 @@ class PurchaseObserver implements ObserverInterface
             $this->_yotpoHelper->emulateFrontendArea($storeId, true);
             $this->_yotpoHelper->log('Yotpo PurchaseObserver [TRIGGERED]: Order ID: ' . $order->getId() . ', Store ID: ' . $storeId, "info");
 
-            if (
-                !$this->_yotpoHelper->isEnabled() ||
-                !$this->_yotpoHelper->isAppKeyAndSecretSet() ||
-                !in_array($order->getStatus(), $this->_yotpoHelper->getCustomOrderStatus())
+            if (!$this->_yotpoHelper->isEnabled() 
+                || !$this->_yotpoHelper->isAppKeyAndSecretSet() 
+                || !in_array($order->getStatus(), $this->_yotpoHelper->getCustomOrderStatus())
             ) {
                 $this->_yotpoHelper->log('Yotpo PurchaseObserver [SKIPPING]', "info");
                 return $this;

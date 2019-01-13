@@ -85,13 +85,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method __construct
-     * @param  Context                $context
-     * @param  StoreManagerInterface  $storeManager
-     * @param  EncryptorInterface     $encryptor
-     * @param  Escaper                $escaper
-     * @param  Registry               $coreRegistry
-     * @param  CatalogImageHelper     $catalogImageHelper
-     * @param  AppEmulation           $appEmulation
+     * @param  Context               $context
+     * @param  StoreManagerInterface $storeManager
+     * @param  EncryptorInterface    $encryptor
+     * @param  Escaper               $escaper
+     * @param  Registry              $coreRegistry
+     * @param  CatalogImageHelper    $catalogImageHelper
+     * @param  AppEmulation          $appEmulation
      */
     public function __construct(
         Context $context,
@@ -207,9 +207,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $scope = ScopeInterface::SCOPE_WEBSITES;
             }
             $collection = $this->_configCollectionFactory->create()
-                    ->addFieldToFilter('scope', $scope)
-                    ->addFieldToFilter('scope_id', $scopeId)
-                    ->addFieldToFilter('path', ['like' => $configPath . '%']);
+                ->addFieldToFilter('scope', $scope)
+                ->addFieldToFilter('scope_id', $scopeId)
+                ->addFieldToFilter('path', ['like' => $configPath . '%']);
             if ($collection->count()) {
                 return $collection->getFirstItem()->getValue();
             }
@@ -332,7 +332,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getYotpoNoSchemaApiUrl
-     * @param  string  $path
+     * @param  string $path
      * @return string
      */
     public function getYotpoNoSchemaApiUrl($path = "")
@@ -342,7 +342,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getYotpoSecuredApiUrl
-     * @param  string  $path
+     * @param  string $path
      * @return string
      */
     public function getYotpoSecuredApiUrl($path = "")
@@ -352,7 +352,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getYotpoUnsecuredApiUrl
-     * @param  string  $path
+     * @param  string $path
      * @return string
      */
     public function getYotpoUnsecuredApiUrl($path = "")
@@ -378,9 +378,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * Function returns information about initial store environment and emulates environment of another store
      *
-     * @param integer $storeId
-     * @param string $area
-     * @param bool $force A true value will ensure that environment is always emulated, regardless of current store
+     * @param  integer $storeId
+     * @param  string  $area
+     * @param  bool    $force   A true value will ensure that environment is always emulated, regardless of current store
      * @return \Yotpo\Yotpo\Helper\Data
      */
     public function startEnvironmentEmulation($storeId, $area = Area::AREA_FRONTEND, $force = false)
@@ -466,23 +466,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method log
-     * @param  mixed   $message
-     * @param  string  $type
-     * @param  array   $data
+     * @param  mixed  $message
+     * @param  string $type
+     * @param  array  $data
      * @return $this
      */
     public function log($message, $type = "info", $data = [])
     {
         if ($this->isDebugMode()) { //Log to system.log
             switch ($type) {
-                case 'error':
-                    $this->_logger->error(print_r($message, true), $data);
+            case 'error':
+                $this->_logger->error(print_r($message, true), $data);
                 break;
-                case 'debug':
-                    $this->_logger->debug(print_r($message, true), $data);
+            case 'debug':
+                $this->_logger->debug(print_r($message, true), $data);
                 break;
-                default:
-                    $this->_logger->info(print_r($message, true), $data);
+            default:
+                $this->_logger->info(print_r($message, true), $data);
                 break;
             }
         }
@@ -491,7 +491,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method escapeHtml
-     * @param  string  $str
+     * @param  string $str
      * @return string
      */
     public function escapeHtml($str)
@@ -501,8 +501,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getMediaUrl
-     * @param  string  $mediaPath
-     * @param  string  $filePath
+     * @param  string $mediaPath
+     * @param  string $filePath
      * @return string
      */
     public function getMediaUrl($mediaPath, $filePath)
@@ -512,7 +512,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getProductMainImageUrl
-     * @param  Product  $product
+     * @param  Product $product
      * @return string
      */
     public function getProductMainImageUrl(Product $product)
@@ -525,8 +525,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getProductImageUrl
-     * @param  Product  $product
-     * @param  string   $imageId
+     * @param  Product $product
+     * @param  string  $imageId
      * @return string
      */
     public function getProductImageUrl(Product $product, $imageId = 'product_page_image_large')
@@ -547,7 +547,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method getAllStoreIds
-     * @param  boolean        $withDefault
+     * @param  boolean $withDefault
      * @return array
      */
     public function getAllStoreIds($withDefault = false)

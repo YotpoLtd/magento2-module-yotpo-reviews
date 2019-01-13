@@ -39,14 +39,14 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @method __construct
      * @param  Context     $context
-     * @param  Curl $curl
+     * @param  Curl        $curl
      * @param  YotpoHelper $yotpoHelper
      */
     public function __construct(
         Context $context,
         Curl $curl,
         YotpoHelper $yotpoHelper
-  ) {
+    ) {
         $this->_curl = $curl;
         $this->_yotpoHelper = $yotpoHelper;
         parent::__construct($context);
@@ -102,14 +102,11 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function isOkResponse()
     {
-        if (
-            $this->getCurlStatus() === 200 ||
-            (
-                $this->getCurlStatus() === 100 &&
-                is_array(($headers = $this->getCurlHeaders())) &&
-                isset($headers['Status']) &&
-                $headers['Status'] === '200 OK'
-            )
+        if ($this->getCurlStatus() === 200 
+            || (            $this->getCurlStatus() === 100 
+            && is_array(($headers = $this->getCurlHeaders())) 
+            && isset($headers['Status']) 
+            && $headers['Status'] === '200 OK')
         ) {
             return true;
         }
@@ -118,7 +115,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method prepareProductsData
-     * @param  Order  $order
+     * @param  Order $order
      * @return array
      */
     protected function prepareProductsData(Order $order)
@@ -135,13 +132,15 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                         'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
                         'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
                         'price'       => $orderItem->getData('row_total_incl_tax'),
-                        'specs'       => array_filter([
+                        'specs'       => array_filter(
+                            [
                             'external_sku' => $product->getSku(),
                             'upc'          => $product->getUpc(),
                             'isbn'         => $product->getIsbn(),
                             'mpn'          => $product->getMpn(),
                             'brand'        => $product->getBrand(),
-                        ]),
+                            ]
+                        ),
                     ];
                 } catch (\Exception $e) {
                     $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
@@ -156,7 +155,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method oauthAuthentication
-     * @param  int|null  $storeId
+     * @param  int|null $storeId
      * @return mixed
      */
     public function oauthAuthentication($storeId = null)
@@ -168,11 +167,13 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->_yotpoHelper->log("Missing app key or secret", "debug");
                 return null;
             }
-            $result = $this->sendApiRequest('oauth/token', [
+            $result = $this->sendApiRequest(
+                'oauth/token', [
                 'client_id' => $app_key,
                 'client_secret' => $secret,
                 'grant_type' => 'client_credentials'
-            ]);
+                ]
+            );
             if (!is_array($result)) {
                 $this->_yotpoHelper->log("Yotpo ApiClient error: no response from api", "error");
                 return null;
@@ -191,7 +192,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method prepareOrderData
-     * @param  Order  $order
+     * @param  Order $order
      * @return array
      */
     public function prepareOrderData(Order $order)
@@ -222,7 +223,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method prepareOrdersData
-     * @param  \Magento\Sales\Model\ResourceModel\Order\Collection  $ordersCollection
+     * @param  \Magento\Sales\Model\ResourceModel\Order\Collection $ordersCollection
      * @return array
      */
     public function prepareOrdersData(\Magento\Sales\Model\ResourceModel\Order\Collection $ordersCollection)
@@ -243,11 +244,11 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method sendApiRequest
-     * @param  string  $path
-     * @param  array   $data
-     * @param  string  $method
-     * @param  int     $timeout
-     * @param  string  $contentType
+     * @param  string $path
+     * @param  array  $data
+     * @param  string $method
+     * @param  int    $timeout
+     * @param  string $contentType
      * @return mixed
      */
     public function sendApiRequest($path, array $data, $method = "post", $timeout = self::DEFAULT_TIMEOUT, $contentType = 'application/json')
@@ -255,15 +256,19 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - request: ", "info", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
 
-            $this->_curl->setHeaders([
+            $this->_curl->setHeaders(
+                [
                 'Content-Type' => $contentType
-            ]);
+                ]
+            );
             $this->_curl->setOption(CURLOPT_TIMEOUT, $timeout);
 
-            call_user_func_array([$this->_curl, strtolower($method)], [
+            call_user_func_array(
+                [$this->_curl, strtolower($method)], [
                 $this->_yotpoHelper->getYotpoSecuredApiUrl($path),
                 $data
-            ]);
+                ]
+            );
 
             $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - response: ", "info", $this->prepareCurlResponseData());
             return $this->prepareCurlResponseData();
@@ -274,7 +279,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method createPurchases
-     * @param  array  $order  Order prepared by $this->prepareOrderData()
+     * @param  array  $order   Order prepared by $this->prepareOrderData()
      * @param  string $token
      * @param  int    $storeId
      * @return mixed
@@ -287,17 +292,19 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @method massCreatePurchases
-     * @param  array   $orders  Array of orders prepared by $this->prepareOrderData()
-     * @param  string  $token
-     * @param  mixed   $storeId
+     * @param  array  $orders  Array of orders prepared by $this->prepareOrderData()
+     * @param  string $token
+     * @param  mixed  $storeId
      * @return mixed
      */
     public function massCreatePurchases(array $orders, string $token, $storeId = null)
     {
-        return $this->sendApiRequest("apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create", [
+        return $this->sendApiRequest(
+            "apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create", [
             'utoken'   => $token,
             'platform' => 'magento',
             'orders'   => $orders,
-        ]);
+            ]
+        );
     }
 }

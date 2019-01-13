@@ -26,7 +26,7 @@ class Conversion extends \Magento\Framework\View\Element\Template
     /**
      * @method __construct
      * @param  Context                  $context
-     * @param  YotpoHelper				$yotpoHelper
+     * @param  YotpoHelper              $yotpoHelper
      * @param  Session                  $checkoutSession
      * @param  OrderRepositoryInterface $orderRepository
      * @param  array                    $data
@@ -96,11 +96,13 @@ class Conversion extends \Magento\Framework\View\Element\Template
         if (!($this->hasOrder() && $this->_yotpoHelper->getAppKey())) {
             return null;
         }
-        return json_encode([
+        return json_encode(
+            [
             "orderId" => $this->getOrderId(),
             "orderAmount" => $this->getOrderAmount(),
             "orderCurrency" => $this->getOrderCurrency(),
-        ]);
+            ]
+        );
     }
 
     /**
@@ -112,11 +114,15 @@ class Conversion extends \Magento\Framework\View\Element\Template
         if (!($this->hasOrder() && $this->_yotpoHelper->getAppKey())) {
             return null;
         }
-        return $this->_yotpoHelper->getYotpoNoSchemaApiUrl("conversion_tracking.gif?" . http_build_query([
-            "app_key" => $this->_yotpoHelper->getAppKey(),
-            "order_id" => $this->getOrderId(),
-            "order_amount" => $this->getOrderAmount(),
-            "order_currency" => $this->getOrderCurrency(),
-        ]));
+        return $this->_yotpoHelper->getYotpoNoSchemaApiUrl(
+            "conversion_tracking.gif?" . http_build_query(
+                [
+                "app_key" => $this->_yotpoHelper->getAppKey(),
+                "order_id" => $this->getOrderId(),
+                "order_amount" => $this->getOrderAmount(),
+                "order_currency" => $this->getOrderCurrency(),
+                ]
+            )
+        );
     }
 }
