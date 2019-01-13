@@ -102,10 +102,10 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function isOkResponse()
     {
-        if ($this->getCurlStatus() === 200 
-            || (            $this->getCurlStatus() === 100 
-            && is_array(($headers = $this->getCurlHeaders())) 
-            && isset($headers['Status']) 
+        if ($this->getCurlStatus() === 200
+            || ($this->getCurlStatus() === 100
+            && is_array(($headers = $this->getCurlHeaders()))
+            && isset($headers['Status'])
             && $headers['Status'] === '200 OK')
         ) {
             return true;
@@ -168,7 +168,8 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 return null;
             }
             $result = $this->sendApiRequest(
-                'oauth/token', [
+                'oauth/token',
+                [
                 'client_id' => $app_key,
                 'client_secret' => $secret,
                 'grant_type' => 'client_credentials'
@@ -264,7 +265,8 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             $this->_curl->setOption(CURLOPT_TIMEOUT, $timeout);
 
             call_user_func_array(
-                [$this->_curl, strtolower($method)], [
+                [$this->_curl, strtolower($method)],
+                [
                 $this->_yotpoHelper->getYotpoSecuredApiUrl($path),
                 $data
                 ]
@@ -300,7 +302,8 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     public function massCreatePurchases(array $orders, string $token, $storeId = null)
     {
         return $this->sendApiRequest(
-            "apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create", [
+            "apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create",
+            [
             'utoken'   => $token,
             'platform' => 'magento',
             'orders'   => $orders,
