@@ -3,12 +3,12 @@
  * @var $block \Yotpo\Yotpo\Block\Yotpo
  */
 ?>
-<?php if (!($block->isEnabled() && $this->isRenderWidget() && $block->hasProduct())) {
+<?php if (!($block->isEnabled() && $block->isRenderWidget() && $block->hasProduct())) {
     return;
 }
 ?>
 <!-- Yotpo - Widget Div -->
-<?php if ($this->isRenderWidget()): ?>
+<?php if ($block->isRenderWidget()): ?>
 	<div class="yotpo yotpo-main-widget"
 		 data-product-id="<?php echo $block->getProductId(); ?>"
 		 data-name="<?php echo $block->getProductName(); ?>"
