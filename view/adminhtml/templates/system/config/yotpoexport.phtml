@@ -1,0 +1,28 @@
+
+<script type="text/javascript">
+    //<![CDATA[
+    function exportCatalog() {debugger;
+    var params = {
+                form_key : FORM_KEY,
+                store_id : '<?php echo $this->getStoreId() ?>'
+            };
+    var url = '<?php echo $this->getExportUrl()?>';
+       new Ajax.Request(url , {
+                parameters:params,
+                method:'post',
+                onComplete:function(transport) {
+                    window.location.href = url; 
+                }
+        });
+
+    }
+    //]]>
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>
+<p style="color: #303030;
+    font-size: 12px;
+    margin: 5px 0;">Please be patient, this may take a while. </p>
+
+

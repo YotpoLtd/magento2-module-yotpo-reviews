@@ -96,6 +96,12 @@
                     <button_label>Generate reviews for my past orders</button_label>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>
                 </field>
+
+                <field id="yotpo_export" translate="button_label" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="1">
+                     <label>Yotpo Export</label>
+                    <button_label>Generate product catalog Yotpo format</button_label>
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoExport</frontend_model>
+                </field>
             </group>
         </section>
     </system>
