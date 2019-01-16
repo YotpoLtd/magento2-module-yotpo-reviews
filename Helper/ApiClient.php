@@ -42,6 +42,8 @@ class ApiClient
     $items = $order->getAllVisibleItems();
     foreach ($items as $item) {
         try {
+	    if ($item->getProduct() == null)
+		continue;
             $productID = $item->getProduct()->getId();
             $productType = $item->getData('product_type');
             if ($productType == 'simple') {

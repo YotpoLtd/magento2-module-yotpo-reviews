@@ -76,6 +76,8 @@ public function __construct(
             foreach($salesCollection as $order)
             {
                 $order_data = $this->_api->prepareOrderData($order);
+		if (empty($order_data["products"]))
+			continue;
                 if (!$order->getCustomerIsGuest()) {
                     $order_data["user_reference"] = $order->getCustomerId();
                 }
