@@ -60,12 +60,8 @@ class ApiClient
                     break 1;
                 }
             }
-            $extension = substr(strrchr($_product->getProductUrl(),'.'),0);
-            if(empty($extension)){
-                $extension = '';
-            } 
             $productName = $_product->getName();
-            $productUrl = $storeUrl.$_product->getUrlKey().$extension;
+            $productUrl = $storeUrl.$_product->getUrlKey();
             $imageUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getImage();
             $sku = $_product->getSku();
             $upc = $_product->getUpc();
