@@ -61,7 +61,7 @@ class ApiClient
                 }
             }
             $extension = substr(strrchr($_product->getProductUrl(),'.'),0);
-            if (empty($extension) || strpos($var, '/') === true){
+            if (empty($extension) || strpos($extension, '/') === true){
                 $extension = '';
             } 
             $productName = $_product->getName();
