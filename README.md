@@ -125,7 +125,7 @@ For more information, please see the Magento DevDocs reference, [here](http://de
 
 ## Support
 ### Architects
-For support or questions regarding your the development of your extension, like best practices or approval guidelines, you may contact your assigned architects directly at **{ext-repo-name}@magento.com**.
+For support or questions regarding your the development of your extension, like best practices or approval guidelines, you may contact your assigned architects directly at **grp-Magento-{ext-repo-name}@adobe.com**.
 
 ### Platform
-If you experience any issues with BESS itself, please reach out to Magento's DevOps Team at [BESS Support team](mailto:bess-support@magento.com) with a description of your issue and accompanying build logs, if applicable.
+If you experience any issues with BESS itself, please reach out to Magento's DevOps Team at [BESS Support team](mailto:grp-bess-support@adobe.com) with a description of your issue and accompanying build logs, if applicable.
