@@ -114,46 +114,6 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @method prepareProductsData
-     * @param  Order $order
-     * @return array
-     */
-    protected function prepareProductsData(Order $order)
-    {
-        $productsData = [];
-
-        try {
-            foreach ($order->getAllVisibleItems() as $orderItem) {
-                try {
-                    $product = $orderItem->getProduct();
-                    $productsData[$product->getId()] = [
-                        'name'        => $product->getName(),
-                        'url'         => $product->getProductUrl(),
-                        'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
-                        'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
-                        'price'       => $orderItem->getData('row_total_incl_tax'),
-                        'specs'       => array_filter(
-                            [
-                            'external_sku' => $product->getSku(),
-                            'upc'          => $product->getUpc(),
-                            'isbn'         => $product->getIsbn(),
-                            'mpn'          => $product->getMpn(),
-                            'brand'        => $product->getBrand(),
-                            ]
-                        ),
-                    ];
-                } catch (\Exception $e) {
-                    $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
-                }
-            }
-        } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
-        }
-
-        return $productsData;
-    }
-
-    /**
      * @method oauthAuthentication
      * @param  int|null $storeId
      * @return mixed
@@ -192,37 +152,6 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @method prepareOrderData
-     * @param  Order $order
-     * @return array
-     */
-    public function prepareOrderData(Order $order)
-    {
-        $orderData = [];
-
-        try {
-            $orderData['order_id'] = $order->getIncrementId();
-            $orderData['order_date'] = $order->getCreatedAt();
-            $orderData['currency_iso'] = $order->getOrderCurrency()->getCode();
-            $orderData['email'] = $order->getCustomerEmail();
-            $orderData['customer_name'] = trim($order->getCustomerFirstName() . ' ' . $order->getCustomerLastName());
-            if (!$orderData['customer_name'] && ($billingAddress = $order->getBillingAddress())) {
-                $orderData['customer_name'] = trim($billingAddress->getFirstname() . ' ' . $billingAddress->getLastname());
-            }
-            if (!$order->getCustomerIsGuest()) {
-                $orderData['user_reference'] = $order->getCustomerId();
-            }
-            $orderData['platform'] = 'magento';
-            $orderData['products'] = $this->prepareProductsData($order);
-        } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient prepareOrderData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
-            return [];
-        }
-
-        return $orderData;
-    }
-
-    /**
      * @method prepareOrdersData
      * @param  \Magento\Sales\Model\ResourceModel\Order\Collection $ordersCollection
      * @return array
@@ -240,7 +169,84 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             return [];
         }
 
-        return $ordersData;
+        return array_filter($ordersData);
+    }
+
+    /**
+     * @method prepareOrderData
+     * @param  Order $order
+     * @return array
+     */
+    public function prepareOrderData(Order $order)
+    {
+        $orderData = [];
+
+        try {
+            $orderData['products'] = $this->prepareProductsData($order);
+            if (!$orderData['products']) {
+                return [];
+            }
+            $orderData['order_id'] = $order->getIncrementId();
+            $orderData['order_date'] = $order->getCreatedAt();
+            $orderData['currency_iso'] = $order->getOrderCurrency()->getCode();
+            $orderData['email'] = $order->getCustomerEmail();
+            $orderData['customer_name'] = trim($order->getCustomerFirstName() . ' ' . $order->getCustomerLastName());
+            if (!$orderData['customer_name'] && ($billingAddress = $order->getBillingAddress())) {
+                $orderData['customer_name'] = trim($billingAddress->getFirstname() . ' ' . $billingAddress->getLastname());
+            }
+            if (!$order->getCustomerIsGuest()) {
+                $orderData['user_reference'] = $order->getCustomerId();
+            }
+            $orderData['platform'] = 'magento';
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("Yotpo ApiClient prepareOrderData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            return [];
+        }
+
+        return $orderData;
+    }
+
+    /**
+     * @method prepareProductsData
+     * @param  Order $order
+     * @return array
+     */
+    protected function prepareProductsData(Order $order)
+    {
+        $productsData = [];
+
+        try {
+            foreach ($order->getAllVisibleItems() as $orderItem) {
+                try {
+                    $product = $orderItem->getProduct();
+                    if (!($product && $product->getId())) {
+                        continue;
+                    }
+                    $productsData[$product->getId()] = [
+                        'name'        => $product->getName(),
+                        'url'         => $product->getProductUrl(),
+                        'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
+                        'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
+                        'price'       => $orderItem->getData('row_total_incl_tax'),
+                        'specs'       => array_filter(
+                            [
+                            'external_sku' => $product->getSku(),
+                            'upc'          => $product->getUpc(),
+                            'isbn'         => $product->getIsbn(),
+                            'mpn'          => $product->getMpn(),
+                            'brand'        => $product->getBrand(),
+                            ]
+                        ),
+                    ];
+                } catch (\Exception $e) {
+                    $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                }
+            }
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+
+        return $productsData;
     }
 
     /**
