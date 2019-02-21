@@ -60,9 +60,13 @@
 				<field id="debug_mode_active" translate="label tooltip" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Debug Mode Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-					<tooltip>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</tooltip>
-                </field>
-                <field id="yotpo_button" translate="label button_label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+										<tooltip>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</tooltip>
+        </field>
+								<field id="start_sync" translate="label comment" sortOrder="110" type="text" showInDefault="1" showInStore="1" >
+										<label>Start Sync From Date</label>
+										<frontend_model>Yotpo\Yotpo\Block\DatePicker</frontend_model>
+								</field>
+                <field id="yotpo_button" translate="label button_label" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Past orders</label>
                     <button_label>Generate reviews for my past orders</button_label>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\YotpoButton</frontend_model>

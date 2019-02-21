@@ -15,6 +15,7 @@ use Magento\Store\Model\App\Emulation as AppEmulation;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
+use \Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -32,6 +33,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_YOTPO_MDR_ENABLED = 'yotpo/settings/mdr_enabled';
     const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
     const XML_PATH_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
+    const SYNC_FROM_DATE = "yotpo/settings/start_sync";
 
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
@@ -84,6 +86,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_logger;
 
     /**
+     * @var CollectionFactory
+     */
+    protected $_orderCollectionFactory;
+
+    /**
      * @method __construct
      * @param  Context               $context
      * @param  StoreManagerInterface $storeManager
@@ -100,9 +107,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Escaper $escaper,
         Registry $coreRegistry,
         CatalogImageHelper $catalogImageHelper,
-        AppEmulation $appEmulation
+        AppEmulation $appEmulation,
+        CollectionFactory $orderCollectionFactory
     ) {
         $this->_context = $context;
+        $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_storeManager = $storeManager;
         $this->_encryptor = $encryptor;
         $this->_escaper = $escaper;
@@ -315,19 +324,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @return date
+     */
+    public function getSyncAfterDate()
+    {
+      $timeString = $this->getConfig(self::SYNC_FROM_DATE);
+      $date = strtotime($timeString);
+      return date('Y-m-d' . ' 00:00:00', $date);
+    }
+
+    /**
      * @return boolean
      */
     public function isAppKeyAndSecretSet($scopeId = null, $scope = null, $skipCahce = false)
     {
         return ($this->getAppKey($scopeId, $scope, $skipCahce) && $this->getSecret($scopeId, $scope, $skipCahce)) ? true : false;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTimeFrame()
-    {
-        return date('Y-m-d', strtotime('-90 days'));
     }
 
     /**
@@ -559,5 +570,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $this->_allStoreIds;
+    }
+
+
+    public function getOrderCollection()
+    {
+        $collection = $this->_orderCollectionFactory->create();
+
+        $collection->getSelect()->joinLeft(
+            ['yotpo_sync'=>$collection->getTable('yotpo_sync')],
+              "main_table.entity_id = yotpo_sync.entity_id AND yotpo_sync.entity_type = 'orders'",
+            [
+                'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
+            ]
+        );
+
+        $collection->addAttributeToFilter('yotpo_sync.sync_flag', array(array('null' => true),array('eq' => 0)));
+        $collection->addAttributeToFilter('created_at', array('gt' => $this->getSyncAfterDate()));
+
+        return $collection;
     }
 }
