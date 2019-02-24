@@ -31,9 +31,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
     const XML_PATH_YOTPO_BOTTOMLINE_QNA_ENABLED = 'yotpo/settings/qna_enabled';
     const XML_PATH_YOTPO_MDR_ENABLED = 'yotpo/settings/mdr_enabled';
-    const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
     const XML_PATH_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
     const XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE = "yotpo/sync_settings/orders_sync_start_date";
+    const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
     const XML_PATH_YOTPO_ORDERS_SYNC_LIMIT = "yotpo/sync_settings/orders_sync_limit";
 
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
@@ -593,6 +593,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $this->_product;
+    }
+
+    /**
+     * @method getCurrentStoreId
+     * @return int
+     */
+    public function getCurrentStoreId()
+    {
+        return $this->_storeManager->getStore()->getId();
     }
 
     /**

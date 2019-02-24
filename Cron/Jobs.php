@@ -153,6 +153,9 @@ class Jobs
                 $this->_output->writeln('<comment>' . print_r($data, true) . '</comment>');
             }
         } else {
+            if ($type === 'error') {
+                $this->addAdminNotification("Yopto - An error occurred during the automated sync process!", "*If you enabled debug mode on Yotpo - Reviews & Visual Marketing, you should see more details in the log file (var/log/system.log)", 'critical');
+            }
             $this->_yotpoHelper->log($message, $type, $data);
         }
         return $this;
@@ -238,7 +241,7 @@ class Jobs
                             ->addAttributeToFilter('main_table.store_id', $storeId)
                             ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
                             ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
-                            ->addAttributeToSort('main_table.created_at', 'DESC');
+                            ->addAttributeToSort('main_table.created_at', 'ASC');
                         if (($limit = (is_null($this->_limit)) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit)) {
                             $ordersCollection->setPageSize((is_null($this->_limit)) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit);
                         }
