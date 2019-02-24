@@ -14,19 +14,14 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 class InstallSchema implements InstallSchemaInterface
 {
     /**
-     * Install script.
-     *
-     * @param SchemaSetupInterface $setup
-     * @param ModuleContextInterface $context
+     * @method install
+     * @param  SchemaSetupInterface   $setup
+     * @param  ModuleContextInterface $context
      */
-    protected $_resource;
-
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;
         $installer->startSetup();
-
-        $installer->endSetup();
 
         $table = $installer->getConnection()->newTable(
             $installer->getTable('yotpo_rich_snippets')
@@ -67,43 +62,8 @@ class InstallSchema implements InstallSchemaInterface
             ['nullable' => false],
             'Expiry Time'
         );
-
-        $syncTable = $installer->getConnection()->newTable(
-            $installer->getTable('yotpo_sync')
-        )->addColumn(
-            'sync_id',
-            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-            null,
-            ['identity' => true, 'nullable' => false, 'primary' => true],
-            'Id'
-        )->addColumn(
-            'entity_type',
-            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-            null,
-            ['nullable' => false],
-            'Entity Type'
-        )->addColumn(
-            'entity_id',
-            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-            null,
-            ['nullable' => false],
-            'Entity Id'
-        )->addColumn(
-            'sync_flag',
-            \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
-            null,
-            ['nullable' => true, 'default' => '0'],
-            'Sync Flag'
-        )->addColumn(
-            'sync_date',
-            \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME,
-            null,
-            ['nullable' => false],
-            'Sync Date'
-        );
-
         $installer->getConnection()->createTable($table);
-        $installer->getConnection()->createTable($syncTable);
+
         $installer->endSetup();
     }
 }

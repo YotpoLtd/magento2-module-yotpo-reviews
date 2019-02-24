@@ -9,13 +9,13 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\App\Emulation as AppEmulation;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use \Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -33,7 +33,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_YOTPO_MDR_ENABLED = 'yotpo/settings/mdr_enabled';
     const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
     const XML_PATH_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
-    const SYNC_FROM_DATE = "yotpo/settings/start_sync";
+    const XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE = "yotpo/sync_settings/orders_sync_start_date";
+    const XML_PATH_YOTPO_ORDERS_SYNC_LIMIT = "yotpo/sync_settings/orders_sync_limit";
 
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
@@ -66,6 +67,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_escaper;
 
     /**
+     * @var DateTimeFactory
+     */
+    protected $_datetimeFactory;
+
+    /**
      * @var Registry
      */
     protected $_coreRegistry;
@@ -86,16 +92,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_logger;
 
     /**
-     * @var CollectionFactory
-     */
-    protected $_orderCollectionFactory;
-
-    /**
      * @method __construct
      * @param  Context               $context
      * @param  StoreManagerInterface $storeManager
      * @param  EncryptorInterface    $encryptor
      * @param  Escaper               $escaper
+     * @param  DateTimeFactory       $datetimeFactory
      * @param  Registry              $coreRegistry
      * @param  CatalogImageHelper    $catalogImageHelper
      * @param  AppEmulation          $appEmulation
@@ -105,16 +107,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         StoreManagerInterface $storeManager,
         EncryptorInterface $encryptor,
         Escaper $escaper,
+        DateTimeFactory $datetimeFactory,
         Registry $coreRegistry,
         CatalogImageHelper $catalogImageHelper,
-        AppEmulation $appEmulation,
-        CollectionFactory $orderCollectionFactory
+        AppEmulation $appEmulation
     ) {
         $this->_context = $context;
-        $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_storeManager = $storeManager;
         $this->_encryptor = $encryptor;
         $this->_escaper = $escaper;
+        $this->_datetimeFactory = $datetimeFactory;
         $this->_coreRegistry = $coreRegistry;
         $this->_catalogImageHelper = $catalogImageHelper;
         $this->_appEmulation = $appEmulation;
@@ -160,6 +162,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getEscaper()
     {
         return $this->_escaper;
+    }
+
+    /**
+     * @method getDatetimeFactory
+     * @return DateTimeFactory
+     */
+    public function getDatetimeFactory()
+    {
+        return $this->_datetimeFactory;
     }
 
     /**
@@ -326,11 +337,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @return date
      */
-    public function getSyncAfterDate()
+    public function getOrdersSyncAfterDate()
     {
-      $timeString = $this->getConfig(self::SYNC_FROM_DATE);
-      $date = strtotime($timeString);
-      return date('Y-m-d' . ' 00:00:00', $date);
+        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE)) ?: time();
+        return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrdersSyncLimit()
+    {
+        return (($limit = (int)$this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_LIMIT)) > 0) ? $limit : 0;
     }
 
     /**
@@ -511,6 +529,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @method getCurrentDate
+     * @return date
+     */
+    public function getCurrentDate()
+    {
+        return $this->getDatetimeFactory()->create()->gmtDate();
+    }
+
+    /**
+     * @method strToCamelCase
+     * @param  string         $str
+     * @param  string         $prefix
+     * @param  string         $suffix
+     * @return string
+     */
+    public function strToCamelCase($str, $prefix = '', $suffix = '')
+    {
+        return $prefix . str_replace('_', '', ucwords($str, '_')) . $suffix;
+    }
+
+    /**
      * @method getMediaUrl
      * @param  string $mediaPath
      * @param  string $filePath
@@ -570,24 +609,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $this->_allStoreIds;
-    }
-
-
-    public function getOrderCollection()
-    {
-        $collection = $this->_orderCollectionFactory->create();
-
-        $collection->getSelect()->joinLeft(
-            ['yotpo_sync'=>$collection->getTable('yotpo_sync')],
-              "main_table.entity_id = yotpo_sync.entity_id AND yotpo_sync.entity_type = 'orders'",
-            [
-                'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
-            ]
-        );
-
-        $collection->addAttributeToFilter('yotpo_sync.sync_flag', array(array('null' => true),array('eq' => 0)));
-        $collection->addAttributeToFilter('created_at', array('gt' => $this->getSyncAfterDate()));
-
-        return $collection;
     }
 }
