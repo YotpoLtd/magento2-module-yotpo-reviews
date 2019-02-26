@@ -49,11 +49,13 @@ class ApiClient
             if ($productType == 'simple') {
                 $_product = $productModel->load($productID);
             } else {
+                $columnFilter = "entity_id";
                 if ($productType == 'grouped') {
+                    $columnFilter = "row_id";
                     $productIDs = $groupedProductModel->getParentIdsByChild($item->getProduct()->getId());
                     $productID = $productIDs[0];
                 }
-                $_products = $productCollection->create()->addAttributeToSelect('*')->addStoreFilter()->addFieldToFilter('entity_id', ['in' => $productID]);
+                $_products = $productCollection->create()->addAttributeToSelect('*')->addStoreFilter()->addFieldToFilter($columnFilter, ['in' => $productID]);
                 foreach ($_products as $product) { // This is needed as we can't use object as array in collection way.
                     $_product = $product;
 
