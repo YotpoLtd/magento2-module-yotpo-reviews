@@ -228,12 +228,12 @@ class Jobs
                         $this->_yotpoHelper->emulateFrontendArea($storeId, true);
 
                         if (!(($appKey = $this->_yotpoHelper->getAppKey()) && ($secret = $this->_yotpoHelper->getSecret()))) {
-                            $this->_messageManager->addError(__('Please make sure you insert your APP KEY and SECRET and save configuration before trying to export past orders'));
-                            return;
+                            $this->_processOutput(__('Please make sure you insert your APP KEY and SECRET and save configuration before trying to export past orders'), "error");
+                            continue;
                         }
                         if (!($token = $this->_yotpoApi->oauthAuthentication())) {
-                            $this->_messageManager->addError(__("Please make sure the APP KEY and SECRET you've entered are correct"));
-                            return;
+                            $this->_processOutput(__("Please make sure the APP KEY and SECRET you've entered are correct"), "error");
+                            continue;
                         }
 
                         $ordersCollection = $this->getOrderCollection()
