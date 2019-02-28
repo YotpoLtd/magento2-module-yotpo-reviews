@@ -61,7 +61,7 @@ class Config
     public function getTimeFrame()
     {        
         $today = time();
-        $last = $today - (60*60*24*90); //90 days ago
+        $last = $today - (60*60*24*150); //150 days ago
         return date("Y-m-d", $last);
     }              
 }
