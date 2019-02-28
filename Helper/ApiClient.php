@@ -97,9 +97,7 @@ class ApiClient
             if (!empty($specsData)) {
                 $productData['specs'] = $specsData;
             }
-        } catch (\Exception $e) {
-            $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
-        }
+
         $rawDescription = str_replace(array('\'', '"'), '', $_product->getDescription());
         $description = $this->_escaper->escapeHtml(strip_tags($rawDescription));
         $productData['description'] = $description;
@@ -109,6 +107,9 @@ class ApiClient
         $productPrice[$productID] += $item->getData('row_total_incl_tax');
         $productData['price'] = $productPrice[$productID];
         $productDataArray[$productID] = $productData;
+        } catch (\Exception $e) {
+            $this->_logger->addDebug('ApiClient prepareProductsData Exception' . json_encode($e));
+        }
     }
     return $productDataArray;
   }

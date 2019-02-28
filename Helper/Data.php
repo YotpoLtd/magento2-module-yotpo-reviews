@@ -10,27 +10,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
-    public function showWidget($thisObj, $product = null, $print=true)
+    public function showWidget($thisObj, $product = null)
     {
-        return $this->renderYotpoProductBlock($thisObj, 'widget_div', $product, $print);
+        return $this->renderYotpoProductBlock($thisObj, 'yotpo_widget_div', $product);
     }  
     
-    public function showBottomline($thisObj, $product = null, $print=true)
+    public function showBottomline($thisObj, $product = null)
     {
-        return $this->renderYotpoProductBlock($thisObj, 'bottomline', $product, $print);
-    }  
-    
-    public function showQABottomline($thisObj, $product = null, $print=true)
-    {
-        return $this->renderYotpoProductBlock($thisObj, 'yotpo-qa-bottomline', $product, $print);
-    }
-    
-    public function showQuestions($thisObj, $product = null, $print=true)
-    {
-        return $this->renderYotpoProductBlock($thisObj, 'yotpo-questions', $product, $print);
+        return $this->renderYotpoProductBlock($thisObj, 'yotpo_bottomline', $product);
     }
 
-    private function renderYotpoProductBlock($thisObj, $blockName, $product = null, $print=true)
+    private function renderYotpoProductBlock($thisObj, $blockName, $product = null)
     {
         $block = $thisObj->getLayout()->getBlock($blockName);
         if ($block == null) {
@@ -44,12 +34,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $block->setAttribute('product', $product);
         }
 
-        if ($print == true) {
-            $block->setAttribute('fromHelper', false);
-        } else {
-            $ret = $block->toHtml();
-            $block->setAttribute('fromHelper', false);
-            return $ret;
-        }        
-    }      
+        $ret = $block->toHtml();
+        $block->setAttribute('fromHelper', false);
+        return $ret;
+    }
 }

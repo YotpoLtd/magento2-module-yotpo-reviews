@@ -11,6 +11,6 @@
 
        <referenceContainer name="product.info.main">
             <block  class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_bottomline" as="yotpo_other" template="bottomline.phtml" before="product.info.addto"/>
-       </referenceContainer>             
+       </referenceContainer>
     </body>
 </page>
