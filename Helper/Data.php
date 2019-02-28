@@ -11,6 +11,7 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\App\Emulation as AppEmulation;
 use Magento\Store\Model\ScopeInterface;
@@ -31,10 +32,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PATH_YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
     const XML_PATH_YOTPO_BOTTOMLINE_QNA_ENABLED = 'yotpo/settings/qna_enabled';
     const XML_PATH_YOTPO_MDR_ENABLED = 'yotpo/settings/mdr_enabled';
-    const XML_PATH_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
+    const XML_PATH_YOTPO_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
     const XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE = "yotpo/sync_settings/orders_sync_start_date";
     const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
     const XML_PATH_YOTPO_ORDERS_SYNC_LIMIT = "yotpo/sync_settings/orders_sync_limit";
+
+    const XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE = "yotpo/module_info/yotpo_installation_date"; //Not visible on system.xml
 
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
@@ -259,7 +262,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isDebugMode($scope = null, $scopeId = null, $skipCahce = false)
     {
-        return ($this->getConfig(self::XML_PATH_DEBUG_MODE_ENABLED, $scope, $scopeId, $skipCahce)) ? true : false;
+        return ($this->getConfig(self::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $scope, $scopeId, $skipCahce)) ? true : false;
     }
 
     /**
@@ -335,12 +338,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @method getOrdersSyncAfterDate
+     * @param  string                 $format
      * @return date
      */
-    public function getOrdersSyncAfterDate()
+    public function getOrdersSyncAfterDate($format = 'Y-m-d H:i:s')
     {
-        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE)) ?: time();
-        return date('Y-m-d H:i:s', $timestamp);
+        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE) ?: $this->getCurrentDate());
+        return date($format, $timestamp);
     }
 
     /**
@@ -349,6 +354,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getOrdersSyncLimit()
     {
         return (($limit = (int)$this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_LIMIT)) > 0) ? $limit : 0;
+    }
+
+    /**
+     * @method getModuleInstallationDate
+     * @param  string                 $format
+     * @return date
+     */
+    public function getModuleInstallationDate($format = 'Y-m-d')
+    {
+        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE) ?: $this->getCurrentDate());
+        return date($format, $timestamp);
+    }
+
+    /**
+     * @method getOrdersSyncAfterMinDate
+     * @param  string                 $format
+     * @return date
+     */
+    public function getOrdersSyncAfterMinDate($format = 'Y-m-d')
+    {
+        $timestamp = strtotime("-3 months", strtotime($this->getConfig(self::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE) ?: $this->getCurrentDate()));
+        return date($format, $timestamp);
     }
 
     /**
@@ -447,46 +474,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     // Renderers //
     ///////////////
 
-    public function showWidget($thisObj, $product = null, $print=true)
+    public function showWidget(AbstractBlock $parentBlock, Product $product = null)
     {
-        return $this->renderYotpoProductBlock($thisObj, 'widget_div', $product, $print);
+        return $parentBlock->getLayout()->createBlock('Yotpo\Yotpo\Block\Yotpo')
+          ->setTemplate('Yotpo_Yotpo::widget_div.phtml')
+          ->setAttribute('product', $product)
+          ->setAttribute('fromHelper', true)
+          ->toHtml();
     }
 
-    public function showBottomline($thisObj, $product = null, $print=true)
+    public function showBottomline(AbstractBlock $parentBlock, Product $product = null)
     {
-        return $this->renderYotpoProductBlock($thisObj, 'bottomline', $product, $print);
-    }
-
-    public function showQABottomline($thisObj, $product = null, $print=true)
-    {
-        return $this->renderYotpoProductBlock($thisObj, 'yotpo-qa-bottomline', $product, $print);
-    }
-
-    public function showQuestions($thisObj, $product = null, $print=true)
-    {
-        return $this->renderYotpoProductBlock($thisObj, 'yotpo-questions', $product, $print);
-    }
-
-    protected function renderYotpoProductBlock($thisObj, $blockName, $product = null, $print=true)
-    {
-        $block = $thisObj->getLayout()->getBlock($blockName);
-        if ($block == null) {
-            $this->_logger->addDebug("can't find yotpo block");
-            return;
-        }
-        $block->setAttribute('fromHelper', true);
-
-        if ($product != null) {
-            $block->setAttribute('product', $product);
-        }
-
-        if ($print == true) {
-            $block->setAttribute('fromHelper', false);
-        } else {
-            $ret = $block->toHtml();
-            $block->setAttribute('fromHelper', false);
-            return $ret;
-        }
+        return $parentBlock->getLayout()->createBlock('Yotpo\Yotpo\Block\Yotpo')
+          ->setTemplate('Yotpo_Yotpo::bottomline.phtml')
+          ->setAttribute('product', $product)
+          ->setAttribute('fromHelper', true)
+          ->toHtml();
     }
 
     ////////////

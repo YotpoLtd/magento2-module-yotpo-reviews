@@ -13,6 +13,7 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 class Jobs
 {
     private $_memoryLimitUpdated = false;
+    private $_adminNotificationError = false;
 
     /**
      * System config (defaults):
@@ -147,17 +148,23 @@ class Jobs
      */
     protected function _processOutput($message, $type = "info", $data = [])
     {
-        if ($this->_output instanceof OutputInterface) { //Output to terminal
+        if ($this->_output instanceof OutputInterface) {
+            //Output to terminal
             $this->_output->writeln('<' . $type . '>' . print_r($message, true) . '</' . $type . '>');
             if ($data) {
                 $this->_output->writeln('<comment>' . print_r($data, true) . '</comment>');
             }
         } else {
-            if ($type === 'error') {
+            //Add admin error notification
+            if ($type === 'error' && !$this->_adminNotificationError) {
                 $this->addAdminNotification("Yopto - An error occurred during the automated sync process!", "*If you enabled debug mode on Yotpo - Reviews & Visual Marketing, you should see more details in the log file (var/log/system.log)", 'critical');
+                $this->_adminNotificationError = true;
             }
-            $this->_yotpoHelper->log($message, $type, $data);
         }
+
+        //Log to var/log/system.log
+        $this->_yotpoHelper->log($message, $type, $data);
+
         return $this;
     }
 

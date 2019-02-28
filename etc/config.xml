@@ -11,7 +11,7 @@
                 <custom_order_status>complete</custom_order_status>
             </settings>
             <sync_settings>
-                <orders_sync_limit>10</orders_sync_limit>
+                <orders_sync_limit>50</orders_sync_limit>
             </sync_settings>
         </yotpo>
     </default>

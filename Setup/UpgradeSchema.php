@@ -3,9 +3,12 @@
 namespace Yotpo\Yotpo\Setup;
 
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
+use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
+use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
+use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
 /**
  * Class UpgradeSchema
@@ -20,13 +23,31 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
      protected $_resourceConfig;
 
      /**
+      * @var DateTimeFactory
+      */
+     protected $_datetimeFactory;
+
+     /**
+      * Application config
+      *
+      * @var ScopeConfigInterface
+      */
+     protected $_appConfig;
+
+     /**
       * @method __construct
       * @param  ResourceConfig $resourceConfig
+      * @param  DateTimeFactory $datetimeFactory
+      * @param  ReinitableConfigInterface $appConfig
       */
      public function __construct(
-        ResourceConfig $resourceConfig
+        ResourceConfig $resourceConfig,
+        DateTimeFactory $datetimeFactory,
+        ReinitableConfigInterface $appConfig
     ) {
          $this->_resourceConfig = $resourceConfig;
+         $this->_datetimeFactory = $datetimeFactory;
+         $this->_appConfig = $appConfig;
      }
 
      /**
@@ -91,12 +112,10 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
             );
              $installer->getConnection()->createTable($syncTable);
 
-             $this->_resourceConfig->saveConfig(
-                \Yotpo\Yotpo\Helper\Data::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE,
-                date('Y-m-d', time()),
-                'default',
-                0
-            );
+             $currentDate = $this->_datetimeFactory->create()->gmtDate('Y-m-d');
+             $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE, $currentDate, 'default', 0);
+             $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $currentDate, 'default', 0);
+             $this->_appConfig->reinit();
          }
 
          $installer->endSetup();
