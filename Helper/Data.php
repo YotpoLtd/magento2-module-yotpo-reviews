@@ -476,17 +476,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function showWidget(AbstractBlock $parentBlock, Product $product = null)
     {
-        return $parentBlock->getLayout()->createBlock('Yotpo\Yotpo\Block\Yotpo')
-          ->setTemplate('Yotpo_Yotpo::widget_div.phtml')
-          ->setAttribute('product', $product)
-          ->setAttribute('fromHelper', true)
-          ->toHtml();
+        return $this->renderYotpoProductBlock('widget_div', $parentBlock, $product);
     }
 
     public function showBottomline(AbstractBlock $parentBlock, Product $product = null)
     {
+        return $this->renderYotpoProductBlock('bottomline', $parentBlock, $product);
+    }
+
+    protected function renderYotpoProductBlock($blockName, AbstractBlock $parentBlock, Product $product = null)
+    {
         return $parentBlock->getLayout()->createBlock('Yotpo\Yotpo\Block\Yotpo')
-          ->setTemplate('Yotpo_Yotpo::bottomline.phtml')
+          ->setTemplate('Yotpo_Yotpo::' . $blockName . '.phtml')
           ->setAttribute('product', $product)
           ->setAttribute('fromHelper', true)
           ->toHtml();
