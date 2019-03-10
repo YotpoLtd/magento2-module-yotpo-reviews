@@ -43,16 +43,11 @@ class ListProduct
         }
 
         if ($this->_yotpoHelper->isCategoryBottomlineEnabled()) {
-            return $this->showCategoryBottomLine($product);
+            return $this->_yotpoHelper->getCategoryBottomLineHtml($product);
         } elseif (!$this->_yotpoHelper->isMdrEnabled()) {
             return $proceed($product, $templateType, $displayIfNoReviews);
         } else {
             return '';
         }
-    }
-
-    public function showCategoryBottomLine(Product $product)
-    {
-        return '<div class="yotpo bottomLine bottomline-position" data-product-id="' . $product->getId() . '" data-url="' . $product->getUrl() . '"></div>';
     }
 }
