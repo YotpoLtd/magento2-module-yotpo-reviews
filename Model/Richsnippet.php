@@ -15,12 +15,12 @@ class Richsnippet extends \Magento\Framework\Model\AbstractModel
 
     public function getSnippetByProductIdAndStoreId($product_id, $store_id)
     {
-        $colection = $this->getCollection()
+        $collection = $this->getCollection()
             ->addFieldToFilter('store_id', $store_id)
             ->addFieldToFilter('product_id', $product_id)
             ->setPageSize(1);
-        if ($colection->count()) {
-            return $colection->getFirstItem();
+        if ($collection->count()) {
+            return $collection->getFirstItem();
         }
     }
 }

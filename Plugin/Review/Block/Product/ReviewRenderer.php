@@ -55,7 +55,7 @@ class ReviewRenderer
 
         if ($this->_yotpoHelper->isCategoryBottomlineEnabled()) {
             if (in_array($currentPage, ['cms_index_index', 'catalog_category_view'])) {
-                return $this->showCategoryBottomLine($product);
+                return $this->_yotpoHelper->getCategoryBottomLineHtml($product);
             }
         } elseif (!$this->_yotpoHelper->isMdrEnabled()) {
             if (in_array($currentPage, ['cms_index_index', 'catalog_category_view'])) {
@@ -64,10 +64,5 @@ class ReviewRenderer
         } else {
             return '';
         }
-    }
-
-    public function showCategoryBottomLine(Product $product)
-    {
-        return '<div class="yotpo bottomLine bottomline-position" data-product-id="' . $product->getId() . '" data-url="' . $product->getUrl() . '"></div>';
     }
 }
