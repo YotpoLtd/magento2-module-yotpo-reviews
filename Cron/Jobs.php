@@ -250,7 +250,7 @@ class Jobs
                             ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
                             ->addAttributeToSort('main_table.created_at', 'ASC');
                         if (($limit = (is_null($this->_limit)) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit)) {
-                            $ordersCollection->setPageSize((is_null($this->_limit)) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit);
+                            $ordersCollection->setPageSize($limit);
                         }
 
                         $orders = $this->_yotpoApi->prepareOrdersData($ordersCollection);
