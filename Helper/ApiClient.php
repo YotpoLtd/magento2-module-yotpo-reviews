@@ -2,7 +2,9 @@
 
 namespace Yotpo\Yotpo\Helper;
 
+use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\App\Helper\Context;
+use Magento\GroupedProduct\Model\Product\Type\Grouped as ProductTypeGrouped;
 use Magento\Sales\Model\Order;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 use Yotpo\Yotpo\Lib\Http\Client\Curl;
@@ -37,18 +39,26 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_yotpoHelper;
 
     /**
+     * @var ProductFactory
+     */
+    protected $_productFactory;
+
+    /**
      * @method __construct
      * @param  Context     $context
      * @param  Curl        $curl
      * @param  YotpoHelper $yotpoHelper
+     * @param  ProductFactory $productFactory
      */
     public function __construct(
         Context $context,
         Curl $curl,
-        YotpoHelper $yotpoHelper
+        YotpoHelper $yotpoHelper,
+        ProductFactory $productFactory
     ) {
         $this->_curl = $curl;
         $this->_yotpoHelper = $yotpoHelper;
+        $this->_productFactory = $productFactory;
         parent::__construct($context);
     }
 
@@ -214,30 +224,49 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     protected function prepareProductsData(Order $order)
     {
         $productsData = [];
+        $groupProductsParents = [];
 
         try {
             foreach ($order->getAllVisibleItems() as $orderItem) {
                 try {
-                    $product = $orderItem->getProduct();
+                    $product = null;
+                    if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE) {
+                        $productOptions = $orderItem->getProductOptions();
+                        $productId = (isset($productOptions['super_product_config']) && isset($productOptions['super_product_config']['product_id'])) ? $productOptions['super_product_config']['product_id'] : null;
+                        if ($productId) {
+                            if (isset($groupProductsParents[$productId])) {
+                                $product = $groupProductsParents[$productId];
+                            } else {
+                                $product = $groupProductsParents[$productId] = $this->_productFactory->create()->load($productId);
+                            }
+                        }
+                    } else {
+                        $product = $orderItem->getProduct();
+                    }
+
                     if (!($product && $product->getId())) {
                         continue;
                     }
-                    $productsData[$product->getId()] = [
-                        'name'        => $product->getName(),
-                        'url'         => $product->getProductUrl(),
-                        'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
-                        'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
-                        'price'       => $orderItem->getData('row_total_incl_tax'),
-                        'specs'       => array_filter(
-                            [
-                            'external_sku' => $product->getSku(),
-                            'upc'          => $product->getUpc(),
-                            'isbn'         => $product->getIsbn(),
-                            'mpn'          => $product->getMpn(),
-                            'brand'        => $product->getBrand(),
-                            ]
-                        ),
-                    ];
+                    if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE && isset($productsData[$product->getId()])) {
+                        $productsData[$product->getId()]['price'] += $orderItem->getData('row_total_incl_tax');
+                    } else {
+                        $productsData[$product->getId()] = [
+                            'name'        => $product->getName(),
+                            'url'         => $product->getProductUrl(),
+                            'image'       => $this->_yotpoHelper->getProductMainImageUrl($product),
+                            'description' => $this->_yotpoHelper->escapeHtml(strip_tags($product->getDescription())),
+                            'price'       => $orderItem->getData('row_total_incl_tax'),
+                            'specs'       => array_filter(
+                                [
+                                'external_sku' => $product->getSku(),
+                                'upc'          => $product->getUpc(),
+                                'isbn'         => $product->getIsbn(),
+                                'mpn'          => $product->getMpn(),
+                                'brand'        => $product->getBrand(),
+                                ]
+                            ),
+                        ];
+                    }
                 } catch (\Exception $e) {
                     $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
                 }
