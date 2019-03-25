@@ -12,6 +12,7 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
 class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const DEFAULT_TIMEOUT = 30;
+    const EXTENSION_VERSION = '2.7.5'
 
     /**
      * @var int
@@ -340,7 +341,8 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             "apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create",
             [
             'utoken'   => $token,
-            'platform' => 'magento',
+            'platform' => 'magento2',
+             extension_version => self::EXTENSION_VERSION,
             'orders'   => $orders,
             ]
         );
