@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/App/etc/routes.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="admin">
-        <route id="massmap" frontName="massmap">
+        <route id="yotpo_yotpo" frontName="yotpo_yotpo">
             <module name="Yotpo_Yotpo" before="Magento_Backend" />
         </route>
     </router>

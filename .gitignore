@@ -1,5 +1,18 @@
-.idea
+#==== OS / Editors / etc... ===================#
 .DS_Store
+.project
+.idea
+.phpintel
+*.sublime-*
+.directory
+.ftpconfig
+.tags
+.tags1
+Thumbs.db
+*Thumbs.db
+*.girit-local*
+*~
+
 nbproject/*.*
 nbproject/
 *.iml
