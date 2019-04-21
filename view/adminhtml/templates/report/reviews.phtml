@@ -1,0 +1,17 @@
+<?php
+/**
+ * @var $block Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
+ */
+?>
+<?php if (sizeof($block->getTotals()) > 0): ?>
+<div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+    <ul class="yotpo-reviews-totals-list">
+        <?php foreach ($block->getTotals() as $_total): ?>
+            <li class="yotpo-reviews-totals-item">
+                <span class="yotpo-reviews-totals-label"><?= /* @escapeNotVerified */ $_total['label'] ?></span>
+                <strong class="yotpo-reviews-totals-value"><?= /* @escapeNotVerified */ $_total['value'] ?></strong>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>

@@ -8,6 +8,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 use Magento\Framework\UrlInterface;
@@ -90,6 +91,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_appEmulation;
 
     /**
+     * @var ModuleListInterface
+     */
+    protected $_moduleList;
+
+    /**
      * @var LoggerInterface
      */
     protected $_logger;
@@ -104,6 +110,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  Registry              $coreRegistry
      * @param  CatalogImageHelper    $catalogImageHelper
      * @param  AppEmulation          $appEmulation
+     * @param  ModuleListInterface   $moduleList
      */
     public function __construct(
         Context $context,
@@ -113,7 +120,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         DateTimeFactory $datetimeFactory,
         Registry $coreRegistry,
         CatalogImageHelper $catalogImageHelper,
-        AppEmulation $appEmulation
+        AppEmulation $appEmulation,
+        ModuleListInterface $moduleList
     ) {
         $this->_context = $context;
         $this->_storeManager = $storeManager;
@@ -123,6 +131,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_coreRegistry = $coreRegistry;
         $this->_catalogImageHelper = $catalogImageHelper;
         $this->_appEmulation = $appEmulation;
+        $this->_moduleList = $moduleList;
         $this->_logger = $context->getLogger();
         parent::__construct($context);
 
@@ -627,5 +636,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return $this->_allStoreIds;
+    }
+
+    public function getModuleVersion()
+    {
+        return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
     }
 }

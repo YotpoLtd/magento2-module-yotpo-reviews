@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Yotpo_Yotpo::configuration" title="Reviews &amp; Visual Marketing" module="Yotpo_Yotpo" sortOrder="10" parent="Yotpo_Core::configuration" action="adminhtml/system_config/edit/section/yotpo" resource="Yotpo_Yotpo::config" />
+        <add id="Yotpo_Yotpo::configuration" title="Reviews &amp; Visual Marketing" translate="title" module="Yotpo_Yotpo" sortOrder="10" parent="Yotpo_Core::configuration" dependsOnModule="Yotpo_Core" action="adminhtml/system_config/edit/section/yotpo" resource="Yotpo_Yotpo::config" />
+        <add id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" module="Yotpo_Yotpo" sortOrder="11" parent="Magento_Backend::marketing_user_content" action="yotpo_yotpo/report/reviews" resource="Yotpo_Yotpo::yotpo_report_reviews"/>
     </menu>
 </config>
