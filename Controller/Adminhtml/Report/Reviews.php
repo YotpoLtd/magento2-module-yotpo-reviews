@@ -16,9 +16,9 @@ class Reviews extends \Magento\Backend\App\Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-            \Magento\Backend\App\Action\Context $context,
-            \Magento\Framework\View\Result\PageFactory $resultPageFactory
-        ) {
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+    ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }

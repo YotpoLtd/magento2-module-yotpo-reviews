@@ -43,7 +43,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
     protected $_yotpo_widget_url = '//staticw2.yotpo.com/';
-    protected $_allStoreIds = null;
+    protected $_allStoreIds = [0 => null, 1 => null];
 
     /**
      * @var Product
@@ -280,6 +280,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getAppKey($scopeId = null, $scope = null, $skipCahce = false)
     {
         return $this->getConfig(self::XML_PATH_YOTPO_APP_KEY, $scopeId, $scope, $skipCahce);
+    }
+
+    /**
+     * @method getAppKeys
+     * @param array $storeIds
+     * @return array
+     */
+    public function getAppKeys(array $storeIds = [])
+    {
+        $appKeys = [];
+        $storeIds = $storeIds ?: $this->getAllStoreIds(true);
+        foreach ($storeIds as $storeId) {
+            $appKeys[] = $this->getAppKey($storeId);
+        }
+        return array_unique(array_filter($appKeys));
     }
 
     /**
@@ -629,13 +644,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllStoreIds($withDefault = false)
     {
-        if (is_null($this->_allStoreIds)) {
-            $this->_allStoreIds = [];
+        $cacheKey = ($withDefault) ? 1 : 0;
+        if (is_null($this->_allStoreIds[$cacheKey])) {
+            $this->_allStoreIds[$cacheKey] = [];
             foreach ($this->_storeManager->getStores($withDefault) as $store) {
-                $this->_allStoreIds[] = $store->getId();
+                $this->_allStoreIds[$cacheKey][] = $store->getId();
             }
         }
-        return $this->_allStoreIds;
+        return $this->_allStoreIds[$cacheKey];
     }
 
     public function getModuleVersion()

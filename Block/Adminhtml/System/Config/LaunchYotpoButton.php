@@ -6,6 +6,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Store\Model\ScopeInterface;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
 class LaunchYotpoButton extends Field
@@ -73,30 +74,30 @@ class LaunchYotpoButton extends Field
         return $this->_toHtml();
     }
 
-    /*public function getSwellGuid()
+    public function getAppKey()
     {
         if (!is_null($this->_storeId)) {
-            return $this->_yotpoHelper->getSwellGuid(\Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->_storeId);
+            return $this->_yotpoHelper->getAppKey($this->_storeId, ScopeInterface::SCOPE_STORE);
         } elseif (!is_null($this->_websiteId)) {
-            return $this->_yotpoHelper->getSwellGuid(\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $this->_websiteId);
+            return $this->_yotpoHelper->getAppKey($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
         } else {
-            return $this->_yotpoHelper->getSwellGuid();
+            return $this->_yotpoHelper->getAppKey();
         }
     }
 
-    public function getSwellApiKey()
+    public function getSecret()
     {
         if (!is_null($this->_storeId)) {
-            return $this->_yotpoHelper->getSwellApiKey(\Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->_storeId);
+            return $this->_yotpoHelper->getSecret($this->_storeId, ScopeInterface::SCOPE_STORE);
         } elseif (!is_null($this->_websiteId)) {
-            return $this->_yotpoHelper->getSwellApiKey(\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $this->_websiteId);
+            return $this->_yotpoHelper->getSecret($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
         } else {
-            return $this->_yotpoHelper->getSwellApiKey();
+            return $this->_yotpoHelper->getSecret();
         }
-    }*/
+    }
 
     /**
-     * Generate collect button html
+     * Generate yotpo button html
      *
      * @return string
      */
@@ -106,15 +107,16 @@ class LaunchYotpoButton extends Field
             'Magento\Backend\Block\Widget\Button'
         )->setData(
             [
-                'id' => 'launch_yotpo_button',
-                'label' => __('Launch Yotpo')
+            'id' => 'launch_yotpo_button',
+            'class' => 'launch-yotpo-button',
+            'label' => __('Launch Yotpo') . ' >'
             ]
         );
-        /*if (!($guid = $this->getSwellGuid()) || !($apiKey = $this->getSwellApiKey())) {
-            $button->setOnClick("window.open('https://app.swellrewards.com/login','_blank');");
+        if (!($appKey = $this->getAppKey())) {
+            $button->setDisabled(true);
         } else {
-            $button->setOnClick("window.open('https://app.swellrewards.com/login/{$guid}/{$apiKey}','_blank');");
-        }*/
+            $button->setOnClick("window.open('https://yap.yotpo.com/#/login?preferredAppKey={$appKey}','_blank');");
+        }
 
         return $button->toHtml();
     }

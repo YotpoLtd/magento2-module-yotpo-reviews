@@ -12,7 +12,6 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
 class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const DEFAULT_TIMEOUT = 30;
-    const EXTENSION_VERSION = '2.7.7';
 
     /**
      * @var int
@@ -64,11 +63,12 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @param bool $refresh
      * @return int
      */
-    protected function getCurlStatus()
+    protected function getCurlStatus($refresh = false)
     {
-        if ($this->_status === null) {
+        if ($this->_status === null || $refresh) {
             $this->_status = $this->_curl->getStatus();
         }
 
@@ -76,11 +76,12 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @param bool $refresh
      * @return array
      */
-    protected function getCurlHeaders()
+    protected function getCurlHeaders($refresh = false)
     {
-        if ($this->_headers === null) {
+        if ($this->_headers === null || $refresh) {
             $this->_headers = $this->_curl->getHeaders();
         }
 
@@ -88,11 +89,12 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @param bool $refresh
      * @return array
      */
-    protected function getCurlBody()
+    protected function getCurlBody($refresh = false)
     {
-        if ($this->_body === null) {
+        if ($this->_body === null || $refresh) {
             $this->_body = json_decode($this->_curl->getBody());
         }
 
@@ -100,15 +102,25 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @return $this
+     */
+    protected function clearResponseData()
+    {
+        $this->_body = $this->_status = $this->_headers = null;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     protected function prepareCurlResponseData()
     {
-        return [
+        $responseData = [
             'status' => $this->getCurlStatus(),
             'headers' => $this->getCurlHeaders(),
             'body' => $this->getCurlBody(),
         ];
+        return $responseData;
     }
 
     protected function isOkResponse()
@@ -125,17 +137,60 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @method oauthAuthentication
-     * @param  int|null $storeId
+     * @method sendApiRequest
+     * @param  string $path
+     * @param  array  $data
+     * @param  string $method
+     * @param  int    $timeout
+     * @param  string $contentType
      * @return mixed
      */
-    public function oauthAuthentication($storeId = null)
+    public function sendApiRequest($path, array $data, $method = "post", $timeout = self::DEFAULT_TIMEOUT, $contentType = 'application/json')
     {
         try {
-            $app_key = $this->_yotpoHelper->getAppKey($storeId);
-            $secret = $this->_yotpoHelper->getSecret($storeId);
+            $this->_yotpoHelper->log("ApiClient::sendApiRequest() - request: ", "info", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
+
+            $this->clearResponseData();
+            $this->_curl->reset();
+
+            if ($contentType) {
+                $this->_curl->setHeaders(
+                    [
+                    'Content-Type' => $contentType
+                    ]
+                );
+            }
+
+            $this->_curl->setOption(CURLOPT_TIMEOUT, $timeout);
+
+            call_user_func_array(
+                [$this->_curl, strtolower($method)],
+                [
+                $this->_yotpoHelper->getYotpoSecuredApiUrl($path),
+                $data
+                ]
+            );
+
+            $this->_yotpoHelper->log("ApiClient::sendApiRequest() - response: ", "info", $this->prepareCurlResponseData());
+            return $this->prepareCurlResponseData();
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("ApiClient::sendApiRequest() Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+    }
+
+    /**
+     * @method oauthAuthentication
+     * @param  int|null $scopeId
+     * @param  string|null $scope
+     * @return mixed
+     */
+    public function oauthAuthentication($scopeId = null, $scope = null)
+    {
+        try {
+            $app_key = $this->_yotpoHelper->getAppKey($scopeId, $scope);
+            $secret = $this->_yotpoHelper->getSecret($scopeId, $scope);
             if (!($app_key && $secret)) {
-                $this->_yotpoHelper->log("Missing app key or secret", "debug");
+                $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - Missing app key or secret", "debug", ['$app_key' => $app_key]);
                 return null;
             }
             $result = $this->sendApiRequest(
@@ -147,17 +202,17 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 ]
             );
             if (!is_array($result)) {
-                $this->_yotpoHelper->log("Yotpo ApiClient error: no response from api", "error");
+                $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - error: no response from api", "error", ['$app_key' => $app_key]);
                 return null;
             }
             $token = (is_object($result['body']) && property_exists($result['body'], "access_token")) ? $result['body']->access_token : false;
             if (!$token) {
-                $this->_yotpoHelper->log("Yotpo ApiClient error: no access token received", "error");
+                $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - error: no access token received", "error", ['$app_key' => $app_key]);
                 return null;
             }
             return $token;
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient oauthAuthentication Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
             return null;
         }
     }
@@ -176,7 +231,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 $ordersData[] = $this->prepareOrderData($order);
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient prepareOrdersData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareOrdersData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
             return [];
         }
 
@@ -210,7 +265,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $orderData['platform'] = 'magento';
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient prepareOrderData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareOrderData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
             return [];
         }
 
@@ -269,50 +324,14 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                         ];
                     }
                 } catch (\Exception $e) {
-                    $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                    $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
                 }
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient prepareProductsData Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
 
         return $productsData;
-    }
-
-    /**
-     * @method sendApiRequest
-     * @param  string $path
-     * @param  array  $data
-     * @param  string $method
-     * @param  int    $timeout
-     * @param  string $contentType
-     * @return mixed
-     */
-    public function sendApiRequest($path, array $data, $method = "post", $timeout = self::DEFAULT_TIMEOUT, $contentType = 'application/json')
-    {
-        try {
-            $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - request: ", "info", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
-
-            $this->_curl->setHeaders(
-                [
-                'Content-Type' => $contentType
-                ]
-            );
-            $this->_curl->setOption(CURLOPT_TIMEOUT, $timeout);
-
-            call_user_func_array(
-                [$this->_curl, strtolower($method)],
-                [
-                $this->_yotpoHelper->getYotpoSecuredApiUrl($path),
-                $data
-                ]
-            );
-
-            $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest - response: ", "info", $this->prepareCurlResponseData());
-            return $this->prepareCurlResponseData();
-        } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo ApiClient sendApiRequest Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
-        }
     }
 
     /**
@@ -340,11 +359,98 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->sendApiRequest(
             "apps/" . $this->_yotpoHelper->getAppKey($storeId) . "/purchases/mass_create",
             [
-            'utoken'   => $token,
-            'platform' => 'magento2',
-            'extension_version' => self::EXTENSION_VERSION,
-            'orders'   => $orders,
+            'utoken'            => $token,
+            'platform'          => 'magento2',
+            'extension_version' => $this->_yotpoHelper->getModuleVersion(),
+            'orders'            => $orders,
             ]
         );
+    }
+
+    /**
+     * @method getMetrics
+     * @param  array      $storeIds
+     * @param  string     $fromDate
+     * @param  string     $toDate
+     * @return array
+     */
+    public function getMetrics(array $storeIds = [], string $fromDate = null, string $toDate = null)
+    {
+        try {
+            $appKeys = [];
+            $token = null;
+            foreach ($storeIds as $storeId) {
+                if (($appKey = $this->_yotpoHelper->getAppKey($storeId)) && ($secret = $this->_yotpoHelper->getSecret($storeId))) {
+                    if (!in_array($appKey, $appKeys)) {
+                        $appKeys[] = $appKey;
+                    }
+                    if (!$token) {
+                        if (!($token = $this->oauthAuthentication($storeId))) {
+                            throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
+                        }
+                    }
+                }
+            }
+            if (!$appKeys) {
+                return;
+            }
+            $appKey = array_shift($appKeys);
+
+            $params = [
+                'utoken'            => $token,
+                'platform'          => 'magento2',
+                'extension_version' => $this->_yotpoHelper->getModuleVersion(),
+            ];
+            if ($appKeys) {
+                $params['app_key'] = $appKeys;
+            }
+            if ($fromDate) {
+                $params['since'] = $fromDate;
+            }
+            if ($toDate) {
+                $params['until'] = $toDate;
+            }
+
+            $result = $this->sendApiRequest("apps/" . $appKey . "/account_usages/metrics", $params, 'get', 60, null);
+            if ($result['status'] == 200 && $result['body']->response) {
+                return (array)$result['body']->response;
+            }
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("ApiClient::getMetrics() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+    }
+
+    /**
+     * @method updateMetadata
+     * @param  int|null      $storeId
+     * @return array
+     */
+    public function updateMetadata($storeId = null)
+    {
+        $result = [];
+        try {
+            if (($appKey = $this->_yotpoHelper->getAppKey($storeId)) && ($secret = $this->_yotpoHelper->getSecret($storeId))) {
+                if (!($token = $this->oauthAuthentication($storeId))) {
+                    throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
+                }
+            }
+
+            $result = $this->sendApiRequest("account_platform/update_metadata", [
+                'utoken'            => $token,
+                'app_key'           => $appKey,
+                'metadata'          => [
+                    'platform'          => 'Magento',
+                    'version'           => 'Magento 2',
+                    'sub_version'       => "{$this->_yotpoHelper->getMagentoPlatformVersion()} {$this->_yotpoHelper->getMagentoPlatformEdition()}",
+                    'plugin_version'    => $this->_yotpoHelper->getModuleVersion(),
+                ],
+            ]);
+            if ($result['status'] !== 200) {
+                throw new \Exception(__("Request to API failed! " . print_r($result, true)));
+            }
+        } catch (\Exception $e) {
+            $this->_yotpoHelper->log("ApiClient::updateMetadata() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error", ['$storeId' => $storeId]);
+        }
+        return $result;
     }
 }

@@ -3,15 +3,40 @@
  * @var $block Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
  */
 ?>
-<?php if (sizeof($block->getTotals()) > 0): ?>
-<div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
-    <ul class="yotpo-reviews-totals-list">
-        <?php foreach ($block->getTotals() as $_total): ?>
-            <li class="yotpo-reviews-totals-item">
-                <span class="yotpo-reviews-totals-label"><?= /* @escapeNotVerified */ $_total['label'] ?></span>
-                <strong class="yotpo-reviews-totals-value"><?= /* @escapeNotVerified */ $_total['value'] ?></strong>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-</div>
+<?php if ($block->getAppKey()): ?>
+    <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+        <div class="yotpo-at-a-glace">
+            <?php echo __("Yotpo at a glace"); ?>
+        </div>
+        <div class="user-generated-content">
+            <?php echo __("User-generated content metrics gathered from your Yotpo dashboards."); ?>
+        </div>
+        <?php if (sizeof($block->getTotals()) > 0): ?>
+            <ul class="yotpo-reviews-totals-list">
+                <?php foreach ($block->getTotals() as $_total): ?>
+                    <li class="yotpo-reviews-totals-item <?php echo /* @escapeNotVerified */ $_total['class']; ?>">
+                        <i class="yotpo-reviews-totals-icon"></i>
+                        <strong class="yotpo-reviews-totals-value"><?php echo /* @escapeNotVerified */ $_total['value']; ?></strong>
+                        <span class="yotpo-reviews-totals-label"><?php echo /* @escapeNotVerified */ $_total['label']; ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <?php echo __("No Data Found"); ?>
+        <?php endif; ?>
+    </div>
+    <?php echo $block->getLounchYotpoButtonHtml(); ?>
+    <div>
+        <a class="yotpo-settings" href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Yotpo Settings"); ?>"><?php echo __("Yotpo Settings"); ?></a>
+    </div>
+<?php else: ?>
+    <div class="yotpo-reviews-totals-no-appkey">
+        <div class="collect-and-leverage">
+            <?php echo __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets."); ?>
+        </div>
+        <?php echo $block->getLounchYotpoButtonHtml(); ?>
+        <div class="already-have-account">
+            <?php echo __("Already have an account?"); ?> <a href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Connect Yotpo"); ?>"><?php echo __("Connect Yotpo"); ?></a>
+        </div>
+    </div>
 <?php endif; ?>

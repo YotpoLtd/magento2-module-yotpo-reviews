@@ -5,21 +5,147 @@
         display: block;
         max-width: 60rem;
         columns: 3;
+        margin-bottom: 20px;
 
         .yotpo-reviews-totals-item{
             display: inline-block;
             padding: 1.2rem 1rem 1.2rem 0;
             max-width: 20rem;
 
-            .yotpo-reviews-totals-label {
+            .yotpo-reviews-totals-label{
                 display: block;
-                font-size: 1.3rem;
-                font-weight: 700;
+                font-size: 1.5rem;
+                font-weight: normal;
             }
 
-            .yotpo-reviews-totals-value {
+            .yotpo-reviews-totals-value{
                 font-size: 2.4rem;
-                font-weight: 600;
+                font-weight: normal;
+            }
+
+            .yotpo-reviews-totals-icon{
+                display: inline-block;
+                width: 3.6rem;
+                height: 3.2rem;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: contain;
+            }
+
+            &.yotpo-totals-emails-sent .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/email-icon.svg');
+            }
+
+            &.yotpo-totals-total-reviews .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/collect-icon.svg');
+            }
+
+            &.yotpo-totals-published-reviews .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/upload-icon.svg');
+            }
+
+            &.yotpo-totals-star-rating .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/star-icon.svg');
+            }
+
+            &.yotpo-totals-photos-generated .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/photo-icon.svg');
+            }
+
+            &.yotpo-totals-engagement-rate .yotpo-reviews-totals-icon{
+                background-image: url('@{baseDir}Yotpo_Yotpo/images/icons/rate-icon.svg');
+            }
+        }
+    }
+}
+.launch-yotpo-button{
+    min-width: 161px;
+    height: 38px;
+    border-radius: 3px;
+    font-size: 1.3rem;
+    background-color: #2b7dbd;
+    color: #ffffff;
+    box-sizing: border-box;
+
+    &:hover, &:active, &:focus{
+        background-color: #0073ae;
+        border-color: #007dbd;
+        box-shadow: 0 0 0 1px #007bdb;
+        color: #ffffff;
+        text-decoration: none;
+    }
+}
+.yotpo-reviews-totals-no-appkey{
+    background: #ffffff;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    text-align: center;
+
+    .collect-and-leverage{
+        max-width: 421px;
+        font-size: 1.6rem;
+        color: #676363;
+        position: relative;
+        margin: 20px auto 20px;
+    }
+    .already-have-account{
+        max-width: 250px;
+        font-size: 1.3rem;
+        position: relative;
+        margin: 14px auto;
+
+        a{
+            color: #2b7dbd;
+        }
+    }
+}
+
+.yotpo_yotpo-report-reviews{
+    #container.main-col{
+        padding: 30px 20px;
+    }
+    .yotpo-at-a-glace{
+        line-height: 3rem;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #313030;
+    }
+    .user-generated-content{
+        font-size: 1.4rem;
+        font-weight: normal;
+        color: #313030;
+    }
+    .launch-yotpo-button {
+        margin-left: 16px;
+    }
+    a.yotpo-settings{
+        font-size: 1.3rem;
+        color: #2b7dbd;
+        display: inline-block;
+        margin-top: 16px;
+        margin-left: 16px;
+    }
+
+    .yotpo-reviews-totals{
+        .yotpo-reviews-totals-list{
+            margin-bottom: 50px;
+            margin-top: 30px;
+            padding-left: 16px;
+
+            .yotpo-reviews-totals-item{
+                .yotpo-reviews-totals-icon{
+                    margin-right: 0.8rem;
+                }
+                .yotpo-reviews-totals-label {
+                    color: #545252;
+                    margin-top: 5px;
+                }
+                .yotpo-reviews-totals-value {
+                    font-size: 3.6rem;
+                }
             }
         }
     }
