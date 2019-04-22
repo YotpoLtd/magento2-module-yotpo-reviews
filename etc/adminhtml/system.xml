@@ -7,7 +7,7 @@
             <tab>yotpo</tab>
             <resource>Yotpo_Yotpo::config</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label><![CDATA[Yotpo Widget Configurations <div style="float:right;margin:0 20px;font-weight:normal;line-height:23px;font-size:1.2rem;">ver. 2.7.5</div>]]></label>
+                <label><![CDATA[Yotpo Widget Configurations <div style="float:right;margin:0 20px;font-weight:normal;line-height:23px;font-size:1.2rem;">ver. 2.7.6</div>]]></label>
                 <comment>
                     <![CDATA[
 						<p>To complete the installation, enter your <a href="https://support.yotpo.com/en/article/finding-your-app-key-and-your-secret-key" target="_blank" title="App Key and API Secret">App Key and API Secret</a> in the fields below and save your configuration.</p>

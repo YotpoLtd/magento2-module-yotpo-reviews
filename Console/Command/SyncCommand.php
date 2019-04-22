@@ -64,12 +64,12 @@ class SyncCommand extends Command
      * @param \Yotpo\Yotpo\Helper\Data $yotpoHelper
      */
     public function __construct(
-        Filesystem $filesystem,
-        ArrayInputFactory $arrayInputFactory,
-        ApplicationFactory $applicationFactory,
-        \Magento\Framework\Registry $registry,
-        \Yotpo\Yotpo\Cron\Jobs $jobs,
-        \Yotpo\Yotpo\Helper\Data $yotpoHelper
+        Filesystem\Proxy $filesystem,
+        ArrayInputFactory\Proxy $arrayInputFactory,
+        ApplicationFactory\Proxy $applicationFactory,
+        \Magento\Framework\Registry\Proxy $registry,
+        \Yotpo\Yotpo\Cron\Jobs\Proxy $jobs,
+        \Yotpo\Yotpo\Helper\Data\Proxy $yotpoHelper
     ) {
         $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;

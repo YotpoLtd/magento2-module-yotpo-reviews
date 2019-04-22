@@ -73,13 +73,13 @@ class ResetCommand extends Command
      * @param ResourceConnection $resourceConnection
      */
     public function __construct(
-        Filesystem $filesystem,
-        ArrayInputFactory $arrayInputFactory,
-        ApplicationFactory $applicationFactory,
-        \Magento\Framework\Registry $registry,
-        \Yotpo\Yotpo\Cron\Jobs $jobs,
-        \Yotpo\Yotpo\Helper\Data $yotpoHelper,
-        ResourceConnection $resourceConnection
+        Filesystem\Proxy $filesystem,
+        ArrayInputFactory\Proxy $arrayInputFactory,
+        ApplicationFactory\Proxy $applicationFactory,
+        \Magento\Framework\Registry\Proxy $registry,
+        \Yotpo\Yotpo\Cron\Jobs\Proxy $jobs,
+        \Yotpo\Yotpo\Helper\Data\Proxy $yotpoHelper,
+        ResourceConnection\Proxy $resourceConnection
     ) {
         $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;
