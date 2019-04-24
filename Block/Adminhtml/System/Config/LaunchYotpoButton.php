@@ -85,17 +85,6 @@ class LaunchYotpoButton extends Field
         }
     }
 
-    public function getSecret()
-    {
-        if (!is_null($this->_storeId)) {
-            return $this->_yotpoHelper->getSecret($this->_storeId, ScopeInterface::SCOPE_STORE);
-        } elseif (!is_null($this->_websiteId)) {
-            return $this->_yotpoHelper->getSecret($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
-        } else {
-            return $this->_yotpoHelper->getSecret();
-        }
-    }
-
     /**
      * Generate yotpo button html
      *

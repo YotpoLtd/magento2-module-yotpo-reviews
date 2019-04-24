@@ -1,9 +1,8 @@
 <?php
 
-namespace Yotpo\Yotpo\Controller\Adminhtml\Report;
+namespace Yotpo\Yotpo\Controller\Adminhtml\External;
 
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
 use Magento\Store\Model\ScopeInterface;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
@@ -16,11 +15,6 @@ class Reviews extends \Magento\Backend\App\Action
     protected $_isAppKeyAndSecretSet;
 
     /**
-    * @var PageFactory
-    */
-    protected $resultPageFactory;
-
-    /**
      * @var YotpoHelper
      */
     protected $_yotpoHelper;
@@ -29,16 +23,13 @@ class Reviews extends \Magento\Backend\App\Action
      * Constructor
      *
      * @param Context $context
-     * @param PageFactory $resultPageFactory
      * @param YotpoHelper $yotpoHelper
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory,
         YotpoHelper $yotpoHelper
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
         $this->_yotpoHelper = $yotpoHelper;
         $this->_initiaize();
     }
@@ -57,18 +48,8 @@ class Reviews extends \Magento\Backend\App\Action
         $this->_isAppKeyAndSecretSet = $this->_yotpoHelper->isAppKeyAndSecretSet($this->_scopeId, $this->_scope);
     }
 
-    /**
-     * Load the page defined in view/adminhtml/layout/yotpo_yotpo_report_reviews.xml
-     *
-     * @return \Magento\Framework\View\Result\Page
-     */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Yotpo Reviews'));
-        if (!($this->_isEnabled && $this->_isAppKeyAndSecretSet)) {
-            $resultPage->getLayout()->unsetElement('store_switcher');
-        }
-        return $resultPage;
+        return $this->getResponse()->setContent("Reviews");
     }
 }

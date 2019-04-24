@@ -3,7 +3,7 @@
  * @var $block Yotpo\Yotpo\Block\Adminhtml\Dashboard\Tab\YotpoReviews
  */
 ?>
-<?php if ($block->getAppKey()): ?>
+<?php if ($block->isAppKeyAndSecretSet()): ?>
     <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
         <?php if (sizeof($block->getTotals()) > 0): ?>
             <ul class="yotpo-reviews-totals-list">
@@ -15,16 +15,18 @@
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <?php echo __("No Data Found"); ?>
+            <div class="yotpo-reviews-totals-nodata">
+                <?php echo __("No Data Found"); ?>
+            </div>
         <?php endif; ?>
     </div>
-    <?php echo $block->getLounchYotpoButtonHtml(); ?>
+    <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
 <?php else: ?>
     <div class="yotpo-reviews-totals-no-appkey">
         <div class="collect-and-leverage">
             <?php echo __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets."); ?>
         </div>
-        <?php echo $block->getLounchYotpoButtonHtml(); ?>
+        <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
         <div class="already-have-account">
             <?php echo __("Already have an account?"); ?> <a href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Connect Yotpo"); ?>"><?php echo __("Connect Yotpo"); ?></a>
         </div>

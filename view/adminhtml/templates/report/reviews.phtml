@@ -3,8 +3,15 @@
  * @var $block Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
  */
 ?>
-<?php if ($block->getAppKey()): ?>
+<?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()):
+    $period = $block->getPeriod('30d'); ?>
     <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+        <select name="period" id="yotpo_reports_period_select" onchange="window.location.href='<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) ?>period/' + this.value;" class="admin__control-select yotpo-reports-period-select">
+            <option value="1d" <?php if ($period == '1d'): ?>selected<?php endif; ?>>Last Day</option>
+            <option value="7d" <?php if ($period == '7d'): ?>selected<?php endif; ?>>Last 7 Days</option>
+            <option value="30d" <?php if ($period == '30d'): ?>selected<?php endif; ?>>Last 30 Days</option>
+            <option value="all" <?php if ($period == 'all'): ?>selected<?php endif; ?>>All Time</option>
+        </select>
         <div class="yotpo-at-a-glace">
             <?php echo __("Yotpo at a glace"); ?>
         </div>
@@ -22,21 +29,44 @@
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <?php echo __("No Data Found"); ?>
+            <div class="yotpo-reviews-totals-nodata">
+                <?php echo __("No Data Found"); ?>
+            </div>
         <?php endif; ?>
     </div>
-    <?php echo $block->getLounchYotpoButtonHtml(); ?>
+    <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
     <div>
         <a class="yotpo-settings" href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Yotpo Settings"); ?>"><?php echo __("Yotpo Settings"); ?></a>
     </div>
 <?php else: ?>
     <div class="yotpo-reviews-totals-no-appkey">
-        <div class="collect-and-leverage">
-            <?php echo __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets."); ?>
+        <div class="yotpo-title-content-container">
+            <h2><?php echo __("Great brands are built<br>on happy customers"); ?></h2>
+            <p><?php echo __("Yotpo Is already installed in your Magento store!<br>Connect your Yotpo account to your store to accelerate growth<br>with a full suite of solutions for customer reviews and visual marketing."); ?></p>
+            <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
+            <div class="already-have-account">
+                <?php echo __("Already have an account?"); ?> <a href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Connect Yotpo"); ?>"><?php echo __("Connect Yotpo"); ?></a>
+            </div>
         </div>
-        <?php echo $block->getLounchYotpoButtonHtml(); ?>
-        <div class="already-have-account">
-            <?php echo __("Already have an account?"); ?> <a href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Connect Yotpo"); ?>"><?php echo __("Connect Yotpo"); ?></a>
+        <div class="yotpo-shaddow-boxes-container">
+            <div class="yotpo-shaddow-box">
+                <h3><?php echo __("Reviews & Ratings"); ?></h3>
+                <img src='<?php echo $this->getViewFileUrl('Yotpo_Yotpo::images/reviews_and_ratings.jpg'); ?>' alt="<?php echo __("Reviews & Ratings"); ?>">
+                <p><?php echo __("Turn customer content into sales by collecting and leveraging reviews, ratings, and Q&A with Yotpo’s AI-powered solutions."); ?></p>
+                <a href="https://www.yotpo.com/platform/visual-marketing/" title="<?php echo __("Learn more"); ?>"><?php echo __("Learn more"); ?> ></a>
+            </div>
+            <div class="yotpo-shaddow-box">
+                <h3><?php echo __("Visual Marketing"); ?></h3>
+                <img src='<?php echo $this->getViewFileUrl('Yotpo_Yotpo::images/visual_marketing.jpg'); ?>' alt="<?php echo __("Reviews & Ratings"); ?>">
+                <p><?php echo __("Collect, curate, and showcase customer photos and videos in fully customizable shoppable galleries across your site."); ?></p>
+                <a href="https://www.yotpo.com/platform/reviews/" title="<?php echo __("Learn more"); ?>"><?php echo __("Learn more"); ?> ></a>
+            </div>
+            <div class="yotpo-shaddow-box">
+                <h3><?php echo __("Consumer Insights"); ?></h3>
+                <img src='<?php echo $this->getViewFileUrl('Yotpo_Yotpo::images/consumer_insights.png'); ?>' alt="<?php echo __("Consumer Insights"); ?>">
+                <p><?php echo __("Understand what customers are saying about your brand and products and make data-driven business decisions with actionable insights."); ?></p>
+                <a href="https://www.yotpo.com/platform/insights/" title="<?php echo __("Learn more"); ?>"><?php echo __("Learn more"); ?> ></a>
+            </div>
         </div>
     </div>
 <?php endif; ?>

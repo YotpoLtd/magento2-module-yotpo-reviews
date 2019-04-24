@@ -3,5 +3,7 @@
     <menu>
         <add id="Yotpo_Yotpo::configuration" title="Reviews &amp; Visual Marketing" translate="title" module="Yotpo_Yotpo" sortOrder="10" parent="Yotpo_Core::configuration" dependsOnModule="Yotpo_Core" action="adminhtml/system_config/edit/section/yotpo" resource="Yotpo_Yotpo::config" />
         <add id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" module="Yotpo_Yotpo" sortOrder="11" parent="Magento_Backend::marketing_user_content" action="yotpo_yotpo/report/reviews" resource="Yotpo_Yotpo::yotpo_report_reviews"/>
+        <add id="Yotpo_Yotpo::yotpo_reviews_external" title="Yotpo Reviews" translate="title" sortOrder="30" module="Yotpo_Yotpo" parent="Magento_Review::report_review" action="yotpo_yotpo/external/reviews" target="_blank" resource="Yotpo_Yotpo::yotpo_reviews_external"/>
+        <add id="Yotpo_Yotpo::yotpo_analytics_external" title="Yotpo Analytics" translate="title" module="Yotpo_Yotpo" sortOrder="30" parent="Magento_Analytics::business_intelligence" action="yotpo_yotpo/external/analytics" target="_blank" resource="Yotpo_Yotpo::yotpo_analytics_external" />
     </menu>
 </config>

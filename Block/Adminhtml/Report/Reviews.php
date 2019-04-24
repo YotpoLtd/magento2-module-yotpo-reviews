@@ -5,6 +5,7 @@ namespace Yotpo\Yotpo\Block\Adminhtml\Report;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Reports\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
@@ -20,10 +21,12 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected $_totals = [];
 
-    /**
-     * @var array
-     */
-    protected $_allStoreIds = null;
+    protected $_scope;
+    protected $_scopeId;
+    protected $_isEnabled;
+    protected $_appKey;
+    protected $_isAppKeyAndSecretSet;
+    protected $_allStoreIds;
 
     /**
      * @var OrderCollectionFactory
@@ -59,39 +62,57 @@ class Reviews extends \Magento\Backend\Block\Template
         $this->_yotpoHelper = $yotpoHelper;
         $this->_yotpoApi = $yotpoApi;
         parent::__construct($context, $data);
+        $this->_initiaize();
+    }
+
+    protected function _initiaize()
+    {
+        if (($storeId = $this->getRequest()->getParam(ScopeInterface::SCOPE_STORE, 0))) {
+            $this->_scope = ScopeInterface::SCOPE_STORE;
+            $this->_scopeId = $storeId;
+            $this->_allStoreIds = [$storeId];
+        } elseif (($websiteId = $this->getRequest()->getParam(ScopeInterface::SCOPE_WEBSITE, 0))) {
+            $this->_scope = ScopeInterface::SCOPE_WEBSITE;
+            $this->_scopeId = $websiteId;
+            $this->_allStoreIds = array_values($this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds());
+        } else {
+            $this->_allStoreIds = array_values($this->_yotpoHelper->getAllStoreIds(true));
+        }
+        $this->_isEnabled = $this->_yotpoHelper->isEnabled($this->_scopeId, $this->_scope);
+        $this->_appKey = $this->_yotpoHelper->getAppKey($this->_scopeId, $this->_scope);
+        $this->_isAppKeyAndSecretSet = $this->_yotpoHelper->isAppKeyAndSecretSet($this->_scopeId, $this->_scope);
+    }
+
+    public function isEnabledAndConfigured()
+    {
+        return ($this->_isEnabled && $this->_isAppKeyAndSecretSet) ? true : false;
     }
 
     public function getStoreIds()
     {
-        if (is_null($this->_allStoreIds)) {
-            if (($_storeId = $this->getRequest()->getParam("store", 0))) {
-                $stores = [$_storeId];
-            } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
-                $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
-            } elseif (($groupId = $this->getRequest()->getParam("group", 0))) {
-                $stores = $this->_yotpoHelper->getStoreManager()->getGroup($groupId)->getStoreIds();
-            } else {
-                $stores = $this->_yotpoHelper->getAllStoreIds(true);
-            }
-            $this->_allStoreIds = array_values($stores);
-        }
         return $this->_allStoreIds;
+    }
+
+    public function getPeriod($default = '30h')
+    {
+        return $this->getRequest()->getParam('period', $default);
+    }
+
+    public function isEnabled()
+    {
+        return $this->_isEnabled;
     }
 
     public function getAppKey()
     {
-        if (($storeId = $this->getRequest()->getParam("store", 0))) {
-            $appKey = $this->_yotpoHelper->getAppKey($storeId, ScopeInterface::SCOPE_STORE);
-        } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
-            $appKey = $this->_yotpoHelper->getAppKey($websiteId, ScopeInterface::SCOPE_WEBSITE);
-        } else {
-            $appKey = $this->_yotpoHelper->getAppKey();
-        }
-        if (!$appKey) {
-            $appKey = $this->_yotpoHelper->getAppKey($this->getStoreIds()[0]);
-        }
-        return $appKey;
+        return $this->_appKey;
     }
+
+    public function isAppKeyAndSecretSet()
+    {
+        return $this->_isAppKeyAndSecretSet;
+    }
+
     /**
      * @return array
      */
@@ -117,12 +138,12 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected function _prepareLayout()
     {
-        if (!$this->_yotpoHelper->isEnabled()) {
+        if (!$this->isEnabled()) {
             return $this;
         }
 
         $storeIds = $this->getStoreIds();
-        $dateRange = $this->_collectionFactory->create()->getDateRange($this->getRequest()->getParam('period', '24h'), 0, 0, true);
+        $dateRange = $this->_collectionFactory->create()->getDateRange($this->getPeriod('24h'), 0, 0, true);
 
         $metrics = $this->_yotpoApi->getMetrics(
             $this->getStoreIds(),
@@ -171,11 +192,10 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getYotpoConfigUrl()
     {
-        return $this->_urlBuilder->getUrl(
-            'adminhtml/system_config/edit',
-            [
-                'section' => 'yotpo'
-            ]
-        );
+        $params = ['section' => 'yotpo'];
+        if ($this->_scope) {
+            $params[$this->_scope] = $this->_scopeId;
+        }
+        return $this->_urlBuilder->getUrl('adminhtml/system_config/edit', $params);
     }
 }
