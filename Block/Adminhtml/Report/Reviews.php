@@ -14,6 +14,11 @@ class Reviews extends \Magento\Backend\Block\Template
     /**
      * @var string
      */
+    protected $_defaultPeriod = '30d';
+
+    /**
+     * @var string
+     */
     protected $_template = 'Yotpo_Yotpo::report/reviews.phtml';
 
     /**
@@ -21,6 +26,9 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected $_totals = [];
 
+    /**
+     * initialized:
+     */
     protected $_scope;
     protected $_scopeId;
     protected $_isEnabled;
@@ -93,9 +101,9 @@ class Reviews extends \Magento\Backend\Block\Template
         return $this->_allStoreIds;
     }
 
-    public function getPeriod($default = '30h')
+    public function getPeriod($default = null)
     {
-        return $this->getRequest()->getParam('period', $default);
+        return $this->getRequest()->getParam('period', ($default ?: $this->_defaultPeriod));
     }
 
     public function isEnabled()
@@ -134,6 +142,81 @@ class Reviews extends \Magento\Backend\Block\Template
     }
 
     /**
+     * Calculate From and To dates (or times) by given period
+     *
+     * @param string $range
+     * @param string $customStart
+     * @param string $customEnd
+     * @param bool $returnObjects
+     * @return array
+     */
+    public function getDateRange($range, $customStart, $customEnd, $returnObjects = false)
+    {
+        $dateEnd = new \DateTime();
+        $dateStart = new \DateTime();
+
+        // go to the end of a day
+        $dateEnd->setTime(23, 59, 59);
+
+        $dateStart->setTime(0, 0, 0);
+
+        switch ($range) {
+            case '24h':
+            case '1d':
+                $dateEnd = new \DateTime();
+                $dateEnd->modify('+1 hour');
+                $dateStart = clone $dateEnd;
+                $dateStart->modify('-1 day');
+                break;
+
+            case '7d':
+                $dateStart->modify('-6 days');
+                break;
+
+            case '30d':
+                $dateStart->modify('-30 days');
+                break;
+
+            case '1m':
+                $dateStart->setDate(
+                    $dateStart->format('Y'),
+                    $dateStart->format('m'),
+                    $this->_yotpoHelper->getConfig('reports/dashboard/mtd_start')
+                );
+                break;
+
+            case 'custom':
+                $dateStart = $customStart ? $customStart : $dateEnd;
+                $dateEnd = $customEnd ? $customEnd : $dateEnd;
+                break;
+
+            case '1y':
+            case '2y':
+                $startMonthDay = explode(
+                    ',',
+                    $this->_yotpoHelper->getConfig('reports/dashboard/ytd_start')
+                );
+                $startMonth = isset($startMonthDay[0]) ? (int)$startMonthDay[0] : 1;
+                $startDay = isset($startMonthDay[1]) ? (int)$startMonthDay[1] : 1;
+                $dateStart->setDate($dateStart->format('Y'), $startMonth, $startDay);
+                if ($range == '2y') {
+                    $dateStart->modify('-1 year');
+                }
+                break;
+
+            case 'all':
+                $dateStart->modify('-1000 years');
+                break;
+        }
+
+        if ($returnObjects) {
+            return [$dateStart, $dateEnd];
+        } else {
+            return ['from' => $dateStart, 'to' => $dateEnd, 'datetime' => true];
+        }
+    }
+
+    /**
      * @return $this|void
      */
     protected function _prepareLayout()
@@ -143,7 +226,7 @@ class Reviews extends \Magento\Backend\Block\Template
         }
 
         $storeIds = $this->getStoreIds();
-        $dateRange = $this->_collectionFactory->create()->getDateRange($this->getPeriod('24h'), 0, 0, true);
+        $dateRange = $this->getDateRange($this->getPeriod(), 0, 0, true);
 
         $metrics = $this->_yotpoApi->getMetrics(
             $this->getStoreIds(),

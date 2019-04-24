@@ -10,6 +10,11 @@ class YotpoReviews extends \Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
     /**
      * @var string
      */
+    protected $_defaultPeriod = 'all';
+
+    /**
+     * @var string
+     */
     protected $_template = 'Yotpo_Yotpo::dashboard/yotpo_reviews_tab.phtml';
 
     /**
