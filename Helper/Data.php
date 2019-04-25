@@ -533,18 +533,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  array  $data
      * @return $this
      */
-    public function log($message, $type = "info", $data = [])
+    public function log($message, $type = "info", $data = [], $prefix = '[Yotpo Log] ')
     {
         if ($this->isDebugMode()) { //Log to system.log
+            if (!isset($data['store_id'])) {
+                $data['store_id'] = $this->getCurrentStoreId();
+            }
+            if (!isset($data['app_key'])) {
+                $data['app_key'] = $this->getAppKey();
+            }
             switch ($type) {
             case 'error':
-                $this->_logger->error(print_r($message, true), $data);
+                $this->_logger->error(print_r($prefix, true) . print_r($message, true), $data);
                 break;
             case 'debug':
-                $this->_logger->debug(print_r($message, true), $data);
-                break;
+                //$this->_logger->debug(print_r($prefix, true) . print_r($message, true), $data);
+                //break;
             default:
-                $this->_logger->info(print_r($message, true), $data);
+                $this->_logger->info(print_r($prefix, true) . print_r($message, true), $data);
                 break;
             }
         }

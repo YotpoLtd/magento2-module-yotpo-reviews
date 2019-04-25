@@ -101,7 +101,7 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
                 "reviews_count" => $snippet->getReviewsCount()
             ];
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("Yotpo RichSnippets Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("RichSnippets::getRichSnippet() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
         return [];
     }

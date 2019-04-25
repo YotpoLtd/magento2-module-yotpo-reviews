@@ -69,7 +69,8 @@ class Save implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($observer->getEvent()->getChangedPaths()) {
+        $changedPaths = (array)$observer->getEvent()->getChangedPaths();
+        if ($changedPaths) {
             $this->_cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
             $this->_appConfig->reinit();
 
@@ -78,6 +79,14 @@ class Save implements ObserverInterface
                 $scope = ScopeInterface::SCOPE_STORE;
             } elseif (($scopeId = $observer->getEvent()->getWebsite())) {
                 $scope = ScopeInterface::SCOPE_WEBSITE;
+            }
+
+            if (in_array(YotpoHelper::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $changedPaths)) {
+                $this->_yotpoHelper->log(
+                    "Yotpo Debug mode " . (($this->_yotpoHelper->isDebugMode(($scopeId ?: null), ($scope ?: null))) ? 'started' : 'stopped'),
+                    "error",
+                    ['$app_key' => $this->_yotpoHelper->getAppKey(($scopeId ?: null), ($scope ?: null)), '$scope' => ($scope ?: 'default'), '$scopeId' => $scopeId]
+                );
             }
 
             if ($this->_yotpoHelper->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->_yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
