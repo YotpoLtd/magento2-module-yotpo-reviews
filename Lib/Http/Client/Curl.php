@@ -81,7 +81,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     public function get($uri, array $params = [])
     {
         if ($params) {
-            $uri .= "?" . \http_build_query($params);
+            $uri .= ((parse_url($uri, PHP_URL_QUERY)) ? "&" : "?") . \http_build_query($params);
         }
         $this->makeRequest("GET", $uri);
     }
@@ -101,7 +101,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
         }
 
         switch ($contentType) {
-        case 'application/json':
+        case 'application/json' :
             $params = json_encode($params);
             $this->curlOption(CURLOPT_POSTFIELDS, $params);
             $this->_headers['Content-Length'] = strlen($params);
@@ -112,14 +112,25 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     }
 
     /**
-     * Clear headers & cookies
+     * Reset class to initial values
      * @return $this
      */
-    public function clear()
+    public function reset()
     {
-        $this->setHeaders([]);
-        $this->setCookies([]);
-        $this->setTimeout(300);
+        $this->_host = 'localhost';
+        $this->_port = 80;
+        $this->_sock = null;
+        $this->_headers = [];
+        $this->_postFields = [];
+        $this->_cookies = [];
+        $this->_responseHeaders = [];
+        $this->_responseBody = '';
+        $this->_responseStatus = 0;
+        $this->_timeout = 300;
+        $this->_redirectCount = 0;
+        $this->_ch = null;
+        $this->_curlUserOptions = [];
+        $this->_headerCount = 0;
         return $this;
     }
 }

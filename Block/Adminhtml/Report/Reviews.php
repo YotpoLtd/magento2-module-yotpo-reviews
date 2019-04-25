@@ -156,17 +156,18 @@ class Reviews extends \Magento\Backend\Block\Template
         $dateStart = new \DateTime();
 
         // go to the end of a day
-        $dateEnd->setTime(23, 59, 59);
-
-        $dateStart->setTime(0, 0, 0);
+        //$dateEnd->setTime(23, 59, 59);
+        //$dateStart->setTime(0, 0, 0);
 
         switch ($range) {
             case '24h':
-            case '1d':
                 $dateEnd = new \DateTime();
                 $dateEnd->modify('+1 hour');
                 $dateStart = clone $dateEnd;
                 $dateStart->modify('-1 day');
+                break;
+            case '1d':
+                $dateStart->modify('-1 days');
                 break;
 
             case '7d':
@@ -234,12 +235,24 @@ class Reviews extends \Magento\Backend\Block\Template
             $dateRange[1]->format(DateTime::DATETIME_PHP_FORMAT)
         );
 
-        $this->addTotal(__('Emails Sent'), $metrics->emails_sent . 'K', 'yotpo-totals-emails-sent');
-        $this->addTotal(__('Avg. Star Rating'), $metrics->star_rating, 'yotpo-totals-star-rating');
-        $this->addTotal(__('Collected Reviews'), $metrics->total_reviews, 'yotpo-totals-total-reviews');
-        $this->addTotal(__('Collected Photos'), $metrics->photos_generated, 'yotpo-totals-photos-generated');
-        $this->addTotal(__('Published Reviews'), $metrics->published_reviews, 'yotpo-totals-published-reviews');
-        $this->addTotal(__('Engagement Rate'), $metrics->engagement_rate . '%', 'yotpo-totals-engagement-rate');
+        if (isset($metrics['emails_sent'])) {
+            $this->addTotal(__('Emails Sent'), $metrics['emails_sent'] . 'K', 'yotpo-totals-emails-sent');
+        }
+        if (isset($metrics['star_rating'])) {
+            $this->addTotal(__('Avg. Star Rating'), $metrics['star_rating'], 'yotpo-totals-star-rating');
+        }
+        if (isset($metrics['total_reviews'])) {
+            $this->addTotal(__('Collected Reviews'), $metrics['total_reviews'], 'yotpo-totals-total-reviews');
+        }
+        if (isset($metrics['photos_generated'])) {
+            $this->addTotal(__('Collected Photos'), $metrics['photos_generated'], 'yotpo-totals-photos-generated');
+        }
+        if (isset($metrics['published_reviews'])) {
+            $this->addTotal(__('Published Reviews'), $metrics['published_reviews'], 'yotpo-totals-published-reviews');
+        }
+        if (isset($metrics['engagement_rate'])) {
+            $this->addTotal(__('Engagement Rate'), $metrics['engagement_rate'] . '%', 'yotpo-totals-engagement-rate');
+        }
     }
 
     /**
