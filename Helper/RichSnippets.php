@@ -3,6 +3,7 @@
 namespace Yotpo\Yotpo\Helper;
 
 use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 use Yotpo\Yotpo\Model\Richsnippet;
@@ -22,24 +23,32 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var Richsnippet
      */
-    protected $_richsnippents;
+    protected $_richsnippet;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $_storeManager;
 
     /**
      * @method __construct
-     * @param  Context        $context
-     * @param  YotpoHelper    $yotpoHelper
+     * @param  Context $context
+     * @param  YotpoHelper $yotpoHelper
      * @param  YotpoApiClient $yotpoApi
-     * @param  Richsnippet    $richsnippents
+     * @param  Richsnippet $richsnippet
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
         YotpoHelper $yotpoHelper,
         YotpoApiClient $yotpoApi,
-        Richsnippet $richsnippents
+        Richsnippet $richsnippet,
+        StoreManagerInterface $storeManager
     ) {
         $this->_yotpoHelper = $yotpoHelper;
         $this->_yotpoApi = $yotpoApi;
-        $this->_richsnippents = $richsnippents;
+        $this->_richsnippet = $richsnippet;
+        $this->_storeManager = $storeManager;
         parent::__construct($context);
     }
 
@@ -54,24 +63,25 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
 
             $productId = $product->getId();
             $storeId = $this->_storeManager->getStore()->getId();
-            $snippet = $this->_model->getSnippetByProductIdAndStoreId($productId, $storeId);
+
+            $snippet = $this->_richsnippet->getSnippetByProductIdAndStoreId($productId, $storeId);
 
             if (!$snippet || !$snippet->isValid()) {
                 //no snippet for product or snippet isn't valid anymore. get valid snippet code from yotpo api
-                $res = $this->_yotpoApi->sendApiRequest("products/" . ($this->_yotpoHelper->getAppKey()) . "/richsnippet/" . $productId, "get", 2);
+                $res = $this->_yotpoApi->sendApiRequest("products/" . $this->_yotpoHelper->getAppKey() . '/' . $productId . "/bottomline/", [], "get", 2);
 
                 if ($res["status"] != 200) {
                     //product not found or feature disabled.
-                    return "";
+                    return [];
                 }
 
                 $body = $res["body"];
-                $averageScore = $body->response->rich_snippet->reviews_average;
-                $reviewsCount = $body->response->rich_snippet->reviews_count;
-                $ttl = $body->response->rich_snippet->ttl;
+                $averageScore = $body->response->bottomline->average_score;
+                $reviewsCount = $body->response->bottomline->total_reviews;
+                $ttl = 60 * 60 * 4; // four hours in seconds (API no longer returns ttl)
 
                 if ($snippet == null) {
-                    $snippet = $this->_model;
+                    $snippet = $this->_richsnippet;
                     $snippet->setProductId($productId);
                     $snippet->setStoreId($storeId);
                 }
