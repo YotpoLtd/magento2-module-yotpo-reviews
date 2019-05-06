@@ -6,6 +6,7 @@ use Magento\Catalog\Helper\Image as CatalogImageHelper;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Module\ModuleListInterface;
@@ -96,21 +97,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_moduleList;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    private $_productMetadata;
+
+    /**
      * @var LoggerInterface
      */
     protected $_logger;
 
     /**
      * @method __construct
-     * @param  Context               $context
-     * @param  StoreManagerInterface $storeManager
-     * @param  EncryptorInterface    $encryptor
-     * @param  Escaper               $escaper
-     * @param  DateTimeFactory       $datetimeFactory
-     * @param  Registry              $coreRegistry
-     * @param  CatalogImageHelper    $catalogImageHelper
-     * @param  AppEmulation          $appEmulation
-     * @param  ModuleListInterface   $moduleList
+     * @param  Context                  $context
+     * @param  StoreManagerInterface    $storeManager
+     * @param  EncryptorInterface       $encryptor
+     * @param  Escaper                  $escaper
+     * @param  DateTimeFactory          $datetimeFactory
+     * @param  Registry                 $coreRegistry
+     * @param  CatalogImageHelper       $catalogImageHelper
+     * @param  AppEmulation             $appEmulation
+     * @param  ModuleListInterface      $moduleList
+     * @param  ProductMetadataInterface $productMetadata
      */
     public function __construct(
         Context $context,
@@ -121,7 +128,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Registry $coreRegistry,
         CatalogImageHelper $catalogImageHelper,
         AppEmulation $appEmulation,
-        ModuleListInterface $moduleList
+        ModuleListInterface $moduleList,
+        ProductMetadataInterface $productMetadata
     ) {
         $this->_context = $context;
         $this->_storeManager = $storeManager;
@@ -132,6 +140,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_catalogImageHelper = $catalogImageHelper;
         $this->_appEmulation = $appEmulation;
         $this->_moduleList = $moduleList;
+        $this->_productMetadata = $productMetadata;
         $this->_logger = $context->getLogger();
         parent::__construct($context);
 
@@ -663,5 +672,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getModuleVersion()
     {
         return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
+    }
+
+    public function getMagentoPlatformName()
+    {
+        return $this->_productMetadata->getName();
+    }
+
+    public function getMagentoPlatformEdition()
+    {
+        return $this->_productMetadata->getEdition();
+    }
+
+    public function getMagentoPlatformVersion()
+    {
+        return $this->_productMetadata->getVersion();
     }
 }

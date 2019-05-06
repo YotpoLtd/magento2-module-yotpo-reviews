@@ -35,6 +35,7 @@ class CommandList implements \Magento\Framework\Console\CommandListInterface
         return [
             'Yotpo\Yotpo\Console\Command\SyncCommand',
             'Yotpo\Yotpo\Console\Command\ResetCommand',
+            'Yotpo\Yotpo\Console\Command\UpdateMetadataCommand',
         ];
     }
 

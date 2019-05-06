@@ -203,11 +203,28 @@ class Jobs
 
     //========================================================================//
 
+    public function updateMetadata()
+    {
+        try {
+            if ($this->_yotpoHelper->isEnabled()) {
+                $this->_processOutput("Jobs::updateMetadata() - [STARTED]", "info");
+                $this->updateMemoryLimit();
+                $this->setCrontabAreaCode();
+                foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
+                    $result = $this->_yotpoApi->updateMetadata($storeId);
+                }
+                $this->_processOutput("Jobs::updateMetadata() - [DONE]", "info");
+            }
+        } catch (\Exception $e) {
+            $this->_processOutput("Jobs::updateMetadata() - Exception:  " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+        }
+    }
+
     public function resetSyncFlags($entityType = null)
     {
         try {
             if ($this->_yotpoHelper->isEnabled()) {
-                $this->_processOutput("Yotpo - resetSyncFlags (entity: {$entityType}) [STARTED]", "info");
+                $this->_processOutput("Jobs::resetSyncFlags() - (entity: {$entityType}) [STARTED]", "info");
                 $this->updateMemoryLimit();
                 $this->setCrontabAreaCode();
                 $this->_resourceConnection->getConnection()->query(
@@ -217,7 +234,7 @@ class Jobs
                 $this->_processOutput("Yotpo - resetSyncFlags (entity: {$entityType}) [DONE]", "info");
             }
         } catch (\Exception $e) {
-            $this->_processOutput("Yotpo Exception on resetSyncFlags:  " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_processOutput("Jobs::resetSyncFlags() - Exception:  " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
     }
 
@@ -225,21 +242,21 @@ class Jobs
     {
         try {
             if ($this->_yotpoHelper->isEnabled()) {
-                $this->_processOutput("Yotpo - ordersSync [STARTED]", "info");
+                $this->_processOutput("Jobs::ordersSync() - [STARTED]", "info");
                 $this->updateMemoryLimit();
                 $this->setCrontabAreaCode();
 
                 foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
                     try {
-                        $this->_processOutput("Yotpo - Processing orders for store ID: {$storeId} ...", "info");
+                        $this->_processOutput("Jobs::ordersSync() - Processing orders for store ID: {$storeId} ...", "info");
                         $this->_yotpoHelper->emulateFrontendArea($storeId, true);
 
                         if (!(($appKey = $this->_yotpoHelper->getAppKey()) && ($secret = $this->_yotpoHelper->getSecret()))) {
-                            $this->_processOutput(__("Please make sure the APP KEY and SECRET you've entered are correct"), "error");
+                            $this->_processOutput(__("Jobs::ordersSync() - Error: Please make sure the APP KEY and SECRET you've entered are correct"), "error");
                             continue;
                         }
                         if (!($token = $this->_yotpoApi->oauthAuthentication())) {
-                            $this->_processOutput(__("Please make sure the APP KEY and SECRET you've entered are correct"), "error");
+                            $this->_processOutput(__("Jobs::ordersSync() - Error: Please make sure the APP KEY and SECRET you've entered are correct"), "error");
                             continue;
                         }
 
@@ -255,26 +272,26 @@ class Jobs
 
                         $orders = $this->_yotpoApi->prepareOrdersData($ordersCollection);
                         $ordersCount = count($orders);
-                        $this->_processOutput("Yotpo - Found {$ordersCount} orders for sync.", "info");
+                        $this->_processOutput("Jobs::ordersSync() - Found {$ordersCount} orders for sync.", "info");
                         if ($ordersCount > 0) {
                             $resData = $this->_yotpoApi->massCreatePurchases($orders, $token);
                             if ($resData['status'] != 200) {
-                                $this->_processOutput("Yotpo - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
+                                $this->_processOutput("Jobs::ordersSync() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                             } else {
                                 $this->flagItems('orders', $storeId, $ordersCollection->getAllIds());
-                                $this->_processOutput("Yotpo - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
+                                $this->_processOutput("Jobs::ordersSync() - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
                             }
                         }
                     } catch (\Exception $e) {
-                        $this->_processOutput("Yotpo Exception - Failed sync orders for store ID: {$storeId} - " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                        $this->_processOutput("Jobs::ordersSync() - Exception: Failed sync orders for store ID: {$storeId} - " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
                     }
                     $this->_yotpoHelper->stopEnvironmentEmulation();
                 }
 
-                $this->_processOutput("Yotpo - ordersSync [DONE]", "info");
+                $this->_processOutput("Jobs::ordersSync() - [DONE]", "info");
             }
         } catch (\Exception $e) {
-            $this->_processOutput("Yotpo Exception - Failed to sync orders. " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_processOutput("Jobs::ordersSync() - Exception: Failed to sync orders. " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
         }
     }
 
