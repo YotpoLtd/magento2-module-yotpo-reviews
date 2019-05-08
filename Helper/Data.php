@@ -495,7 +495,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getCategoryBottomLineHtml(Product $product)
     {
-        return '<div class="yotpo bottomLine bottomline-position" data-product-id="' . $product->getId() . '" data-url="' . $product->getUrl() . '"></div>';
+        return '<a href="' . $product->getProductUrl() . '">
+                <div class="yotpo bottomLine bottomline-position" data-product-id="' . $product->getId() . '" data-url="' . $product->getProductUrl() . '"></div>
+                </a>';
     }
 
     ////////////
