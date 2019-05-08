@@ -78,7 +78,7 @@ class RichSnippets extends \Magento\Framework\App\Helper\AbstractHelper
                 $body = $res["body"];
                 $averageScore = $body->response->bottomline->average_score;
                 $reviewsCount = $body->response->bottomline->total_reviews;
-                $ttl = 60 * 60 * 4; // four hours in seconds (API no longer returns ttl)
+                $ttl = 60 * 60 * 24; // seconds
 
                 if ($snippet == null) {
                     $snippet = $this->_richsnippet;
