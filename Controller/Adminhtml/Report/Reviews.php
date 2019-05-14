@@ -10,7 +10,7 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 class Reviews extends \Magento\Backend\App\Action
 {
     /**
-     * initialized:
+     * initialize:
      */
     protected $_scope;
     protected $_scopeId;

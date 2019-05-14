@@ -4,7 +4,6 @@
     "version": "2.7.7",
     "require": {
         "php": "~5.5.0|~5.6.0|^7.0",
-        "yotpo/magento2-module-yotpo-core": "*",
         "magento/framework": ">=100.1.0"
     },
     "type": "magento2-module",

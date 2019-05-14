@@ -92,6 +92,7 @@ class Save implements ObserverInterface
             if ($this->_yotpoHelper->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->_yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
                 $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_APP_KEY, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
                 $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_SECRET, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ENABLED, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
             }
         }

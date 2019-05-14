@@ -258,9 +258,10 @@ class Reviews extends \Magento\Backend\Block\Template
     /**
      * Generate yotpo button html
      *
+     * @param string $utm
      * @return string
      */
-    public function getLounchYotpoButtonHtml()
+    public function getLounchYotpoButtonHtml($utm = 'MagentoAdmin_Dashboard')
     {
         $button = $this->getLayout()->createBlock(
             'Magento\Backend\Block\Widget\Button'
@@ -272,7 +273,7 @@ class Reviews extends \Magento\Backend\Block\Template
         );
         if (!($appKey = $this->getAppKey())) {
             $button->setLabel(__('Get Started') . ' >');
-            $button->setOnClick("window.open('https://www.yotpo.com/integrations/magento/','_blank');");
+            $button->setOnClick("window.open('https://www.yotpo.com/integrations/magento/?utm_source={$utm}','_blank');");
         } else {
             $button->setLabel(__('Launch Yotpo') . ' >');
             $button->setOnClick("window.open('https://yap.yotpo.com/#/login?preferredAppKey={$appKey}','_blank');");
