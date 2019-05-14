@@ -68,10 +68,10 @@ class Reviews extends \Magento\Backend\App\Action
     {
         if ($this->_appKey) {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl('https://yap.yotpo.com/#/moderation/reviews?utm_source=MagentoAdmin_ReportingReviews');
+                ->setUrl('https://yap.yotpo.com/?utm_source=MagentoAdmin_ReportingReviews#/moderation/reviews');
         } else {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl('https://yap.yotpo.com/#/moderation/reviews?utm_source=MagentoAdmin_ReportingReviews');
+                ->setUrl('https://www.yotpo.com/integrations/magento/?utm_source=MagentoAdmin_ReportingReviews');
         }
     }
 }

@@ -68,10 +68,10 @@ class Analytics extends \Magento\Backend\App\Action
     {
         if ($this->_appKey) {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl('https://yap.yotpo.com/#/tools/conversions_dashboard/engagement');
+                ->setUrl('https://yap.yotpo.com/?utm_source=MagentoAdmin_ReportingAnalytics#/tools/conversions_dashboard/engagement');
         } else {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl('https://yap.yotpo.com/#/tools/conversions_dashboard/engagement?utm_source=MagentoAdmin_ReportingAnalytics');
+                ->setUrl('https://www.yotpo.com/integrations/magento/?utm_source=MagentoAdmin_ReportingAnalytics');
         }
     }
 }
