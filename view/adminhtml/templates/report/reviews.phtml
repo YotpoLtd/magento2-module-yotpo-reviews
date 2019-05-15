@@ -57,6 +57,11 @@
             <a class="yotpo-settings" href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Yotpo Settings"); ?>"><?php echo __("Yotpo Settings"); ?></a>
         </div>
     </div>
+    <style>
+        .yotpo_yotpo-report-reviews .page-wrapper {
+            background-color: #f8f8f8;
+        }
+    </style>
 <?php else: ?>
     <div class="yotpo-reviews-totals-no-appkey">
         <div class="yotpo-title-content-container">
@@ -88,4 +93,9 @@
             </div>
         </div>
     </div>
+    <style>
+        .yotpo_yotpo-report-reviews .page-wrapper {
+            background-image: linear-gradient(to bottom, #fdffff, #eff9ff);
+        }
+    </style>
 <?php endif; ?>
