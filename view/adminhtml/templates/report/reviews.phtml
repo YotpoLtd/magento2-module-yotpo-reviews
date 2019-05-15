@@ -4,15 +4,32 @@
  */
 ?>
 <?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()):
-    $period = $block->getPeriod('30d'); ?>
+    $periods = $block->getPeriods(); ?>
     <div class="yotpo-reviews-totals-container">
         <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
-            <select name="period" id="yotpo_reports_period_select" onchange="window.location.href='<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) ?>period/' + this.value;" class="admin__control-select yotpo-reports-period-select">
-                <option value="1d" <?php if ($period == '1d'): ?>selected<?php endif; ?>>Last Day</option>
-                <option value="7d" <?php if ($period == '7d'): ?>selected<?php endif; ?>>Last 7 Days</option>
-                <option value="30d" <?php if ($period == '30d'): ?>selected<?php endif; ?>>Last 30 Days</option>
-                <option value="all" <?php if ($period == 'all'): ?>selected<?php endif; ?>>All Time</option>
-            </select>
+            <div class="yotpo-reports-period-select admin__action-dropdown-wrap">
+                <a
+                    href="#"
+                    class="admin__action-dropdown"
+                    title="<?= $block->escapeHtml(__('Time Period')) ?>"
+                    data-mage-init='{"dropdown":{}}'
+                    data-toggle="dropdown">
+                    <span class="admin__action-dropdown-text">
+                        <span class="admin-user-account-text"><?= $periods[$block->getPeriod('30d')] ?></span>
+                    </span>
+                </a>
+                <ul class="admin__action-dropdown-menu">
+                    <?php foreach ($periods as $_period => $_label): ?>
+                        <li>
+                            <a
+                                href="<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) . 'period/' . $_period ?>"
+                                title="<?= $block->escapeHtml(__($_label)) ?>">
+                                <?= __($_label) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
             <div class="yotpo-at-a-glace">
                 <?php echo __("Yotpo at a glace"); ?>
             </div>

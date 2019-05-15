@@ -295,4 +295,14 @@ class Reviews extends \Magento\Backend\Block\Template
         }
         return $this->_urlBuilder->getUrl('adminhtml/system_config/edit', $params);
     }
+
+    public function getPeriods()
+    {
+        return [
+            '1d' => 'Last Day',
+            '7d' => 'Last 7 Days',
+            '30d' => 'Last 30 Days',
+            'all' => 'All Time',
+        ];
+    }
 }
