@@ -97,8 +97,8 @@ class LaunchYotpoButton extends Field
         )->setData(
             [
             'id' => 'launch_yotpo_button',
-            'class' => 'launch-yotpo-button',
-            'label' => __('Launch Yotpo') . ' >'
+            'class' => 'launch-yotpo-button yotpo-cta-add-arrow',
+            'label' => __('Launch Yotpo'),
             ]
         );
         if (!($appKey = $this->getAppKey())) {

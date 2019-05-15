@@ -268,14 +268,14 @@ class Reviews extends \Magento\Backend\Block\Template
         )->setData(
             [
             'id' => 'launch_yotpo_button',
-            'class' => 'launch-yotpo-button',
+            'class' => 'launch-yotpo-button yotpo-cta-add-arrow',
             ]
         );
         if (!($appKey = $this->getAppKey())) {
-            $button->setLabel(__('Get Started') . ' >');
+            $button->setLabel(__('Get Started'));
             $button->setOnClick("window.open('https://www.yotpo.com/integrations/magento/?utm_source={$utm}','_blank');");
         } else {
-            $button->setLabel(__('Launch Yotpo') . ' >');
+            $button->setLabel(__('Launch Yotpo'));
             $button->setOnClick("window.open('https://yap.yotpo.com/#/login?preferredAppKey={$appKey}','_blank');");
         }
 
