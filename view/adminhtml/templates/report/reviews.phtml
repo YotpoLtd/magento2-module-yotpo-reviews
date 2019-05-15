@@ -5,38 +5,40 @@
 ?>
 <?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()):
     $period = $block->getPeriod('30d'); ?>
-    <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
-        <select name="period" id="yotpo_reports_period_select" onchange="window.location.href='<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) ?>period/' + this.value;" class="admin__control-select yotpo-reports-period-select">
-            <option value="1d" <?php if ($period == '1d'): ?>selected<?php endif; ?>>Last Day</option>
-            <option value="7d" <?php if ($period == '7d'): ?>selected<?php endif; ?>>Last 7 Days</option>
-            <option value="30d" <?php if ($period == '30d'): ?>selected<?php endif; ?>>Last 30 Days</option>
-            <option value="all" <?php if ($period == 'all'): ?>selected<?php endif; ?>>All Time</option>
-        </select>
-        <div class="yotpo-at-a-glace">
-            <?php echo __("Yotpo at a glace"); ?>
-        </div>
-        <div class="user-generated-content">
-            <?php echo __("User-generated content metrics gathered from your Yotpo dashboards."); ?>
-        </div>
-        <?php if (sizeof($block->getTotals()) > 0): ?>
-            <ul class="yotpo-reviews-totals-list">
-                <?php foreach ($block->getTotals() as $_total): ?>
-                    <li class="yotpo-reviews-totals-item <?php echo /* @escapeNotVerified */ $_total['class']; ?>">
-                        <i class="yotpo-reviews-totals-icon"></i>
-                        <strong class="yotpo-reviews-totals-value"><?php echo /* @escapeNotVerified */ $_total['value']; ?></strong>
-                        <span class="yotpo-reviews-totals-label"><?php echo /* @escapeNotVerified */ $_total['label']; ?></span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <div class="yotpo-reviews-totals-nodata">
-                <?php echo __("No Data Found"); ?>
+    <div class="yotpo-reviews-totals-container">
+        <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+            <select name="period" id="yotpo_reports_period_select" onchange="window.location.href='<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) ?>period/' + this.value;" class="admin__control-select yotpo-reports-period-select">
+                <option value="1d" <?php if ($period == '1d'): ?>selected<?php endif; ?>>Last Day</option>
+                <option value="7d" <?php if ($period == '7d'): ?>selected<?php endif; ?>>Last 7 Days</option>
+                <option value="30d" <?php if ($period == '30d'): ?>selected<?php endif; ?>>Last 30 Days</option>
+                <option value="all" <?php if ($period == 'all'): ?>selected<?php endif; ?>>All Time</option>
+            </select>
+            <div class="yotpo-at-a-glace">
+                <?php echo __("Yotpo at a glace"); ?>
             </div>
-        <?php endif; ?>
-    </div>
-    <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
-    <div>
-        <a class="yotpo-settings" href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Yotpo Settings"); ?>"><?php echo __("Yotpo Settings"); ?></a>
+            <div class="user-generated-content">
+                <?php echo __("User-generated content metrics gathered from your Yotpo dashboards."); ?>
+            </div>
+            <?php if (sizeof($block->getTotals()) > 0): ?>
+                <ul class="yotpo-reviews-totals-list">
+                    <?php foreach ($block->getTotals() as $_total): ?>
+                        <li class="yotpo-reviews-totals-item <?php echo /* @escapeNotVerified */ $_total['class']; ?>">
+                            <i class="yotpo-reviews-totals-icon"></i>
+                            <strong class="yotpo-reviews-totals-value"><?php echo /* @escapeNotVerified */ $_total['value']; ?></strong>
+                            <span class="yotpo-reviews-totals-label"><?php echo /* @escapeNotVerified */ $_total['label']; ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <div class="yotpo-reviews-totals-nodata">
+                    <?php echo __("No Data Found"); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div><?php echo $block->getLounchYotpoButtonHtml(); ?></div>
+        <div>
+            <a class="yotpo-settings" href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Yotpo Settings"); ?>"><?php echo __("Yotpo Settings"); ?></a>
+        </div>
     </div>
 <?php else: ?>
     <div class="yotpo-reviews-totals-no-appkey">
