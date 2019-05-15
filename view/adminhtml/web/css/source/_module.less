@@ -120,8 +120,28 @@
         min-height: 500px;
         margin-bottom: 120px;
     }
-    .yotpo-reports-period-select{
+    .yotpo-reports-period-select.admin__action-dropdown-wrap{
         float: right;
+
+        .admin__action-dropdown-text{
+            font-size: 1.5rem;
+        }
+        &.active .admin__action-dropdown, &._active .admin__action-dropdown {
+            border: none;
+            box-shadow: none;
+        }
+        .admin__action-dropdown{
+            padding-left: 0;
+        }
+        .admin__action-dropdown-menu {
+            width: 179px;
+            height: 169px;
+            box-shadow: 0 2px 4px 0 rgba(46, 46, 46, 0.5);
+            background-color: #ffffff;
+            border: none;
+            left: 0 !important;
+            right: auto !important;
+        }
     }
     .yotpo-at-a-glace{
         line-height: 3rem;
