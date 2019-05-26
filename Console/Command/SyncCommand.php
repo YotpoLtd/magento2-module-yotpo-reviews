@@ -4,11 +4,14 @@ namespace Yotpo\Yotpo\Console\Command;
 
 use Composer\Console\ApplicationFactory;
 use Magento\Deploy\Model\Filesystem;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Registry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInputFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
 /**
  * Yotpo - Manual orders sync
@@ -22,6 +25,11 @@ class SyncCommand extends Command
     const LIMIT = 'limit';
     const ENTITY = 'entity';
     /**#@- */
+
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $_objectManager;
 
     /**
      * @var Magento\Deploy\Model\Filesystem
@@ -40,9 +48,14 @@ class SyncCommand extends Command
     private $_applicationFactory;
 
     /**
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     protected $_registry;
+
+    /**
+     * @param YotpoHelper
+     */
+    protected $_yotpoHelper;
 
     /**
      * @param \Yotpo\Yotpo\Cron\Jobs
@@ -50,32 +63,27 @@ class SyncCommand extends Command
     protected $_jobs;
 
     /**
-     * @param \Yotpo\Yotpo\Helper\Data
-     */
-    protected $_yotpoHelper;
-
-    /**
      * @method __construct
+     * @param ObjectManagerInterface $objectManager
      * @param Filesystem $filesystem
      * @param ArrayInputFactory $arrayInputFactory
      * @param ApplicationFactory $applicationFactory
-     * @param \Magento\Framework\Registry $registry
-     * @param \Yotpo\Yotpo\Cron\Jobs $jobs
-     * @param \Yotpo\Yotpo\Helper\Data $yotpoHelper
+     * @param Registry $registry
+     * @param YotpoHelper $yotpoHelper
      */
     public function __construct(
-        Filesystem\Proxy $filesystem,
-        ArrayInputFactory\Proxy $arrayInputFactory,
-        ApplicationFactory\Proxy $applicationFactory,
-        \Magento\Framework\Registry\Proxy $registry,
-        \Yotpo\Yotpo\Cron\Jobs\Proxy $jobs,
-        \Yotpo\Yotpo\Helper\Data\Proxy $yotpoHelper
+        ObjectManagerInterface $objectManager,
+        Filesystem $filesystem,
+        ArrayInputFactory $arrayInputFactory,
+        ApplicationFactory $applicationFactory,
+        Registry $registry,
+        YotpoHelper $yotpoHelper
     ) {
+        $this->_objectManager = $objectManager;
         $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;
         $this->_applicationFactory = $applicationFactory;
         $this->_registry = $registry;
-        $this->_jobs = $jobs;
         $this->_yotpoHelper = $yotpoHelper;
         parent::__construct();
     }
@@ -115,6 +123,8 @@ class SyncCommand extends Command
             $output->writeln('<error>' . 'The Yotpo Yotpo module has been disabled from system configuration. Please enable it in order to run this command!' . '</error>');
             return;
         }
+
+        $this->_jobs = $this->_objectManager->get('\Yotpo\Yotpo\Cron\Jobs');
 
         $this->_registry->register('isYotpoOrdersSyncCommand', true);
 
