@@ -239,8 +239,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getConfig($configPath, $scopeId = null, $scope = null, $skipCahce = false)
     {
-        $scope = (is_null($scope)) ? ScopeInterface::SCOPE_STORE : $scope;
-        $scopeId = (is_null($scopeId)) ? $this->getStoreManager()->getStore()->getId() : $scopeId;
+        $scope = ($scope === null) ? ScopeInterface::SCOPE_STORE : $scope;
+        $scopeId = ($scopeId === null) ? $this->getStoreManager()->getStore()->getId() : $scopeId;
         if ($skipCahce) {
             if ($scope === ScopeInterface::SCOPE_STORE) {
                 $scope = ScopeInterface::SCOPE_STORES;
@@ -553,13 +553,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             switch ($type) {
             case 'error':
-                $this->_logger->error(print_r($prefix, true) . print_r($message, true), $data);
+                $this->_logger->error($prefix . json_encode($message), $data);
                 break;
             case 'debug':
-                //$this->_logger->debug(print_r($prefix, true) . print_r($message, true), $data);
+                //$this->_logger->debug($prefix . json_encode($message), $data);
                 //break;
             default:
-                $this->_logger->info(print_r($prefix, true) . print_r($message, true), $data);
+                $this->_logger->info($prefix . json_encode($message), $data);
                 break;
             }
         }
@@ -634,7 +634,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getCurrentProduct()
     {
-        if (is_null($this->_product)) {
+        if ($this->_product === null) {
             $this->_product = $this->_coreRegistry->registry('current_product');
             if (!$this->_product) {
                 $this->_product = false;
@@ -660,7 +660,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getAllStoreIds($withDefault = false)
     {
         $cacheKey = ($withDefault) ? 1 : 0;
-        if (is_null($this->_allStoreIds[$cacheKey])) {
+        if ($this->_allStoreIds[$cacheKey] === null) {
             $this->_allStoreIds[$cacheKey] = [];
             foreach ($this->_storeManager->getStores($withDefault) as $store) {
                 $this->_allStoreIds[$cacheKey][] = $store->getId();

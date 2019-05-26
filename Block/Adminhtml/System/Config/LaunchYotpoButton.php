@@ -76,9 +76,9 @@ class LaunchYotpoButton extends Field
 
     public function getAppKey()
     {
-        if (!is_null($this->_storeId)) {
+        if ($this->_storeId !== null) {
             return $this->_yotpoHelper->getAppKey($this->_storeId, ScopeInterface::SCOPE_STORE);
-        } elseif (!is_null($this->_websiteId)) {
+        } elseif ($this->_websiteId !== null) {
             return $this->_yotpoHelper->getAppKey($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
         } else {
             return $this->_yotpoHelper->getAppKey();

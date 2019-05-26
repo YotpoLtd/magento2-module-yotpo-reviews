@@ -137,7 +137,8 @@ class SyncCommand extends Command
                 "limit" => $input->getOption(self::LIMIT),
             ]);
 
-            call_user_func([$this->_jobs, $input->getOption(self::ENTITY) . "Sync"]);
+            $method = $input->getOption(self::ENTITY) . "Sync";
+            $this->_jobs->{$method}();
             //================================================================//
 
             $output->writeln('<info>' . 'Done :)' . '</info>');

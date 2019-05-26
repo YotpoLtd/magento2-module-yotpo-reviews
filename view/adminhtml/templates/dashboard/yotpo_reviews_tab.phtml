@@ -8,27 +8,27 @@
         <?php if (sizeof($block->getTotals()) > 0): ?>
             <ul class="yotpo-reviews-totals-list">
                 <?php foreach ($block->getTotals() as $_total): ?>
-                    <li class="yotpo-reviews-totals-item <?php echo /* @escapeNotVerified */ $_total['class']; ?>">
-                        <span class="yotpo-reviews-totals-label"><?php echo /* @escapeNotVerified */ $_total['label']; ?></span>
-                        <strong class="yotpo-reviews-totals-value"><?php echo /* @escapeNotVerified */ $_total['value']; ?></strong>
+                    <li class="yotpo-reviews-totals-item <?= $_total['class'] ?>">
+                        <span class="yotpo-reviews-totals-label"><?= $_total['label'] ?></span>
+                        <strong class="yotpo-reviews-totals-value"><?= $_total['value'] ?></strong>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
             <div class="yotpo-reviews-totals-nodata">
-                <?php echo __("No Data Found"); ?>
+                <?= __("No Data Found") ?>
             </div>
         <?php endif; ?>
     </div>
-    <div><?php echo $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard'); ?></div>
+    <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
 <?php else: ?>
     <div class="yotpo-reviews-totals-no-appkey">
         <div class="collect-and-leverage">
-            <?php echo __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets."); ?>
+            <?= __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets.") ?>
         </div>
-        <div><?php echo $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard'); ?></div>
+        <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
         <div class="already-have-account">
-            <?php echo __("Already have an account?"); ?> <a href="<?php echo $block->getYotpoConfigUrl(); ?>" title="<?php echo __("Connect Yotpo"); ?>"><?php echo __("Connect Yotpo"); ?></a>
+            <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
         </div>
     </div>
 <?php endif; ?>

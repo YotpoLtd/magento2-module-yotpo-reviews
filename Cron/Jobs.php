@@ -12,7 +12,6 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
 class Jobs
 {
-    private $_memoryLimitUpdated = false;
     private $_adminNotificationError = false;
 
     /**
@@ -96,7 +95,7 @@ class Jobs
         foreach ($config as $key => $val) {
             $method = $this->_yotpoHelper->strToCamelCase(strtolower($key), 'set');
             if (method_exists($this, $method)) {
-                call_user_func([$this, $method], $val);
+                $this->{$method}($val);
             }
         }
         return $this;
@@ -150,9 +149,9 @@ class Jobs
     {
         if ($this->_output instanceof OutputInterface) {
             //Output to terminal
-            $this->_output->writeln('<' . $type . '>' . print_r($message, true) . '</' . $type . '>');
+            $this->_output->writeln('<' . $type . '>' . json_encode($message) . '</' . $type . '>');
             if ($data) {
-                $this->_output->writeln('<comment>' . print_r($data, true) . '</comment>');
+                $this->_output->writeln('<comment>' . json_encode($data) . '</comment>');
             }
         } else {
             //Add admin error notification
@@ -170,7 +169,8 @@ class Jobs
 
     protected function addAdminNotification(string $title, $description = "", $type = 'critical')
     {
-        call_user_func_array([$this->_notifierPool, 'add' . ucfirst($type)], [$title, $description]);
+        $method = 'add' . ucfirst($type);
+        $this->_notifierPool->{$method}($title, $description);
         return $this;
     }
 
@@ -208,7 +208,6 @@ class Jobs
         try {
             if ($this->_yotpoHelper->isEnabled()) {
                 $this->_processOutput("Jobs::updateMetadata() - [STARTED]", "info");
-                $this->updateMemoryLimit();
                 $this->setCrontabAreaCode();
                 foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
                     $result = $this->_yotpoApi->updateMetadata($storeId);
@@ -216,7 +215,7 @@ class Jobs
                 $this->_processOutput("Jobs::updateMetadata() - [DONE]", "info");
             }
         } catch (\Exception $e) {
-            $this->_processOutput("Jobs::updateMetadata() - Exception:  " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_processOutput("Jobs::updateMetadata() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
     }
 
@@ -225,16 +224,16 @@ class Jobs
         try {
             if ($this->_yotpoHelper->isEnabled()) {
                 $this->_processOutput("Jobs::resetSyncFlags() - (entity: {$entityType}) [STARTED]", "info");
-                $this->updateMemoryLimit();
                 $this->setCrontabAreaCode();
-                $this->_resourceConnection->getConnection()->query(
-                    "UPDATE `yotpo_sync` SET `sync_flag`='0'" .
-                    (($entityType) ? " WHERE `entity_type`='{$entityType}'" : "")
+                $this->_resourceConnection->getConnection()->update(
+                    $this->_resourceConnection->getTableName('yotpo_sync'),
+                    ['sync_flag' => 0],
+                    (($entityType) ? ['entity_type = ?' => "{$entityType}"] : [])
                 );
                 $this->_processOutput("Yotpo - resetSyncFlags (entity: {$entityType}) [DONE]", "info");
             }
         } catch (\Exception $e) {
-            $this->_processOutput("Jobs::resetSyncFlags() - Exception:  " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_processOutput("Jobs::resetSyncFlags() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
     }
 
@@ -243,7 +242,6 @@ class Jobs
         try {
             if ($this->_yotpoHelper->isEnabled()) {
                 $this->_processOutput("Jobs::ordersSync() - [STARTED]", "info");
-                $this->updateMemoryLimit();
                 $this->setCrontabAreaCode();
 
                 foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
@@ -266,7 +264,7 @@ class Jobs
                             ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
                             ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
                             ->addAttributeToSort('main_table.created_at', 'ASC');
-                        if (($limit = (is_null($this->_limit)) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit)) {
+                        if (($limit = ($this->_limit === null) ? $this->_yotpoHelper->getOrdersSyncLimit() : $this->_limit)) {
                             $ordersCollection->setPageSize($limit);
                         }
 
@@ -283,7 +281,7 @@ class Jobs
                             }
                         }
                     } catch (\Exception $e) {
-                        $this->_processOutput("Jobs::ordersSync() - Exception: Failed sync orders for store ID: {$storeId} - " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                        $this->_processOutput("Jobs::ordersSync() - Exception: Failed sync orders for store ID: {$storeId} - " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
                     }
                     $this->_yotpoHelper->stopEnvironmentEmulation();
                 }
@@ -291,25 +289,13 @@ class Jobs
                 $this->_processOutput("Jobs::ordersSync() - [DONE]", "info");
             }
         } catch (\Exception $e) {
-            $this->_processOutput("Jobs::ordersSync() - Exception: Failed to sync orders. " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_processOutput("Jobs::ordersSync() - Exception: Failed to sync orders. " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
     }
 
     /////////////
     // Helpers //
     /////////////
-
-    /**
-     * @return void
-     */
-    private function updateMemoryLimit()
-    {
-        if (!$this->_memoryLimitUpdated && function_exists('\ini_set')) {
-            @ini_set('display_errors', 1);
-            @ini_set('memory_limit', '2048M');
-            $this->_memoryLimitUpdated = true;
-        }
-    }
 
     private function setCrontabAreaCode()
     {

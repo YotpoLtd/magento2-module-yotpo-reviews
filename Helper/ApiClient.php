@@ -163,18 +163,15 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 
             $this->_curl->setOption(CURLOPT_TIMEOUT, $timeout);
 
-            call_user_func_array(
-                [$this->_curl, strtolower($method)],
-                [
+            $this->_curl->{strtolower($method)}(
                 $this->_yotpoHelper->getYotpoSecuredApiUrl($path),
                 $data
-                ]
             );
 
             $this->_yotpoHelper->log("ApiClient::sendApiRequest() - response: ", "info", $this->prepareCurlResponseData());
             return $this->prepareCurlResponseData();
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::sendApiRequest() Exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::sendApiRequest() Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
     }
 
@@ -212,7 +209,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             }
             return $token;
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::oauthAuthentication({$scopeId}, {$scope}) - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
             return null;
         }
     }
@@ -231,7 +228,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 $ordersData[] = $this->prepareOrderData($order);
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::prepareOrdersData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareOrdersData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
             return [];
         }
 
@@ -265,7 +262,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $orderData['platform'] = 'magento';
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::prepareOrderData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareOrderData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
             return [];
         }
 
@@ -324,11 +321,11 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                         ];
                     }
                 } catch (\Exception $e) {
-                    $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+                    $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
                 }
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::prepareProductsData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
 
         return $productsData;
@@ -416,7 +413,7 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 return (array)$result['body']->response;
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::getMetrics() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error");
+            $this->_yotpoHelper->log("ApiClient::getMetrics() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }
     }
 
@@ -446,10 +443,10 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 ],
             ]);
             if ($result['status'] !== 200) {
-                throw new \Exception(__("Request to API failed! " . print_r($result, true)));
+                throw new \Exception(__("Request to API failed! " . json_encode($result)));
             }
         } catch (\Exception $e) {
-            $this->_yotpoHelper->log("ApiClient::updateMetadata() - exception: " . $e->getMessage() . "\n" . print_r($e->getTraceAsString(), true), "error", ['$storeId' => $storeId]);
+            $this->_yotpoHelper->log("ApiClient::updateMetadata() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error", ['$storeId' => $storeId]);
         }
         return $result;
     }
