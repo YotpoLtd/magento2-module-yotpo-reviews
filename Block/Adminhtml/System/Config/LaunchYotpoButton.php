@@ -109,4 +109,9 @@ class LaunchYotpoButton extends Field
 
         return $button->toHtml();
     }
+
+    public function isStoreScope()
+    {
+        return $this->getRequest()->getParam('store');
+    }
 }

@@ -18,12 +18,12 @@
 					<comment><![CDATA[To connect Yotpo to your store, enter your <a href="https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret" title="App Key and API Secret" target="_blank" style="color:#2b7dbd">App Key and API Secret</a> in the fields below and save your configuration.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="app_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="app_key" translate="label comment" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
                     <label>App Key</label>
 					<config_path>yotpo/settings/app_key</config_path>
                     <comment>Note: Additional stores must be connected to their own App Key via Store View settings.</comment>
                 </field>
-                <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
                     <label>API Secret</label>
 					<config_path>yotpo/settings/secret</config_path>
 					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
