@@ -248,7 +248,7 @@ class Reviews extends \Magento\Backend\Block\Template
         $this->addTotal(__('Collected Reviews'), (isset($metrics['total_reviews'])) ? (float)$metrics['total_reviews'] : '-', 'yotpo-totals-total-reviews');
         $this->addTotal(__('Collected Photos'), (isset($metrics['photos_generated'])) ? (float)$metrics['photos_generated'] : '-', 'yotpo-totals-photos-generated');
         $this->addTotal(__('Published Reviews'), (isset($metrics['published_reviews'])) ? (float)$metrics['published_reviews'] : '-', 'yotpo-totals-published-reviews');
-        $this->addTotal(__('Engagement Rate'), (isset($metrics['total_reviews'])) ? (float)$metrics['total_reviews'] . '%' : '-', 'yotpo-totals-engagement-rate');
+        $this->addTotal(__('Engagement Rate'), (isset($metrics['engagement_rate'])) ? (float)$metrics['engagement_rate'] . '%' : '-', 'yotpo-totals-engagement-rate');
     }
 
     /**
