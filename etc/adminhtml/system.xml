@@ -12,7 +12,7 @@
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Setup</label>
 				<attribute type="expanded">1</attribute>
-				<field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+				<field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
                     <label>Enable Yotpo</label>
 					<config_path>yotpo/settings/active</config_path>
 					<comment><![CDATA[To connect Yotpo to your store, enter your <a href="https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret" title="App Key and API Secret" target="_blank" style="color:#2b7dbd">App Key and API Secret</a> in the fields below and save your configuration.]]></comment>

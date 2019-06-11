@@ -222,10 +222,6 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected function _prepareLayout()
     {
-        if (!$this->isEnabled()) {
-            return $this;
-        }
-
         $storeIds = $this->getStoreIds();
         $dateRange = $this->getDateRange($this->getPeriod(), 0, 0, true);
 
@@ -235,24 +231,24 @@ class Reviews extends \Magento\Backend\Block\Template
             $dateRange[1]->format(DateTime::DATETIME_PHP_FORMAT)
         );
 
-        if (isset($metrics['emails_sent'])) {
-            $this->addTotal(__('Emails Sent'), $metrics['emails_sent'] . 'K', 'yotpo-totals-emails-sent');
+        if (!isset($metrics['emails_sent'])) {
+            $emailsSent = "-";
+        } elseif ($metrics['emails_sent'] > 999999) {
+            $emailsSent = number_format((float)($metrics['emails_sent']/1000000), 1, '.', "") . 'M';
+        } elseif ($metrics['emails_sent'] > 99999) {
+            $emailsSent = number_format((float)($metrics['emails_sent']/1000), 0, '.', "") . 'K';
+        } elseif ($metrics['emails_sent'] > 999) {
+            $emailsSent = number_format((float)($metrics['emails_sent']/1000), 1, '.', "") . 'K';
+        } else {
+            $emailsSent = (float)$metrics['emails_sent'];
         }
-        if (isset($metrics['star_rating'])) {
-            $this->addTotal(__('Avg. Star Rating'), $metrics['star_rating'], 'yotpo-totals-star-rating');
-        }
-        if (isset($metrics['total_reviews'])) {
-            $this->addTotal(__('Collected Reviews'), $metrics['total_reviews'], 'yotpo-totals-total-reviews');
-        }
-        if (isset($metrics['photos_generated'])) {
-            $this->addTotal(__('Collected Photos'), $metrics['photos_generated'], 'yotpo-totals-photos-generated');
-        }
-        if (isset($metrics['published_reviews'])) {
-            $this->addTotal(__('Published Reviews'), $metrics['published_reviews'], 'yotpo-totals-published-reviews');
-        }
-        if (isset($metrics['engagement_rate'])) {
-            $this->addTotal(__('Engagement Rate'), $metrics['engagement_rate'] . '%', 'yotpo-totals-engagement-rate');
-        }
+
+        $this->addTotal(__('Emails Sent'), $emailsSent, 'yotpo-totals-emails-sent');
+        $this->addTotal(__('Avg. Star Rating'), (isset($metrics['star_rating'])) ? (float)$metrics['star_rating'] : '-', 'yotpo-totals-star-rating');
+        $this->addTotal(__('Collected Reviews'), (isset($metrics['total_reviews'])) ? (float)$metrics['total_reviews'] : '-', 'yotpo-totals-total-reviews');
+        $this->addTotal(__('Collected Photos'), (isset($metrics['photos_generated'])) ? (float)$metrics['photos_generated'] : '-', 'yotpo-totals-photos-generated');
+        $this->addTotal(__('Published Reviews'), (isset($metrics['published_reviews'])) ? (float)$metrics['published_reviews'] : '-', 'yotpo-totals-published-reviews');
+        $this->addTotal(__('Engagement Rate'), (isset($metrics['total_reviews'])) ? (float)$metrics['total_reviews'] . '%' : '-', 'yotpo-totals-engagement-rate');
     }
 
     /**

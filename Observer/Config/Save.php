@@ -74,9 +74,10 @@ class Save implements ObserverInterface
             $this->_cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
             $this->_appConfig->reinit();
 
-            $scope = null;
+            $scope = $scopes = null;
             if (($scopeId = $observer->getEvent()->getStore())) {
                 $scope = ScopeInterface::SCOPE_STORE;
+                $scopes = ScopeInterface::SCOPE_STORES;
             } elseif (($scopeId = $observer->getEvent()->getWebsite())) {
                 $scope = ScopeInterface::SCOPE_WEBSITE;
             }
@@ -89,10 +90,13 @@ class Save implements ObserverInterface
                 );
             }
 
+            if ($scope !== ScopeInterface::SCOPE_STORE) {
+                return true;
+            }
             if ($this->_yotpoHelper->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->_yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_APP_KEY, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_SECRET, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ENABLED, null, ($scope ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_APP_KEY, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_SECRET, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ENABLED, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
             }
         }
