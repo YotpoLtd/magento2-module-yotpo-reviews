@@ -285,7 +285,8 @@ class Jobs
                     $this->_processOutput("Jobs::ordersSync() - Found {$ordersCount} orders for sync.", "info");
                     if ($ordersCount > 0) {
                         $resData = $this->_yotpoApi->massCreatePurchases($orders, $token);
-                        if ($resData['status'] != 200) {
+                        $status = (is_object($result['body']) && property_exists($result['body'], "code")) ? $result['body']->code : $resData['status'];
+                        if ($status != 200) {
                             $this->_processOutput("Jobs::ordersSync() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
                             $this->flagItems('orders', $storeId, $ordersCollection->getAllIds());
