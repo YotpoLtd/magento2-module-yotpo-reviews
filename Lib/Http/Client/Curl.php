@@ -81,7 +81,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     public function get($uri, array $params = [])
     {
         if ($params) {
-            $uri .= ((parse_url($uri, PHP_URL_QUERY)) ? "&" : "?") . \http_build_query($params);
+            $uri .= ((parse_url($uri, PHP_URL_QUERY)) ? "&" : "?") . \preg_replace('/%5B([0-9]+)?%5D=/', '[]=', \http_build_query($params));
         }
         $this->makeRequest("GET", $uri);
     }
@@ -101,7 +101,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
         }
 
         switch ($contentType) {
-        case 'application/json' :
+        case 'application/json':
             $params = json_encode($params);
             $this->curlOption(CURLOPT_POSTFIELDS, $params);
             $this->_headers['Content-Length'] = strlen($params);
