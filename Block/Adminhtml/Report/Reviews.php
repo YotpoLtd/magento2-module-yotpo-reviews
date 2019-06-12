@@ -240,15 +240,15 @@ class Reviews extends \Magento\Backend\Block\Template
         } elseif ($metrics['emails_sent'] > 999) {
             $emailsSent = number_format((float)($metrics['emails_sent']/1000), 1, '.', "") . 'K';
         } else {
-            $emailsSent = (float)$metrics['emails_sent'];
+            $emailsSent = round((float)$metrics['emails_sent'], 2);
         }
 
         $this->addTotal(__('Emails Sent'), $emailsSent, 'yotpo-totals-emails-sent');
-        $this->addTotal(__('Avg. Star Rating'), (isset($metrics['star_rating'])) ? (float)$metrics['star_rating'] : '-', 'yotpo-totals-star-rating');
-        $this->addTotal(__('Collected Reviews'), (isset($metrics['total_reviews'])) ? (float)$metrics['total_reviews'] : '-', 'yotpo-totals-total-reviews');
-        $this->addTotal(__('Collected Photos'), (isset($metrics['photos_generated'])) ? (float)$metrics['photos_generated'] : '-', 'yotpo-totals-photos-generated');
-        $this->addTotal(__('Published Reviews'), (isset($metrics['published_reviews'])) ? (float)$metrics['published_reviews'] : '-', 'yotpo-totals-published-reviews');
-        $this->addTotal(__('Engagement Rate'), (isset($metrics['engagement_rate'])) ? (float)$metrics['engagement_rate'] . '%' : '-', 'yotpo-totals-engagement-rate');
+        $this->addTotal(__('Avg. Star Rating'), (isset($metrics['star_rating'])) ? round((float)$metrics['star_rating'], 2) : '-', 'yotpo-totals-star-rating');
+        $this->addTotal(__('Collected Reviews'), (isset($metrics['total_reviews'])) ? round((float)$metrics['total_reviews'], 2) : '-', 'yotpo-totals-total-reviews');
+        $this->addTotal(__('Collected Photos'), (isset($metrics['photos_generated'])) ? round((float)$metrics['photos_generated'], 2) : '-', 'yotpo-totals-photos-generated');
+        $this->addTotal(__('Published Reviews'), (isset($metrics['published_reviews'])) ? round((float)$metrics['published_reviews'], 2) : '-', 'yotpo-totals-published-reviews');
+        $this->addTotal(__('Engagement Rate'), (isset($metrics['engagement_rate'])) ? round((float)$metrics['engagement_rate'], 2) . '%' : '-', 'yotpo-totals-engagement-rate');
     }
 
     /**
