@@ -156,7 +156,7 @@ class Jobs
         } else {
             //Add admin error notification
             if ($type === 'error' && !$this->_adminNotificationError) {
-                $this->addAdminNotification("Yopto - An error occurred during the automated sync process!", "*If you enabled debug mode on Yotpo - Reviews & Visual Marketing, you should see more details in the log file (var/log/system.log)", 'critical');
+                $this->addAdminNotification("Yopto - An error occurred during the automated sync process! (module: Yotpo_Yotpo)", "*If you enabled debug mode on Yotpo - Reviews & Visual Marketing, you should see more details in the log file (var/log/system.log)", 'critical');
                 $this->_adminNotificationError = true;
             }
         }
@@ -193,7 +193,7 @@ class Jobs
         $collection = $this->_orderCollectionFactory->create();
         $collection->getSelect()->joinLeft(
             ['yotpo_sync'=>$collection->getTable('yotpo_sync')],
-              "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
+            "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
             [
                 'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
             ]
@@ -237,9 +237,9 @@ class Jobs
             $this->_processOutput("Jobs::resetSyncFlags() - (entity: {$entityType}) [STARTED]", "info");
             $this->setCrontabAreaCode();
             $this->_resourceConnection->getConnection()->update(
-                    $this->_resourceConnection->getTableName('yotpo_sync'),
-                    ['sync_flag' => 0],
-                    (($entityType) ? ['entity_type = ?' => "{$entityType}"] : [])
+                $this->_resourceConnection->getTableName('yotpo_sync'),
+                ['sync_flag' => 0],
+                (($entityType) ? ['entity_type = ?' => "{$entityType}"] : [])
                 );
             $this->_processOutput("Yotpo - resetSyncFlags (entity: {$entityType}) [DONE]", "info");
         } catch (\Exception $e) {

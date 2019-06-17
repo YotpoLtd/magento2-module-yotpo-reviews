@@ -104,7 +104,7 @@ class LaunchYotpoButton extends Field
         if (!($appKey = $this->getAppKey())) {
             $button->setDisabled(true);
         } else {
-            $button->setOnClick("window.open('https://yap.yotpo.com/#/login?preferredAppKey={$appKey}','_blank');");
+            $button->setOnClick("window.open('https://yap.yotpo.com/#/preferredAppKey={$appKey}','_blank');");
         }
 
         return $button->toHtml();
