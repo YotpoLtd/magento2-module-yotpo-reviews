@@ -6,8 +6,10 @@ use Magento\Catalog\Helper\Image as CatalogImageHelper;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 use Magento\Framework\UrlInterface;
@@ -42,7 +44,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_yotpo_secured_api_url = 'https://api.yotpo.com/';
     protected $_yotpo_unsecured_api_url = 'http://api.yotpo.com/';
     protected $_yotpo_widget_url = '//staticw2.yotpo.com/';
-    protected $_allStoreIds = null;
+    protected $_allStoreIds = [0 => null, 1 => null];
 
     /**
      * @var Product
@@ -90,20 +92,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_appEmulation;
 
     /**
+     * @var ModuleListInterface
+     */
+    protected $_moduleList;
+
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $_productMetadata;
+
+    /**
      * @var LoggerInterface
      */
     protected $_logger;
 
     /**
      * @method __construct
-     * @param  Context               $context
-     * @param  StoreManagerInterface $storeManager
-     * @param  EncryptorInterface    $encryptor
-     * @param  Escaper               $escaper
-     * @param  DateTimeFactory       $datetimeFactory
-     * @param  Registry              $coreRegistry
-     * @param  CatalogImageHelper    $catalogImageHelper
-     * @param  AppEmulation          $appEmulation
+     * @param  Context                  $context
+     * @param  StoreManagerInterface    $storeManager
+     * @param  EncryptorInterface       $encryptor
+     * @param  Escaper                  $escaper
+     * @param  DateTimeFactory          $datetimeFactory
+     * @param  Registry                 $coreRegistry
+     * @param  CatalogImageHelper       $catalogImageHelper
+     * @param  AppEmulation             $appEmulation
+     * @param  ModuleListInterface      $moduleList
+     * @param  ProductMetadataInterface $productMetadata
      */
     public function __construct(
         Context $context,
@@ -113,7 +127,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         DateTimeFactory $datetimeFactory,
         Registry $coreRegistry,
         CatalogImageHelper $catalogImageHelper,
-        AppEmulation $appEmulation
+        AppEmulation $appEmulation,
+        ModuleListInterface $moduleList,
+        ProductMetadataInterface $productMetadata
     ) {
         $this->_context = $context;
         $this->_storeManager = $storeManager;
@@ -123,6 +139,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_coreRegistry = $coreRegistry;
         $this->_catalogImageHelper = $catalogImageHelper;
         $this->_appEmulation = $appEmulation;
+        $this->_moduleList = $moduleList;
+        $this->_productMetadata = $productMetadata;
         $this->_logger = $context->getLogger();
         parent::__construct($context);
 
@@ -221,8 +239,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getConfig($configPath, $scopeId = null, $scope = null, $skipCahce = false)
     {
-        $scope = (is_null($scope)) ? ScopeInterface::SCOPE_STORE : $scope;
-        $scopeId = (is_null($scopeId)) ? $this->getStoreManager()->getStore()->getId() : $scopeId;
+        $scope = ($scope === null) ? ScopeInterface::SCOPE_STORE : $scope;
+        $scopeId = ($scopeId === null) ? $this->getStoreManager()->getStore()->getId() : $scopeId;
         if ($skipCahce) {
             if ($scope === ScopeInterface::SCOPE_STORE) {
                 $scope = ScopeInterface::SCOPE_STORES;
@@ -271,6 +289,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getAppKey($scopeId = null, $scope = null, $skipCahce = false)
     {
         return $this->getConfig(self::XML_PATH_YOTPO_APP_KEY, $scopeId, $scope, $skipCahce);
+    }
+
+    /**
+     * @method getAppKeys
+     * @param array $storeIds
+     * @return array
+     */
+    public function getAppKeys(array $storeIds = [])
+    {
+        $appKeys = [];
+        $storeIds = $storeIds ?: $this->getAllStoreIds(true);
+        foreach ($storeIds as $storeId) {
+            $appKeys[] = $this->getAppKey($storeId);
+        }
+        return array_unique(array_filter($appKeys));
     }
 
     /**
@@ -509,18 +542,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  array  $data
      * @return $this
      */
-    public function log($message, $type = "info", $data = [])
+    public function log($message, $type = "info", $data = [], $prefix = '[Yotpo Log] ')
     {
         if ($this->isDebugMode()) { //Log to system.log
+            if (!isset($data['store_id'])) {
+                $data['store_id'] = $this->getCurrentStoreId();
+            }
+            if (!isset($data['app_key'])) {
+                $data['app_key'] = $this->getAppKey();
+            }
             switch ($type) {
             case 'error':
-                $this->_logger->error(print_r($message, true), $data);
+                $this->_logger->error($prefix . json_encode($message), $data);
                 break;
             case 'debug':
-                $this->_logger->debug(print_r($message, true), $data);
-                break;
+                //$this->_logger->debug($prefix . json_encode($message), $data);
+                //break;
             default:
-                $this->_logger->info(print_r($message, true), $data);
+                $this->_logger->info($prefix . json_encode($message), $data);
                 break;
             }
         }
@@ -595,7 +634,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getCurrentProduct()
     {
-        if (is_null($this->_product)) {
+        if ($this->_product === null) {
             $this->_product = $this->_coreRegistry->registry('current_product');
             if (!$this->_product) {
                 $this->_product = false;
@@ -620,12 +659,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllStoreIds($withDefault = false)
     {
-        if (is_null($this->_allStoreIds)) {
-            $this->_allStoreIds = [];
+        $cacheKey = ($withDefault) ? 1 : 0;
+        if ($this->_allStoreIds[$cacheKey] === null) {
+            $this->_allStoreIds[$cacheKey] = [];
             foreach ($this->_storeManager->getStores($withDefault) as $store) {
-                $this->_allStoreIds[] = $store->getId();
+                $this->_allStoreIds[$cacheKey][] = $store->getId();
             }
         }
-        return $this->_allStoreIds;
+        return $this->_allStoreIds[$cacheKey];
+    }
+
+    public function getModuleVersion()
+    {
+        return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
+    }
+
+    public function getMagentoPlatformName()
+    {
+        return $this->_productMetadata->getName();
+    }
+
+    public function getMagentoPlatformEdition()
+    {
+        return $this->_productMetadata->getEdition();
+    }
+
+    public function getMagentoPlatformVersion()
+    {
+        return $this->_productMetadata->getVersion();
     }
 }

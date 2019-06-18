@@ -4,5 +4,8 @@
 		<job name="yotpo_yotpo_orders_sync" instance="Yotpo\Yotpo\Cron\Jobs" method="ordersSync">
             <schedule>* * * * *</schedule>
         </job>
+		<job name="yotpo_yotpo_update_metadata" instance="Yotpo\Yotpo\Cron\Jobs" method="updateMetadata">
+            <schedule>30 2 * * *</schedule>
+        </job>
 	</group>
 </config>

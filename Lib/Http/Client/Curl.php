@@ -72,6 +72,21 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     }
 
     /**
+     * Make GET request
+     *
+     * @param string $uri uri relative to host, ex. "/index.php"
+     * @param array $params
+     * @return void
+     */
+    public function get($uri, array $params = [])
+    {
+        if ($params) {
+            $uri .= ((parse_url($uri, PHP_URL_QUERY)) ? "&" : "?") . \preg_replace('/%5B([0-9]+)?%5D=/', '[]=', \http_build_query($params));
+        }
+        $this->makeRequest("GET", $uri);
+    }
+
+    /**
      * Prepare and set post params.
      *
      * @param array $params
@@ -94,5 +109,28 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
         default:
             $this->curlOption(CURLOPT_POSTFIELDS, http_build_query($params));
         }
+    }
+
+    /**
+     * Reset class to initial values
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->_host = 'localhost';
+        $this->_port = 80;
+        $this->_sock = null;
+        $this->_headers = [];
+        $this->_postFields = [];
+        $this->_cookies = [];
+        $this->_responseHeaders = [];
+        $this->_responseBody = '';
+        $this->_responseStatus = 0;
+        $this->_timeout = 300;
+        $this->_redirectCount = 0;
+        $this->_ch = null;
+        $this->_curlUserOptions = [];
+        $this->_headerCount = 0;
+        return $this;
     }
 }
