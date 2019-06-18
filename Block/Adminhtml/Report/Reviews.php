@@ -135,7 +135,7 @@ class Reviews extends \Magento\Backend\Block\Template
      * @param  mixed    $value
      * @param  string   $class
      */
-    public function addTotal($label, $value, string $class = "")
+    public function addTotal($label, $value, $class = "")
     {
         $this->_totals[] = ['label' => $label, 'value' => $value, 'class' => $class];
         return $this;
