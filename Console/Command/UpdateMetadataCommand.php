@@ -3,7 +3,6 @@
 namespace Yotpo\Yotpo\Console\Command;
 
 use Composer\Console\ApplicationFactory;
-use Magento\Deploy\Model\Filesystem;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Symfony\Component\Console\Command\Command;
@@ -21,11 +20,6 @@ class UpdateMetadataCommand extends Command
      * @param ObjectManagerInterface
      */
     protected $_objectManager;
-
-    /**
-     * @var Magento\Deploy\Model\Filesystem
-     */
-    private $_filesystem;
 
     /**
      * @var ArrayInputFactory
@@ -56,20 +50,17 @@ class UpdateMetadataCommand extends Command
     /**
      * @method __construct
      * @param ObjectManagerInterface $objectManager
-     * @param Filesystem $filesystem
      * @param ArrayInputFactory $arrayInputFactory
      * @param ApplicationFactory $applicationFactory
      * @param Registry $registry
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        Filesystem $filesystem,
         ArrayInputFactory $arrayInputFactory,
         ApplicationFactory $applicationFactory,
         Registry $registry
     ) {
         $this->_objectManager = $objectManager;
-        $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;
         $this->_applicationFactory = $applicationFactory;
         $this->_registry = $registry;
