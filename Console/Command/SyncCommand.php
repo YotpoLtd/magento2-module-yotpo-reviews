@@ -3,7 +3,6 @@
 namespace Yotpo\Yotpo\Console\Command;
 
 use Composer\Console\ApplicationFactory;
-use Magento\Deploy\Model\Filesystem;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Symfony\Component\Console\Command\Command;
@@ -30,11 +29,6 @@ class SyncCommand extends Command
      * @var ObjectManagerInterface
      */
     private $_objectManager;
-
-    /**
-     * @var Magento\Deploy\Model\Filesystem
-     */
-    private $_filesystem;
 
     /**
      * @var ArrayInputFactory
@@ -65,26 +59,20 @@ class SyncCommand extends Command
     /**
      * @method __construct
      * @param ObjectManagerInterface $objectManager
-     * @param Filesystem $filesystem
      * @param ArrayInputFactory $arrayInputFactory
      * @param ApplicationFactory $applicationFactory
      * @param Registry $registry
-     * @param YotpoHelper $yotpoHelper
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        Filesystem $filesystem,
         ArrayInputFactory $arrayInputFactory,
         ApplicationFactory $applicationFactory,
-        Registry $registry,
-        YotpoHelper $yotpoHelper
+        Registry $registry
     ) {
         $this->_objectManager = $objectManager;
-        $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;
         $this->_applicationFactory = $applicationFactory;
         $this->_registry = $registry;
-        $this->_yotpoHelper = $yotpoHelper;
         parent::__construct();
     }
 
@@ -119,6 +107,8 @@ class SyncCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->_yotpoHelper = $this->_objectManager->get('\Yotpo\Yotpo\Helper\Data');
+
         if (!$this->_yotpoHelper->isEnabled()) {
             $output->writeln('<error>' . 'The Yotpo Yotpo module has been disabled from system configuration. Please enable it in order to run this command!' . '</error>');
             return;

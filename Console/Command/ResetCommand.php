@@ -3,7 +3,6 @@
 namespace Yotpo\Yotpo\Console\Command;
 
 use Composer\Console\ApplicationFactory;
-use Magento\Deploy\Model\Filesystem;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
@@ -33,11 +32,6 @@ class ResetCommand extends Command
      * @param ObjectManagerInterface
      */
     protected $_objectManager;
-
-    /**
-     * @var Magento\Deploy\Model\Filesystem
-     */
-    private $_filesystem;
 
     /**
      * @var ArrayInputFactory
@@ -73,26 +67,20 @@ class ResetCommand extends Command
     /**
      * @method __construct
      * @param ObjectManagerInterface $objectManager
-     * @param Filesystem $filesystem
      * @param ArrayInputFactory $arrayInputFactory
      * @param ApplicationFactory $applicationFactory
      * @param Registry $registry
-     * @param YotpoHelper $yotpoHelper
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        Filesystem $filesystem,
         ArrayInputFactory $arrayInputFactory,
         ApplicationFactory $applicationFactory,
-        Registry $registry,
-        YotpoHelper $yotpoHelper
+        Registry $registry
     ) {
         $this->_objectManager = $objectManager;
-        $this->_filesystem = $filesystem;
         $this->_arrayInputFactory = $arrayInputFactory;
         $this->_applicationFactory = $applicationFactory;
         $this->_registry = $registry;
-        $this->_yotpoHelper = $yotpoHelper;
         parent::__construct();
     }
 
@@ -120,6 +108,7 @@ class ResetCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->_yotpoHelper = $this->_objectManager->get('\Yotpo\Yotpo\Helper\Data');
         $this->_jobs = $this->_objectManager->get('\Yotpo\Yotpo\Cron\Jobs');
         $this->_resourceConnection = $this->_objectManager->get('\Magento\Framework\App\ResourceConnection');
 
