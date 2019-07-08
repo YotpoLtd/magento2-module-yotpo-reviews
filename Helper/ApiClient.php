@@ -11,7 +11,7 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
 
 class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const DEFAULT_TIMEOUT = 30;
+    const DEFAULT_TIMEOUT = 90;
 
     /**
      * @var int

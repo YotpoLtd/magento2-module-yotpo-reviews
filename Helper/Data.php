@@ -474,6 +474,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function startEnvironmentEmulation($storeId, $area = Area::AREA_FRONTEND, $force = false)
     {
+        $this->stopEnvironmentEmulation();
         $this->getAppEmulation()->startEnvironmentEmulation($storeId, $area, $force);
         return $this;
     }

@@ -63,6 +63,18 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Remove scope label
+     *
+     * @param  AbstractElement $element
+     * @return string
+     */
+    public function render(AbstractElement $element)
+    {
+        $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
+        return parent::render($element);
+    }
+
+    /**
      * Return element html
      *
      * @param  AbstractElement $element
@@ -102,7 +114,7 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
         $collection = $this->_orderCollectionFactory->create();
         $collection->getSelect()->joinLeft(
             ['yotpo_sync'=>$collection->getTable('yotpo_sync')],
-              "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
+            "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
             [
                 'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
             ]
