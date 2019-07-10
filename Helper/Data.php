@@ -375,9 +375,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string                 $format
      * @return date
      */
-    public function getOrdersSyncAfterDate($format = 'Y-m-d H:i:s')
+    public function getOrdersSyncAfterDate($scopeId = null, $scope = null, $format = 'Y-m-d H:i:s', $skipCahce = false)
     {
-        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE) ?: $this->getCurrentDate());
+        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $scopeId, $scope, $skipCahce) ?: $this->getCurrentDate());
         return date($format, $timestamp);
     }
 
