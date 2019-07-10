@@ -206,25 +206,21 @@ class Jobs
     public function updateMetadata()
     {
         try {
-            if ($this->_yotpoHelper->isEnabled()) {
-                $this->_processOutput("Jobs::updateMetadata() - [STARTED]", "info");
-                $this->setCrontabAreaCode();
-                foreach ($this->_yotpoHelper->getAllStoreIds(false) as $storeId) {
-                    try {
-                        $this->_yotpoHelper->emulateFrontendArea($storeId, true);
-                        if (!$this->_yotpoHelper->isEnabled()) {
-                            $this->_processOutput("Jobs::updateMetadata() - Skipping store ID: {$storeId} (disabled)", "info");
-                            continue;
-                        }
-                        $this->_processOutput("Jobs::updateMetadata() - Updating metadata for store ID: {$storeId} ...", "info");
-                        $result = $this->_yotpoApi->updateMetadata($storeId);
-                        $this->_processOutput("Jobs::updateMetadata() - Updating metadata for store ID: {$storeId} [SUCCESS]", "info");
-                    } catch (\Exception $e) {
-                        $this->_processOutput("Jobs::updateMetadata() - Exception on store ID: {$storeId} - " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
+            $this->setCrontabAreaCode();
+            foreach ($this->_yotpoHelper->getAllStoreIds(false) as $storeId) {
+                try {
+                    $this->_yotpoHelper->emulateFrontendArea($storeId, true);
+                    if (!$this->_yotpoHelper->isEnabled()) {
+                        $this->_processOutput("Jobs::updateMetadata() - Skipping store ID: {$storeId} (disabled)", "info");
+                        continue;
                     }
-                    $this->_yotpoHelper->stopEnvironmentEmulation();
+                    $this->_processOutput("Jobs::updateMetadata() - Updating metadata for store ID: {$storeId} ...", "info");
+                    $result = $this->_yotpoApi->updateMetadata($storeId);
+                    $this->_processOutput("Jobs::updateMetadata() - Updating metadata for store ID: {$storeId} [SUCCESS]", "info");
+                } catch (\Exception $e) {
+                    $this->_processOutput("Jobs::updateMetadata() - Exception on store ID: {$storeId} - " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
                 }
-                $this->_processOutput("Jobs::updateMetadata() - [DONE]", "info");
+                $this->_yotpoHelper->stopEnvironmentEmulation();
             }
         } catch (\Exception $e) {
             $this->_processOutput("Jobs::updateMetadata() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
@@ -250,9 +246,7 @@ class Jobs
     public function ordersSync()
     {
         try {
-            $this->_processOutput("Jobs::ordersSync() - [STARTED]", "info");
             $this->setCrontabAreaCode();
-
             foreach ($this->_yotpoHelper->getAllStoreIds(false) as $storeId) {
                 try {
                     $this->_yotpoHelper->emulateFrontendArea($storeId, true);
@@ -298,8 +292,6 @@ class Jobs
                 }
                 $this->_yotpoHelper->stopEnvironmentEmulation();
             }
-
-            $this->_processOutput("Jobs::ordersSync() - [DONE]", "info");
         } catch (\Exception $e) {
             $this->_processOutput("Jobs::ordersSync() - Exception: Failed to sync orders. " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
         }

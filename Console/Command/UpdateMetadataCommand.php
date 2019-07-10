@@ -83,12 +83,6 @@ class UpdateMetadataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->_yotpoHelper = $this->_objectManager->get('\Yotpo\Yotpo\Helper\Data');
-
-        if (!$this->_yotpoHelper->isEnabled()) {
-            $output->writeln('<error>' . 'The Yotpo Yotpo module has been disabled from system configuration. Please enable it in order to run this command!' . '</error>');
-            return;
-        }
-
         $this->_jobs = $this->_objectManager->get('\Yotpo\Yotpo\Cron\Jobs');
 
         $this->_registry->register('isUpdateMetadataCommand', true);
