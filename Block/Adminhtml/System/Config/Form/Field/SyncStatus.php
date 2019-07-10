@@ -5,6 +5,7 @@ namespace Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 use Yotpo\Yotpo\Model\SyncFactory as YotpoSyncFactory;
 
@@ -96,17 +97,25 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
 
     protected function getStoreIds()
     {
-        if (($_storeId = $this->getRequest()->getParam("store", 0))) {
-            $stores = [$_storeId];
-        } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
-            $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
-        } else {
-            $stores = [];
-            foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
-                $stores[] = $storeId;
+        if (!$this->hasData('storeIds')) {
+            if (($_storeId = $this->getRequest()->getParam("store", 0))) {
+                $stores = [$_storeId];
+            } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
+                $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
+            } else {
+                $stores = [];
+                foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
+                    $stores[] = $storeId;
+                }
             }
+            foreach ($stores as $key => $storeId) {
+                if (!($this->_yotpoHelper->isEnabled($storeId, ScopeInterface::SCOPE_STORE) && $this->_yotpoHelper->isAppKeyAndSecretSet($storeId, ScopeInterface::SCOPE_STORE))) {
+                    unset($stores[$key]);
+                }
+            }
+            $this->setData('storeIds', array_values($stores));
         }
-        return array_values($stores);
+        return $this->getData('storeIds');
     }
 
     protected function getOrderCollection()
@@ -126,13 +135,13 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
     {
         $status = [];
 
-        $status['total_orders'] = $this->getOrderCollection()
+        $status['total_orders'] = (!$this->getStoreIds()) ? 0 : $this->getOrderCollection()
             ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
             ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
             ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
             ->getSize();
 
-        $status['total_orders_synced'] = $this->getOrderCollection()
+        $status['total_orders_synced'] = (!$this->getStoreIds()) ? 0 : $this->getOrderCollection()
             ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
             ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
             ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
