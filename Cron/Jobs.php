@@ -271,7 +271,7 @@ class Jobs
                     }
 
                     $ordersCollection = $this->getOrderCollection()
-                            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
+                            ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoHelper->getCustomOrderStatus()])
                             ->addAttributeToFilter('main_table.store_id', $storeId)
                             ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
                             ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
