@@ -136,15 +136,15 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
         $status = [];
 
         $status['total_orders'] = (!$this->getStoreIds()) ? 0 : $this->getOrderCollection()
-            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
+            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus($this->getStoreId(), ScopeInterface::SCOPE_STORE))
             ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
-            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
+            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($this->getStoreId(), ScopeInterface::SCOPE_STORE)])
             ->getSize();
 
         $status['total_orders_synced'] = (!$this->getStoreIds()) ? 0 : $this->getOrderCollection()
-            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
+            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus($this->getStoreId(), ScopeInterface::SCOPE_STORE))
             ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
-            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
+            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($this->getStoreId(), ScopeInterface::SCOPE_STORE)])
             ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
             ->getSize();
 
