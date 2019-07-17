@@ -52,11 +52,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_product;
 
     /**
-     * @var array
-     */
-    protected $_orderStatuses = [];
-
-    /**
      * @var StoreManagerInterface
      */
     protected $_storeManager;
@@ -359,15 +354,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCustomOrderStatus($scopeId = null, $scope = null, $skipCahce = false)
     {
-        if (!$this->_orderStatuses) {
-            $this->_orderStatuses = $this->getConfig(self::XML_PATH_YOTPO_CUSTOM_ORDER_STATUS, $scopeId, $scope, $skipCahce);
-            if (!$this->_orderStatuses) {
-                $this->_orderStatuses = [Order::STATE_COMPLETE];
-            } else {
-                $this->_orderStatuses = array_map('strtolower', explode(',', $this->_orderStatuses));
-            }
-        }
-        return $this->_orderStatuses;
+        $orderStatuses = $this->getConfig(self::XML_PATH_YOTPO_CUSTOM_ORDER_STATUS, $scopeId, $scope, $skipCahce);
+        return ($orderStatuses) ? array_map('strtolower', explode(',', $orderStatuses)) : [Order::STATE_COMPLETE];
     }
 
     /**
@@ -375,9 +363,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param  string                 $format
      * @return date
      */
-    public function getOrdersSyncAfterDate($format = 'Y-m-d H:i:s')
+    public function getOrdersSyncAfterDate($scopeId = null, $scope = null, $format = 'Y-m-d H:i:s', $skipCahce = false)
     {
-        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE) ?: $this->getCurrentDate());
+        $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $scopeId, $scope, $skipCahce) ?: $this->getCurrentDate());
         return date($format, $timestamp);
     }
 
@@ -474,6 +462,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function startEnvironmentEmulation($storeId, $area = Area::AREA_FRONTEND, $force = false)
     {
+        $this->stopEnvironmentEmulation();
         $this->getAppEmulation()->startEnvironmentEmulation($storeId, $area, $force);
         return $this;
     }

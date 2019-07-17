@@ -5,6 +5,7 @@ namespace Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 use Yotpo\Yotpo\Model\SyncFactory as YotpoSyncFactory;
 
@@ -63,6 +64,18 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Remove scope label
+     *
+     * @param  AbstractElement $element
+     * @return string
+     */
+    public function render(AbstractElement $element)
+    {
+        $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
+        return parent::render($element);
+    }
+
+    /**
      * Return element html
      *
      * @param  AbstractElement $element
@@ -84,17 +97,25 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
 
     protected function getStoreIds()
     {
-        if (($_storeId = $this->getRequest()->getParam("store", 0))) {
-            $stores = [$_storeId];
-        } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
-            $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
-        } else {
-            $stores = [];
-            foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
-                $stores[] = $storeId;
+        if (!$this->hasData('storeIds')) {
+            if (($_storeId = $this->getRequest()->getParam("store", 0))) {
+                $stores = [$_storeId];
+            } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
+                $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
+            } else {
+                $stores = [];
+                foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
+                    $stores[] = $storeId;
+                }
             }
+            foreach ($stores as $key => $storeId) {
+                if (!($this->_yotpoHelper->isEnabled($storeId, ScopeInterface::SCOPE_STORE) && $this->_yotpoHelper->isAppKeyAndSecretSet($storeId, ScopeInterface::SCOPE_STORE))) {
+                    unset($stores[$key]);
+                }
+            }
+            $this->setData('storeIds', array_values($stores));
         }
-        return array_values($stores);
+        return $this->getData('storeIds');
     }
 
     protected function getOrderCollection()
@@ -102,7 +123,7 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
         $collection = $this->_orderCollectionFactory->create();
         $collection->getSelect()->joinLeft(
             ['yotpo_sync'=>$collection->getTable('yotpo_sync')],
-              "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
+            "main_table.entity_id = yotpo_sync.entity_id AND main_table.store_id = yotpo_sync.store_id AND yotpo_sync.entity_type = 'orders'",
             [
                 'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
             ]
@@ -112,23 +133,35 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
 
     public function getStatus()
     {
-        $status = [];
+        $status = [
+            'total_orders' => 0,
+            'total_orders_synced' => 0,
+            'total_orders_synced_all' => 0,
+            'last_sync_date' => "never",
+        ];
 
-        $status['total_orders'] = $this->getOrderCollection()
-            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
-            ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
-            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
-            ->getSize();
-
-        $status['total_orders_synced'] = $this->getOrderCollection()
-            ->addAttributeToFilter('main_table.status', $this->_yotpoHelper->getCustomOrderStatus())
-            ->addAttributeToFilter('main_table.store_id', ['in' => $this->getStoreIds()])
-            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate()])
-            ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
-            ->getSize();
+        foreach ($this->getStoreIds() as $key => $storeId) {
+            $status['total_orders'] += $this->getOrderCollection()
+                ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoHelper->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.store_id', $storeId)
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->getSize();
+            $status['total_orders_synced'] += $this->getOrderCollection()
+                ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoHelper->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.store_id', $storeId)
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
+                ->getSize();
+            $status['total_orders_synced_all'] += $this->getOrderCollection()
+                ->addAttributeToFilter('main_table.store_id', $storeId)
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
+                ->getSize();
+        }
 
         $lastSyncDate = $this->_yotpoSyncFactory->create()->getCollection()
             ->addFieldToFilter('entity_type', 'orders')
+            ->addFieldToFilter('store_id', ['in' => $this->getStoreIds()])
             ->setOrder('sync_flag', 'DESC')
             ->setPageSize(1)
             ->getFirstItem();
