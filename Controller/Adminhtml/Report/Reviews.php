@@ -12,21 +12,21 @@ class Reviews extends \Magento\Backend\App\Action
     /**
      * initialize:
      */
-    protected $_scope;
-    protected $_scopeId;
-    protected $_isEnabled;
-    protected $_appKey;
-    protected $_isAppKeyAndSecretSet;
+    private $_scope;
+    private $_scopeId;
+    private $_isEnabled;
+    private $_appKey;
+    private $_isAppKeyAndSecretSet;
 
     /**
     * @var PageFactory
     */
-    protected $resultPageFactory;
+    private $_resultPageFactory;
 
     /**
      * @var YotpoHelper
      */
-    protected $_yotpoHelper;
+    private $_yotpoHelper;
 
     /**
      * Constructor
@@ -41,12 +41,11 @@ class Reviews extends \Magento\Backend\App\Action
         YotpoHelper $yotpoHelper
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
+        $this->_resultPageFactory = $resultPageFactory;
         $this->_yotpoHelper = $yotpoHelper;
-        $this->_initiaize();
     }
 
-    protected function _initiaize()
+    private function _initiaize()
     {
         if (($storeId = $this->getRequest()->getParam("store", 0))) {
             $this->_scope = ScopeInterface::SCOPE_STORE;
@@ -67,7 +66,8 @@ class Reviews extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
+        $this->_initiaize();
+        $resultPage = $this->_resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(__('Yotpo Reviews'));
         if (!($this->_isEnabled && $this->_isAppKeyAndSecretSet)) {
             $resultPage->getLayout()->unsetElement('store_switcher');

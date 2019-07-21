@@ -12,16 +12,16 @@ class Reviews extends \Magento\Backend\App\Action
     /**
      * initialize:
      */
-    protected $_scope;
-    protected $_scopeId;
-    protected $_isEnabled;
-    protected $_appKey;
-    protected $_isAppKeyAndSecretSet;
+    private $_scope;
+    private $_scopeId;
+    private $_isEnabled;
+    private $_appKey;
+    private $_isAppKeyAndSecretSet;
 
     /**
      * @var YotpoHelper
      */
-    protected $_yotpoHelper;
+    private $_yotpoHelper;
 
     /**
      * Constructor
@@ -35,10 +35,9 @@ class Reviews extends \Magento\Backend\App\Action
     ) {
         parent::__construct($context);
         $this->_yotpoHelper = $yotpoHelper;
-        $this->_initiaize();
     }
 
-    protected function _initiaize()
+    private function _initiaize()
     {
         if (($storeId = $this->getRequest()->getParam("store", 0))) {
             $this->_scope = ScopeInterface::SCOPE_STORE;
@@ -66,6 +65,7 @@ class Reviews extends \Magento\Backend\App\Action
 
     public function execute()
     {
+        $this->_initiaize();
         if ($this->_appKey) {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
                 ->setUrl('https://yap.yotpo.com/?utm_source=MagentoAdmin_ReportingReviews#/moderation/reviews');
