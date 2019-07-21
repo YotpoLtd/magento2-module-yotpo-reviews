@@ -12,9 +12,14 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 class Reviews extends \Magento\Backend\Block\Template
 {
     /**
+     * @var bool
+     */
+    private $_initialized;
+
+    /**
      * @var string
      */
-    protected $_defaultPeriod = '30d';
+    private $_defaultPeriod = '30d';
 
     /**
      * @var string
@@ -24,32 +29,32 @@ class Reviews extends \Magento\Backend\Block\Template
     /**
      * @var array
      */
-    protected $_totals = [];
+    private $_totals = [];
 
     /**
      * initialized:
      */
-    protected $_scope;
-    protected $_scopeId;
-    protected $_isEnabled;
-    protected $_appKey;
-    protected $_isAppKeyAndSecretSet;
-    protected $_allStoreIds;
+    private $_scope;
+    private $_scopeId;
+    private $_isEnabled;
+    private $_appKey;
+    private $_isAppKeyAndSecretSet;
+    private $_allStoreIds;
 
     /**
      * @var OrderCollectionFactory
      */
-    protected $_collectionFactory;
+    private $_collectionFactory;
 
     /**
      * @var YotpoHelper
      */
-    protected $_yotpoHelper;
+    private $_yotpoHelper;
 
     /**
      * @var YotpoApiClient
      */
-    protected $_yotpoApi;
+    private $_yotpoApi;
 
     /**
      * @method __construct
@@ -70,11 +75,15 @@ class Reviews extends \Magento\Backend\Block\Template
         $this->_yotpoHelper = $yotpoHelper;
         $this->_yotpoApi = $yotpoApi;
         parent::__construct($context, $data);
-        $this->_initiaize();
     }
 
-    protected function _initiaize()
+    private function _initiaize()
     {
+        if ($this->_initialized) {
+            return;
+        }
+        $this->_initialized = true;
+
         if (($storeId = $this->getRequest()->getParam(ScopeInterface::SCOPE_STORE, 0))) {
             $this->_scope = ScopeInterface::SCOPE_STORE;
             $this->_scopeId = $storeId;
@@ -135,7 +144,7 @@ class Reviews extends \Magento\Backend\Block\Template
      * @param  mixed    $value
      * @param  string   $class
      */
-    public function addTotal($label, $value, $class = "")
+    private function addTotal($label, $value, $class = "")
     {
         $this->_totals[] = ['label' => $label, 'value' => $value, 'class' => $class];
         return $this;
@@ -150,7 +159,7 @@ class Reviews extends \Magento\Backend\Block\Template
      * @param bool $returnObjects
      * @return array
      */
-    public function getDateRange($range, $customStart, $customEnd, $returnObjects = false)
+    private function getDateRange($range, $customStart, $customEnd, $returnObjects = false)
     {
         $dateEnd = new \DateTime();
         $dateStart = new \DateTime();
@@ -222,6 +231,7 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected function _prepareLayout()
     {
+        $this->_initiaize();
         $storeIds = $this->getStoreIds();
         $dateRange = $this->getDateRange($this->getPeriod(), 0, 0, true);
 
@@ -259,6 +269,7 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getLounchYotpoButtonHtml($utm = 'MagentoAdmin_Dashboard')
     {
+        $this->_initiaize();
         $button = $this->getLayout()->createBlock(
             'Magento\Backend\Block\Widget\Button'
         )->setData(
@@ -285,6 +296,7 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getYotpoConfigUrl()
     {
+        $this->_initiaize();
         $params = ['section' => 'yotpo'];
         if ($this->_scope) {
             $params[$this->_scope] = $this->_scopeId;
