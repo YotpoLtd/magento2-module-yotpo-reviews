@@ -11,8 +11,8 @@ use Magento\Framework\App\ScopeInterface as AppScopeInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Store\Model\ScopeInterface;
-use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\AbstractApi as YotpoApi;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 class Save implements ObserverInterface
 {
@@ -21,47 +21,48 @@ class Save implements ObserverInterface
      *
      * @var ScopeConfigInterface
      */
-    protected $_appConfig;
+    private $appConfig;
 
     /**
      * @var TypeListInterface
      */
-    protected $_cacheTypeList;
+    private $cacheTypeList;
 
     /**
      * @var ResourceConfig
      */
-    protected $_resourceConfig;
+    private $resourceConfig;
 
     /**
-     * @var YotpoHelper
+     * @var YotpoConfig
      */
-    protected $_yotpoHelper;
+    private $yotpoConfig;
 
     /**
-     * @var YotpoApiClient
+     * @var YotpoApi
      */
-    protected $_yotpoApi;
+    private $yotpoApi;
 
     /**
-     * @param TypeListInterface         $cacheTypeList
-     * @param ReinitableConfigInterface $config
-     * @param ResourceConfig            $resourceConfig
-     * @param YotpoHelper               $yotpoHelper
-     * @param YotpoApiClient            $yotpoApi
+     * @method __construct
+     * @param  TypeListInterface         $cacheTypeList
+     * @param  ReinitableConfigInterface $config
+     * @param  ResourceConfig            $resourceConfig
+     * @param  YotpoConfig               $yotpoConfig
+     * @param  YotpoApi                  $yotpoApi
      */
     public function __construct(
         TypeListInterface $cacheTypeList,
         ReinitableConfigInterface $config,
         ResourceConfig $resourceConfig,
-        YotpoHelper $yotpoHelper,
-        YotpoApiClient $yotpoApi
+        YotpoConfig $yotpoConfig,
+        YotpoApi $yotpoApi
     ) {
-        $this->_cacheTypeList = $cacheTypeList;
-        $this->_appConfig = $config;
-        $this->_resourceConfig = $resourceConfig;
-        $this->_yotpoHelper = $yotpoHelper;
-        $this->_yotpoApi = $yotpoApi;
+        $this->cacheTypeList = $cacheTypeList;
+        $this->appConfig = $config;
+        $this->resourceConfig = $resourceConfig;
+        $this->yotpoConfig = $yotpoConfig;
+        $this->yotpoApi = $yotpoApi;
     }
 
     /**
@@ -71,8 +72,8 @@ class Save implements ObserverInterface
     {
         $changedPaths = (array)$observer->getEvent()->getChangedPaths();
         if ($changedPaths) {
-            $this->_cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
-            $this->_appConfig->reinit();
+            $this->cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
+            $this->appConfig->reinit();
 
             $scope = $scopes = null;
             if (($scopeId = $observer->getEvent()->getStore())) {
@@ -82,21 +83,21 @@ class Save implements ObserverInterface
                 $scope = ScopeInterface::SCOPE_WEBSITE;
             }
 
-            if (in_array(YotpoHelper::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $changedPaths)) {
-                $this->_yotpoHelper->log(
-                    "Yotpo Debug mode " . (($this->_yotpoHelper->isDebugMode(($scopeId ?: null), ($scope ?: null))) ? 'started' : 'stopped'),
+            if (in_array(YotpoConfig::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $changedPaths)) {
+                $this->yotpoConfig->log(
+                    "Yotpo Debug mode " . (($this->yotpoConfig->isDebugMode(($scopeId ?: null), ($scope ?: null))) ? 'started' : 'stopped'),
                     "error",
-                    ['$app_key' => $this->_yotpoHelper->getAppKey(($scopeId ?: null), ($scope ?: null)), '$scope' => ($scope ?: 'default'), '$scopeId' => $scopeId]
+                    ['$app_key' => $this->yotpoConfig->getAppKey(($scopeId ?: null), ($scope ?: null)), '$scope' => ($scope ?: 'default'), '$scopeId' => $scopeId]
                 );
             }
 
             if ($scope !== ScopeInterface::SCOPE_STORE) {
                 return true;
             }
-            if ($this->_yotpoHelper->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->_yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_APP_KEY, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_SECRET, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
-                $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ENABLED, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+            if ($this->yotpoConfig->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
+                $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_APP_KEY, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_SECRET, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
+                $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_ENABLED, null, ($scopes ?: AppScopeInterface::SCOPE_DEFAULT), ($scopeId ?: 0));
                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
             }
         }

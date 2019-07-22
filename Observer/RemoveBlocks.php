@@ -4,19 +4,19 @@ namespace Yotpo\Yotpo\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 class RemoveBlocks implements ObserverInterface
 {
     /**
-     * @var YotpoHelper
+     * @var YotpoConfig
      */
-    protected $_yotpoHelper;
+    private $yotpoConfig;
 
     public function __construct(
-        YotpoHelper $yotpoHelper
+        YotpoConfig $yotpoConfig
     ) {
-        $this->_yotpoHelper = $yotpoHelper;
+        $this->yotpoConfig = $yotpoConfig;
     }
 
     public function execute(Observer $observer)
@@ -27,7 +27,7 @@ class RemoveBlocks implements ObserverInterface
 */
         $layout = $observer->getLayout();
 
-        if ($this->_yotpoHelper->isEnabled() && $this->_yotpoHelper->isMdrEnabled() && $layout->getBlock('reviews.tab')) {
+        if ($this->yotpoConfig->isEnabled() && $this->yotpoConfig->isMdrEnabled() && $layout->getBlock('reviews.tab')) {
             $layout->unsetElement('reviews.tab');
         }
 

@@ -6,7 +6,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 use Yotpo\Yotpo\Model\SyncFactory as YotpoSyncFactory;
 
 class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
@@ -19,9 +19,9 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
     protected $_template = 'Yotpo_Yotpo::system/config/sync_status.phtml';
 
     /**
-     * @var YotpoHelper
+     * @var YotpoConfig
      */
-    protected $_yotpoHelper;
+    private $yotpoConfig;
 
     /**
      * @var OrderCollectionFactory
@@ -36,19 +36,19 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
     /**
      * @method __construct
      * @param  Context                $context
-     * @param  YotpoHelper            $yotpoHelper
+     * @param  YotpoConfig            $yotpoConfig
      * @param  OrderCollectionFactory $orderCollectionFactory
      * @param  YotpoSyncFactory       $yotpoSyncFactory
      * @param  array                  $data
      */
     public function __construct(
         Context $context,
-        YotpoHelper $yotpoHelper,
+        YotpoConfig $yotpoConfig,
         OrderCollectionFactory $orderCollectionFactory,
         YotpoSyncFactory $yotpoSyncFactory,
         array $data = []
     ) {
-        $this->_yotpoHelper = $yotpoHelper;
+        $this->yotpoConfig = $yotpoConfig;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_yotpoSyncFactory = $yotpoSyncFactory;
         parent::__construct($context, $data);
@@ -91,7 +91,7 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
         if ($this->getRequest()->getParam('store', 0)) {
             return $this->getRequest()->getParam('store', 0);
         } else {
-            return $this->_yotpoHelper->getCurrentStoreId();
+            return $this->yotpoConfig->getCurrentStoreId();
         }
     }
 
@@ -101,19 +101,11 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
             if (($_storeId = $this->getRequest()->getParam("store", 0))) {
                 $stores = [$_storeId];
             } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
-                $stores = $this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds();
+                $stores = $this->yotpoConfig->getStoreManager()->getWebsite($websiteId)->getStoreIds();
             } else {
-                $stores = [];
-                foreach ($this->_yotpoHelper->getAllStoreIds(true) as $storeId) {
-                    $stores[] = $storeId;
-                }
+                $stores = $this->yotpoConfig->getAllStoreIds(false);
             }
-            foreach ($stores as $key => $storeId) {
-                if (!($this->_yotpoHelper->isEnabled($storeId, ScopeInterface::SCOPE_STORE) && $this->_yotpoHelper->isAppKeyAndSecretSet($storeId, ScopeInterface::SCOPE_STORE))) {
-                    unset($stores[$key]);
-                }
-            }
-            $this->setData('storeIds', array_values($stores));
+            $this->setData('storeIds', $this->yotpoConfig->filterDisabledStoreIds($stores));
         }
         return $this->getData('storeIds');
     }
@@ -142,19 +134,19 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
 
         foreach ($this->getStoreIds() as $key => $storeId) {
             $status['total_orders'] += $this->getOrderCollection()
-                ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoHelper->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.status', ['in' => $this->yotpoConfig->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
                 ->addAttributeToFilter('main_table.store_id', $storeId)
-                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->yotpoConfig->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
                 ->getSize();
             $status['total_orders_synced'] += $this->getOrderCollection()
-                ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoHelper->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.status', ['in' => $this->yotpoConfig->getCustomOrderStatus($storeId, ScopeInterface::SCOPE_STORE)])
                 ->addAttributeToFilter('main_table.store_id', $storeId)
-                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->yotpoConfig->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
                 ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
                 ->getSize();
             $status['total_orders_synced_all'] += $this->getOrderCollection()
                 ->addAttributeToFilter('main_table.store_id', $storeId)
-                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoHelper->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
+                ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->yotpoConfig->getOrdersSyncAfterDate($storeId, ScopeInterface::SCOPE_STORE)])
                 ->addAttributeToFilter('yotpo_sync.sync_flag', 1)
                 ->getSize();
         }

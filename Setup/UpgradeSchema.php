@@ -4,11 +4,12 @@ namespace Yotpo\Yotpo\Setup;
 
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Config\ReinitableConfigInterface;
+use Magento\Framework\Notification\NotifierInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 /**
  * Class UpgradeSchema
@@ -20,34 +21,50 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
      /**
       * @var ResourceConfig
       */
-     protected $_resourceConfig;
+     private $resourceConfig;
 
      /**
       * @var DateTimeFactory
       */
-     protected $_datetimeFactory;
+     private $datetimeFactory;
 
      /**
       * Application config
       *
       * @var ScopeConfigInterface
       */
-     protected $_appConfig;
+     private $appConfig;
+
+     /**
+      * @var YotpoConfig
+      */
+     private $yotpoConfig;
+
+     /**
+      * @var NotifierInterface
+      */
+     private $notifierPool;
 
      /**
       * @method __construct
-      * @param  ResourceConfig $resourceConfig
-      * @param  DateTimeFactory $datetimeFactory
+      * @param  ResourceConfig            $resourceConfig
+      * @param  DateTimeFactory           $datetimeFactory
       * @param  ReinitableConfigInterface $appConfig
+      * @param  YotpoConfig               $yotpoConfig
+      * @param  NotifierInterface         $notifierPool
       */
      public function __construct(
-        ResourceConfig $resourceConfig,
-        DateTimeFactory $datetimeFactory,
-        ReinitableConfigInterface $appConfig
+         ResourceConfig $resourceConfig,
+         DateTimeFactory $datetimeFactory,
+         ReinitableConfigInterface $appConfig,
+         YotpoConfig $yotpoConfig,
+         NotifierInterface $notifierPool
     ) {
-         $this->_resourceConfig = $resourceConfig;
-         $this->_datetimeFactory = $datetimeFactory;
-         $this->_appConfig = $appConfig;
+         $this->resourceConfig = $resourceConfig;
+         $this->datetimeFactory = $datetimeFactory;
+         $this->appConfig = $appConfig;
+         $this->yotpoConfig = $yotpoConfig;
+         $this->notifierPool = $notifierPool;
      }
 
      /**
@@ -62,7 +79,7 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
 
          if (version_compare($context->getVersion(), '2.7.5', '<')) {
              $syncTable = $installer->getConnection()->newTable(
-                $installer->getTable('yotpo_sync')
+                 $installer->getTable('yotpo_sync')
             )->addColumn(
                 'sync_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -112,10 +129,10 @@ use Yotpo\Yotpo\Helper\Data as YotpoHelper;
             );
              $installer->getConnection()->createTable($syncTable);
 
-             $currentDate = $this->_datetimeFactory->create()->gmtDate('Y-m-d');
-             $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE, $currentDate, 'default', 0);
-             $this->_resourceConfig->saveConfig(YotpoHelper::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $currentDate, 'default', 0);
-             $this->_appConfig->reinit();
+             $currentDate = $this->datetimeFactory->create()->gmtDate('Y-m-d');
+             $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE, $currentDate, 'default', 0);
+             $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $currentDate, 'default', 0);
+             $this->appConfig->reinit();
          }
 
          $installer->endSetup();
