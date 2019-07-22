@@ -7,7 +7,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Store\Model\ScopeInterface;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 class LaunchYotpoButton extends Field
 {
@@ -21,7 +21,7 @@ class LaunchYotpoButton extends Field
     /**
      * @var \Yotpo\Yotpo\Helper\Data
      */
-    protected $_yotpoHelper;
+    private $yotpoConfig;
 
     /**
      * @var Http
@@ -34,18 +34,18 @@ class LaunchYotpoButton extends Field
     /**
      * @method __construct
      * @param  Context     $context
-     * @param  YotpoHelper $yotpoHelper
+     * @param  YotpoConfig $yotpoConfig
      * @param  Http        $request
      * @param  array       $data
      */
     public function __construct(
         Context $context,
-        YotpoHelper $yotpoHelper,
+        YotpoConfig $yotpoConfig,
         Http $request,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->_yotpoHelper = $yotpoHelper;
+        $this->yotpoConfig = $yotpoConfig;
         $this->_request = $request;
         $this->_websiteId = $request->getParam('website');
         $this->_storeId = $this->getRequest()->getParam('store');
@@ -77,11 +77,11 @@ class LaunchYotpoButton extends Field
     public function getAppKey()
     {
         if ($this->_storeId !== null) {
-            return $this->_yotpoHelper->getAppKey($this->_storeId, ScopeInterface::SCOPE_STORE);
+            return $this->yotpoConfig->getAppKey($this->_storeId, ScopeInterface::SCOPE_STORE);
         } elseif ($this->_websiteId !== null) {
-            return $this->_yotpoHelper->getAppKey($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
+            return $this->yotpoConfig->getAppKey($this->_websiteId, ScopeInterface::SCOPE_WEBSITE);
         } else {
-            return $this->_yotpoHelper->getAppKey();
+            return $this->yotpoConfig->getAppKey();
         }
     }
 
@@ -93,7 +93,7 @@ class LaunchYotpoButton extends Field
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock(
-            'Magento\Backend\Block\Widget\Button'
+            \Magento\Backend\Block\Widget\Button::class
         )->setData(
             [
             'id' => 'launch_yotpo_button',

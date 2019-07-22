@@ -15,6 +15,7 @@ class YotpoReviews extends AjaxBlock
     {
         $output = $this->layoutFactory->create()
             ->createBlock(\Yotpo\Yotpo\Block\Adminhtml\Dashboard\Tab\YotpoReviews::class)
+            ->setId('yotpoReviewsTab')
             ->toHtml();
         $resultRaw = $this->resultRawFactory->create();
         return $resultRaw->setContents($output);

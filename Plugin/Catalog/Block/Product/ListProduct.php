@@ -3,23 +3,13 @@
 namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product;
 
 use Magento\Catalog\Model\Product;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Plugin\AbstractYotpoReviewsSummary;
 
 /**
  * Plugin for ListProduct Block
  */
-class ListProduct
+class ListProduct extends AbstractYotpoReviewsSummary
 {
-    /**
-     * @var YotpoHelper
-     */
-    protected $_yotpoHelper;
-
-    public function __construct(
-        YotpoHelper $yotpoHelper
-    ) {
-        $this->_yotpoHelper = $yotpoHelper;
-    }
 
     /**
      * Get product reviews summary
@@ -38,13 +28,13 @@ class ListProduct
         $templateType = false,
         $displayIfNoReviews = false
     ) {
-        if (!$this->_yotpoHelper->isEnabled()) {
+        if (!$this->_yotpoConfig->isEnabled()) {
             return $proceed($product, $templateType, $displayIfNoReviews);
         }
 
-        if ($this->_yotpoHelper->isCategoryBottomlineEnabled()) {
-            return $this->_yotpoHelper->getCategoryBottomLineHtml($product);
-        } elseif (!$this->_yotpoHelper->isMdrEnabled()) {
+        if ($this->_yotpoConfig->isCategoryBottomlineEnabled()) {
+            return $this->_getCategoryBottomLineHtml($product);
+        } elseif (!$this->_yotpoConfig->isMdrEnabled()) {
             return $proceed($product, $templateType, $displayIfNoReviews);
         } else {
             return '';
