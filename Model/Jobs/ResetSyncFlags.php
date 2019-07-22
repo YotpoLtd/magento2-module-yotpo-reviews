@@ -14,7 +14,7 @@ class ResetSyncFlags extends AbstractJobs
                 $this->_resourceConnection->getTableName('yotpo_sync'),
                 ['sync_flag' => 0],
                 (($entityType) ? ['entity_type = ?' => "{$entityType}"] : [])
-                );
+            );
             $this->_processOutput("Yotpo - resetSyncFlags (entity: {$entityType}) [DONE]", "info");
         } catch (\Exception $e) {
             $this->_processOutput("ResetSyncFlags::execute() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");

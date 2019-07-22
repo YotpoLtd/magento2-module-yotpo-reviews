@@ -19,8 +19,8 @@ class Reviews extends \Magento\Backend\App\Action
     private $isAppKeyAndSecretSet;
 
     /**
-    * @var PageFactory
-    */
+     * @var PageFactory
+     */
     private $resultPageFactory;
 
     /**
