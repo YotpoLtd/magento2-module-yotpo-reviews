@@ -23,7 +23,7 @@ class RemoveBlocks implements ObserverInterface
     {
 
         /**
- * @var \Magento\Framework\View\Layout $layout 
+ * @var \Magento\Framework\View\Layout $layout
 */
         $layout = $observer->getLayout();
 

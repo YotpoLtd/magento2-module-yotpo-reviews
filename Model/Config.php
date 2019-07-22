@@ -366,15 +366,15 @@ class Config
                 $data['app_key'] = $this->getAppKey();
             }
             switch ($type) {
-            case 'error':
-                $this->logger->error($prefix . json_encode($message), $data);
-                break;
-            case 'debug':
-                //$this->logger->debug($prefix . json_encode($message), $data);
-                //break;
-            default:
-                $this->logger->info($prefix . json_encode($message), $data);
-                break;
+                case 'error':
+                    $this->logger->error($prefix . json_encode($message), $data);
+                    break;
+                case 'debug':
+                    //$this->logger->debug($prefix . json_encode($message), $data);
+                    //break;
+                default:
+                    $this->logger->info($prefix . json_encode($message), $data);
+                    break;
             }
         }
         return $this;

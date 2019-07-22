@@ -8,13 +8,13 @@
 }
 ?>
 <!-- Yotpo - Widget Div -->
-<?php if ($block->isRenderWidget()): ?>
-	<div class="yotpo yotpo-main-widget"
-		 data-product-id="<?= $block->getProductId() ?>"
-		 data-name="<?= $block->getProductName() ?>"
-		 data-description="<?= $block->getProductDescription() ?>"
-		 data-url="<?= $block->getProductUrl() ?>"
-		 data-image-url="<?= $block->getProductImageUrl() ?>"
+<?php if ($block->isRenderWidget()) : ?>
+    <div class="yotpo yotpo-main-widget"
+         data-product-id="<?= $block->getProductId() ?>"
+         data-name="<?= $block->getProductName() ?>"
+         data-description="<?= $block->getProductDescription() ?>"
+         data-url="<?= $block->getProductUrl() ?>"
+         data-image-url="<?= $block->getProductImageUrl() ?>"
          data-price="<?= $block->getProductFinalPrice() ?>"
          data-currency="<?= $block->getCurrentCurrencyCode() ?>">
      </div>
