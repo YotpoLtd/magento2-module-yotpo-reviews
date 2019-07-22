@@ -68,7 +68,7 @@ class UpgradeData implements UpgradeDataInterface
         YotpoConfig $yotpoConfig,
         NotifierInterface $notifierPool,
         ConsoleOutput $output
-   ) {
+    ) {
         $this->resourceConfig = $resourceConfig;
         $this->datetimeFactory = $datetimeFactory;
         $this->appConfig = $appConfig;
