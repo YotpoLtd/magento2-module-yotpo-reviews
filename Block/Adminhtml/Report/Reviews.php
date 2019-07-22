@@ -6,20 +6,31 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Reports\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
-use Yotpo\Yotpo\Helper\ApiClient as YotpoApiClient;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Api\AccountUsages as YotpoApi;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 class Reviews extends \Magento\Backend\Block\Template
 {
     /**
-     * @var bool
+     * initialize:
      */
-    private $_initialized;
+    private $initialized;
+    private $scope = ScopeInterface::SCOPE_STORE;
+    private $scopeId;
+    private $isEnabled;
+    private $appKey;
+    private $isAppKeyAndSecretSet;
+    private $allStoreIds;
+
+    /**
+     * @var array
+     */
+    private $totals = [];
 
     /**
      * @var string
      */
-    private $_defaultPeriod = '30d';
+    protected $_defaultPeriod = '30d';
 
     /**
      * @var string
@@ -27,87 +38,71 @@ class Reviews extends \Magento\Backend\Block\Template
     protected $_template = 'Yotpo_Yotpo::report/reviews.phtml';
 
     /**
-     * @var array
-     */
-    private $_totals = [];
-
-    /**
-     * initialized:
-     */
-    private $_scope;
-    private $_scopeId;
-    private $_isEnabled;
-    private $_appKey;
-    private $_isAppKeyAndSecretSet;
-    private $_allStoreIds;
-
-    /**
      * @var OrderCollectionFactory
      */
-    private $_collectionFactory;
+    private $collectionFactory;
 
     /**
-     * @var YotpoHelper
+     * @var YotpoConfig
      */
-    private $_yotpoHelper;
+    private $yotpoConfig;
 
     /**
-     * @var YotpoApiClient
+     * @var YotpoApi
      */
-    private $_yotpoApi;
+    private $yotpoApi;
 
     /**
      * @method __construct
      * @param  Context                $context
      * @param  OrderCollectionFactory $collectionFactory
-     * @param  YotpoHelper            $yotpoHelper
-     * @param  YotpoApiClient         $yotpoApi
+     * @param  YotpoConfig            $yotpoConfig
+     * @param  YotpoApi               $yotpoApi
      * @param  array                  $data
      */
     public function __construct(
         Context $context,
         OrderCollectionFactory $collectionFactory,
-        YotpoHelper $yotpoHelper,
-        YotpoApiClient $yotpoApi,
+        YotpoConfig $yotpoConfig,
+        YotpoApi $yotpoApi,
         array $data = []
     ) {
-        $this->_collectionFactory = $collectionFactory;
-        $this->_yotpoHelper = $yotpoHelper;
-        $this->_yotpoApi = $yotpoApi;
+        $this->collectionFactory = $collectionFactory;
+        $this->yotpoConfig = $yotpoConfig;
+        $this->yotpoApi = $yotpoApi;
         parent::__construct($context, $data);
     }
 
-    private function _initiaize()
+    private function initialize()
     {
-        if ($this->_initialized) {
+        if ($this->initialized) {
             return;
         }
-        $this->_initialized = true;
+        $this->initialized = true;
 
         if (($storeId = $this->getRequest()->getParam(ScopeInterface::SCOPE_STORE, 0))) {
-            $this->_scope = ScopeInterface::SCOPE_STORE;
-            $this->_scopeId = $storeId;
-            $this->_allStoreIds = [$storeId];
+            $this->allStoreIds = [$storeId];
         } elseif (($websiteId = $this->getRequest()->getParam(ScopeInterface::SCOPE_WEBSITE, 0))) {
-            $this->_scope = ScopeInterface::SCOPE_WEBSITE;
-            $this->_scopeId = $websiteId;
-            $this->_allStoreIds = array_values($this->_yotpoHelper->getStoreManager()->getWebsite($websiteId)->getStoreIds());
+            $this->allStoreIds = $this->yotpoConfig->getStoreManager()->getWebsite($websiteId)->getStoreIds();
         } else {
-            $this->_allStoreIds = array_values($this->_yotpoHelper->getAllStoreIds(true));
+            $this->allStoreIds = $this->yotpoConfig->getAllStoreIds(false);
         }
-        $this->_isEnabled = $this->_yotpoHelper->isEnabled($this->_scopeId, $this->_scope);
-        $this->_appKey = $this->_yotpoHelper->getAppKey($this->_scopeId, $this->_scope);
-        $this->_isAppKeyAndSecretSet = $this->_yotpoHelper->isAppKeyAndSecretSet($this->_scopeId, $this->_scope);
+        $this->allStoreIds = $this->yotpoConfig->filterDisabledStoreIds($this->allStoreIds);
+        $this->scopeId = ($this->allStoreIds) ? $this->allStoreIds[0] : null;
+
+        $this->isEnabled = ($this->allStoreIds) ? true : false;
+        $this->isAppKeyAndSecretSet = ($this->allStoreIds) ? true : false;
+        $this->appKey = ($this->scopeId) ? $this->yotpoConfig->getAppKey($this->scopeId, $this->scope) : null;
     }
 
     public function isEnabledAndConfigured()
     {
-        return ($this->_isEnabled && $this->_isAppKeyAndSecretSet) ? true : false;
+        return ($this->isEnabled && $this->isAppKeyAndSecretSet) ? true : false;
     }
 
     public function getStoreIds()
     {
-        return $this->_allStoreIds;
+        return $this->allStoreIds;
     }
 
     public function getPeriod($default = null)
@@ -117,17 +112,17 @@ class Reviews extends \Magento\Backend\Block\Template
 
     public function isEnabled()
     {
-        return $this->_isEnabled;
+        return $this->isEnabled;
     }
 
     public function getAppKey()
     {
-        return $this->_appKey;
+        return $this->appKey;
     }
 
     public function isAppKeyAndSecretSet()
     {
-        return $this->_isAppKeyAndSecretSet;
+        return $this->isAppKeyAndSecretSet;
     }
 
     /**
@@ -135,7 +130,7 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getTotals()
     {
-        return $this->_totals;
+        return $this->totals;
     }
 
     /**
@@ -146,7 +141,7 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     private function addTotal($label, $value, $class = "")
     {
-        $this->_totals[] = ['label' => $label, 'value' => $value, 'class' => $class];
+        $this->totals[] = ['label' => $label, 'value' => $value, 'class' => $class];
         return $this;
     }
 
@@ -191,7 +186,7 @@ class Reviews extends \Magento\Backend\Block\Template
                 $dateStart->setDate(
                     $dateStart->format('Y'),
                     $dateStart->format('m'),
-                    $this->_yotpoHelper->getConfig('reports/dashboard/mtd_start')
+                    $this->yotpoConfig->getConfig('reports/dashboard/mtd_start')
                 );
                 break;
 
@@ -204,7 +199,7 @@ class Reviews extends \Magento\Backend\Block\Template
             case '2y':
                 $startMonthDay = explode(
                     ',',
-                    $this->_yotpoHelper->getConfig('reports/dashboard/ytd_start')
+                    $this->yotpoConfig->getConfig('reports/dashboard/ytd_start')
                 );
                 $startMonth = isset($startMonthDay[0]) ? (int)$startMonthDay[0] : 1;
                 $startDay = isset($startMonthDay[1]) ? (int)$startMonthDay[1] : 1;
@@ -231,11 +226,11 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     protected function _prepareLayout()
     {
-        $this->_initiaize();
+        $this->initialize();
         $storeIds = $this->getStoreIds();
         $dateRange = $this->getDateRange($this->getPeriod(), 0, 0, true);
 
-        $metrics = $this->_yotpoApi->getMetrics(
+        $metrics = $this->yotpoApi->getMetrics(
             $this->getStoreIds(),
             $dateRange[0]->format(DateTime::DATETIME_PHP_FORMAT),
             $dateRange[1]->format(DateTime::DATETIME_PHP_FORMAT)
@@ -269,9 +264,9 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getLounchYotpoButtonHtml($utm = 'MagentoAdmin_Dashboard')
     {
-        $this->_initiaize();
+        $this->initialize();
         $button = $this->getLayout()->createBlock(
-            'Magento\Backend\Block\Widget\Button'
+            \Magento\Backend\Block\Widget\Button::class
         )->setData(
             [
             'id' => 'launch_yotpo_button',
@@ -296,10 +291,10 @@ class Reviews extends \Magento\Backend\Block\Template
      */
     public function getYotpoConfigUrl()
     {
-        $this->_initiaize();
+        $this->initialize();
         $params = ['section' => 'yotpo'];
-        if ($this->_scope) {
-            $params[$this->_scope] = $this->_scopeId;
+        if ($this->scope) {
+            $params[$this->scope] = $this->scopeId;
         }
         return $this->_urlBuilder->getUrl('adminhtml/system_config/edit', $params);
     }
