@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" module="Yotpo_Yotpo" sortOrder="30" parent="Magento_Backend::marketing_user_content" action="yotpo_yotpo/report/reviews" resource="Yotpo_Yotpo::yotpo_report_reviews"/>
+        <add id="Yotpo_Yotpo::yotpo_reviews_external" title="Yotpo Reviews" translate="title" sortOrder="30" module="Yotpo_Yotpo" parent="Magento_Review::report_review" action="yotpo_yotpo/external/reviews" target="_blank" resource="Yotpo_Yotpo::yotpo_reviews_external"/>
+        <add id="Yotpo_Yotpo::yotpo_analytics_external" title="Yotpo Analytics" translate="title" module="Yotpo_Yotpo" sortOrder="30" parent="Magento_Analytics::business_intelligence" action="yotpo_yotpo/external/analytics" target="_blank" resource="Yotpo_Yotpo::yotpo_analytics_external" />
+    </menu>
+</config>

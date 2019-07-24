@@ -1,0 +1,357 @@
+@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,700');
+
+.yotpo-reviews-totals {
+    font-family: 'Open Sans', sans-serif;
+    background: #ffffff;
+
+    .yotpo-reviews-totals-list {
+        display: block;
+        max-width: 60rem;
+        columns: 3;
+        margin-bottom: 20px;
+
+        .yotpo-reviews-totals-item {
+            display: inline-block;
+            padding: 1.2rem 1rem 1.2rem 0;
+            max-width: 20rem;
+
+            .yotpo-reviews-totals-label {
+                display: block;
+                font-size: 1.5rem;
+                font-weight: normal;
+            }
+
+            .yotpo-reviews-totals-value {
+                font-size: 2.4rem;
+                font-weight: normal;
+            }
+
+            .yotpo-reviews-totals-icon {
+                display: inline-block;
+                width: 3.6rem;
+                height: 3.2rem;
+                vertical-align: sub;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: contain;
+            }
+
+            &.yotpo-totals-emails-sent .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/email-icon.svg");
+            }
+
+            &.yotpo-totals-total-reviews .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/collect-icon.svg");
+            }
+
+            &.yotpo-totals-published-reviews .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/upload-icon.svg");
+            }
+
+            &.yotpo-totals-star-rating .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/star-icon.svg");
+            }
+
+            &.yotpo-totals-photos-generated .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/photo-icon.svg");
+            }
+
+            &.yotpo-totals-engagement-rate .yotpo-reviews-totals-icon {
+                background-image: url("@{baseDir}Yotpo_Yotpo/images/icons/rate-icon.svg");
+            }
+        }
+    }
+
+    .yotpo-reviews-totals-nodata {
+        background: #ffffff;
+        padding: 20px;
+    }
+}
+
+.launch-yotpo-button {
+    font-family: 'Open Sans', sans-serif;
+    min-width: 161px;
+    height: 38px;
+    border-radius: 3px;
+    font-size: 1.3rem;
+    background-color: #2b7dbd;
+    color: #ffffff;
+    box-sizing: border-box;
+    border: none;
+
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: #0073ae;
+        border-color: #007dbd;
+        box-shadow: 0 0 0 1px #007bdb;
+        color: #ffffff;
+        text-decoration: none;
+    }
+}
+
+.yotpo-reviews-totals-no-appkey {
+    font-family: 'Open Sans', sans-serif;
+    background: #ffffff;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    text-align: center;
+
+    .collect-and-leverage {
+        max-width: 421px;
+        font-size: 1.6rem;
+        color: #676363;
+        position: relative;
+        margin: 20px auto;
+    }
+
+    .already-have-account {
+        max-width: 250px;
+        font-size: 1.3rem;
+        position: relative;
+        margin: 14px auto;
+
+        a {
+            color: #2b7dbd;
+        }
+    }
+}
+
+.yotpo_yotpo-report-reviews {
+    #container.main-col {
+        min-height: 500px;
+        margin-bottom: 120px;
+    }
+
+    .yotpo-reports-period-select.admin__action-dropdown-wrap {
+        float: right;
+
+        .admin__action-dropdown-text {
+            font-size: 1.5rem;
+        }
+
+        &._active .admin__action-dropdown,
+        &.active .admin__action-dropdown {
+            border: none;
+            box-shadow: none;
+        }
+
+        .admin__action-dropdown {
+            padding-left: 0 !important;
+        }
+
+        .admin__action-dropdown-menu {
+            box-shadow: 0 2px 4px 0 rgba(46, 46, 46, 0.5);
+            background-color: #ffffff;
+            border: none;
+            left: 0 !important;
+            right: auto !important;
+            z-index: 9;
+
+            > li {
+                > a {
+                    &:active,
+                    &:hover {
+                        background-color: #c7effd;
+                    }
+                }
+            }
+        }
+    }
+
+    .yotpo-at-a-glance {
+        line-height: 3rem;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #313030;
+    }
+
+    .user-generated-content {
+        font-size: 1.4rem;
+        font-weight: normal;
+        color: #313030;
+    }
+
+    .launch-yotpo-button {
+        margin-left: 16px;
+    }
+
+    a.yotpo-settings {
+        font-size: 1.3rem;
+        color: #2b7dbd;
+        display: inline-block;
+        margin-top: 16px;
+        margin-left: 16px;
+        font-weight: 600;
+    }
+
+    .yotpo-reviews-totals-container {
+        box-sizing: border-box;
+        max-width: 800px;
+        padding: 25px 25px 55px;
+        margin: 10px 0;
+        background: #fff;
+    }
+
+    .yotpo-reviews-totals {
+        max-width: 800px;
+
+        .yotpo-reviews-totals-list {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding-left: 16px;
+
+            .yotpo-reviews-totals-item {
+                padding: 1.2rem 1rem 3.2rem 0;
+
+                .yotpo-reviews-totals-icon {
+                    margin-right: 0.5rem;
+                }
+
+                .yotpo-reviews-totals-label {
+                    color: #545252;
+                    margin-top: 10px;
+                }
+
+                .yotpo-reviews-totals-value {
+                    display: inline-block;
+                    font-size: 3.6rem;
+                    line-height: 3.6rem;
+                    height: 3.6rem;
+                }
+            }
+        }
+    }
+
+    .yotpo-reviews-totals-no-appkey {
+        padding: 140px 0 30px 30px;
+        display: inline-block;
+        width: 100%;
+        background: transparent;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .yotpo-title-content-container {
+            float: left;
+            text-align: left;
+            padding: 0 40px 0 0;
+            width: 40%;
+
+            h2 {
+                font-family: 'Work Sans', sans-serif;
+                font-size: 4rem;
+                font-weight: bold;
+                line-height: 1.15;
+                color: #051146;
+                margin: 80px 0 10px;
+            }
+
+            p {
+                font-size: 1.7rem;
+                line-height: 1.6;
+                color: #051146;
+            }
+
+            .launch-yotpo-button {
+                font-size: 1.62rem;
+                background-color: #1576ec;
+                font-weight: bold;
+                min-width: 19rem;
+                height: 4.8rem;
+                border-radius: 4.5px;
+                margin: 30px 0 3px;
+            }
+
+            .already-have-account {
+                font-size: 1.5rem;
+                margin: 10px 0 0;
+                max-width: none;
+            }
+        }
+
+        .yotpo-shaddow-boxes-container {
+            float: right;
+            width: 60%;
+
+            .yotpo-shaddow-box {
+                width: 32%;
+                max-width: 306px;
+                height: 435px;
+                overflow: hidden;
+                float: left;
+                box-shadow: 0 0 23px 0 rgba(0, 0, 0, 0.1);
+                background-color: #ffffff;
+                padding: 50px 22.5px;
+                margin: 0 1%;
+
+                &:first-of-type {
+                    margin-left: 0;
+                }
+
+                &:last-of-type {
+                    margin-right: 0;
+                }
+
+                h3 {
+                    font-size: 1.5rem;
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    color: #051146;
+                }
+
+                img {
+                    width: 100%;
+                    display: block;
+                }
+
+                p {
+                    font-size: 1.3rem;
+                    color: #051146;
+                    margin: 35px 0 10px;
+                    min-height: 90px;
+                }
+
+                a {
+                    &.yotpo-cta-add-arrow:after {
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+        @media all and (max-width: 1390px) {
+            .yotpo-shaddow-boxes-container,
+            .yotpo-title-content-container {
+                float: none;
+                clear: both;
+                margin-bottom: 40px;
+                width: 100%;
+            }
+        }
+    }
+}
+
+.yotpo-cta-add-arrow {
+    &:after {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 1.3rem;
+        color: inherit;
+        font-style: normal;
+        content: '\e629';
+        font-family: 'Admin Icons';
+        -webkit-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        transform: rotate(180deg);
+        display: inline-block;
+        speak: none;
+        text-align: center;
+        vertical-align: middle;
+    }
+}

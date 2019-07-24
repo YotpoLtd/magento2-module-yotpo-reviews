@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+                            <resource id="Yotpo_Core::config" title="Yotpo" translate="title" sortOrder="80">
+                                <resource id="Yotpo_Yotpo::config" title="Product Reviews Settings" translate="title" sortOrder="20" />
+                            </resource>
+						</resource>
+					</resource>
+				</resource>
+				<resource id="Magento_Backend::marketing">
+					<resource id="Magento_Backend::marketing_user_content">
+						<resource id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" sortOrder="30"/>
+					</resource>
+				</resource>
+				<resource id="Magento_Reports::report">
+                    <resource id="Magento_Analytics::business_intelligence">
+                        <resource id="Yotpo_Yotpo::yotpo_analytics_external" title="Yotpo Analytics" translate="title" sortOrder="30" />
+                    </resource>
+					<resource id="Magento_Reports::review">
+                        <resource id="Yotpo_Yotpo::yotpo_reviews_external" title="Yotpo Reviews" translate="title" sortOrder="30" />
+                    </resource>
+                </resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

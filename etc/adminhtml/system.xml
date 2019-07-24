@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="yotpo" translate="label" sortOrder="400">
+            <label><![CDATA[<span class='yotpo-icon'></span>Yotpo]]></label>
+		</tab>
+        <section id="yotpo" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Reviews and Visual Marketing</label>
+            <tab>yotpo</tab>
+            <resource>Yotpo_Yotpo::config</resource>
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Setup</label>
+				<attribute type="expanded">1</attribute>
+				<field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Enable Yotpo</label>
+					<config_path>yotpo/settings/active</config_path>
+					<comment><![CDATA[To connect Yotpo to your store, enter your <a href="https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret" title="App Key and API Secret" target="_blank" style="color:#2b7dbd">App Key and API Secret</a> in the fields below and save your configuration.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="app_key" translate="label comment" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>App Key</label>
+					<config_path>yotpo/settings/app_key</config_path>
+                    <comment>Note: Additional stores must be connected to their own App Key via Store View settings.</comment>
+                </field>
+                <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>API Secret</label>
+					<config_path>yotpo/settings/secret</config_path>
+					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment><![CDATA[<a href="https://support.yotpo.com/en/article/finding-your-app-key-and-your-secret-key" target="_blank" title="I can't find my API Secret" style="color:#2b7dbd">I can't find my API Secret</a>]]></comment>
+                </field>
+				<field id="module_version" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Module Version</label>
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\ModuleVersion</frontend_model>
+					<comment><![CDATA[<input name="disable_autofill_appkey" type="text" style="display:none!important;"><input name="disable_autofill_secret" type="password" style="display:none!important;">]]></comment>
+                </field>
+				<field id="launch_yotpo_button" type="button" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\LaunchYotpoButton</frontend_model>
+                </field>
+			</group>
+			<group id="widget_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>Widget Settings</label>
+				<attribute type="expanded">0</attribute>
+                <field id="widget_enabled" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show Reviews Widget</label>
+					<config_path>yotpo/settings/widget_enabled</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+				<field id="category_bottomline_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show star rating on category pages</label>
+					<config_path>yotpo/settings/category_bottomline_enabled</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="bottomline_enabled" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show star rating on product pages</label>
+					<config_path>yotpo/settings/bottomline_enabled</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="qna_enabled" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Q&amp;A</label>
+					<config_path>yotpo/settings/qna_enabled</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+				<field id="mdr_enabled" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Hide Magento Reviews</label>
+					<config_path>yotpo/settings/mdr_enabled</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+				<field id="debug_mode_active" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Debug Mode</label>
+					<config_path>yotpo/settings/debug_mode_active</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<comment>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</comment>
+        		</field>
+            </group>
+			<group id="sync_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" canRestore="0">
+				<label>Sync Settings</label>
+				<attribute type="expanded">0</attribute>
+				<field id="sync_status" translate="label" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sync Status</label>
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\SyncStatus</frontend_model>
+                </field>
+				<field id="orders_sync_start_date" translate="label comment" sortOrder="10" type="date" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+					<label>Orders Sync From Date</label>
+					<config_path>yotpo/sync_settings/orders_sync_start_date</config_path>
+					<frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\Date</frontend_model>
+				</field>
+				<field id="orders_sync_limit" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Orders Sync Limit</label>
+					<config_path>yotpo/sync_settings/orders_sync_limit</config_path>
+					<comment>Note: Setting a high sync limit (or no limit) may result in a high server load (0=no limit).</comment>
+                </field>
+				<field id="custom_order_status" translate="label comment" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+	                <label>Orders Sync Statuses</label>
+					<config_path>yotpo/settings/custom_order_status</config_path>
+	                <source_model>Magento\Sales\Model\ResourceModel\Order\Status\Collection</source_model>
+					<validate>validate-select</validate>
+					<can_be_empty>0</can_be_empty>
+	                <comment>Customize the order status that will trigger the order export after purchase. You can choose multiple statuses by holding ctrl button.</comment>
+                </field>
+			</group>
+        </section>
+    </system>
+</config>

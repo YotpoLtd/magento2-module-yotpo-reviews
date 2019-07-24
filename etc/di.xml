@@ -1,0 +1,11 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Result\Page">
+        <plugin name="yotpo_yotpo_framework_view_result_page_plugin" type="Yotpo\Yotpo\Plugin\Framework\View\Result\Page" />
+    </type>
+    <type name="Magento\Catalog\Block\Product\ListProduct">
+        <plugin name="yotpo_yotpo_catalog_block_product_listproduct_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\ListProduct" />
+    </type>
+    <type name="Magento\Review\Block\Product\ReviewRenderer">
+        <plugin name="yotpo_yotpo_review_block_product_reviewrenderer_plugin" type="Yotpo\Yotpo\Plugin\Review\Block\Product\ReviewRenderer" />
+    </type>
+</config>

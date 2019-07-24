@@ -1,0 +1,103 @@
+<?php
+/**
+ * @var $block Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
+ */
+?>
+<?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()) :
+    $periods = $block->getPeriods(); ?>
+    <div class="yotpo-reviews-totals-container">
+        <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+            <div class="yotpo-reports-period-select admin__action-dropdown-wrap">
+                <a
+                    href="#"
+                    class="admin__action-dropdown"
+                    title="<?= $block->escapeHtml(__('Time Period')) ?>"
+                    data-mage-init='{"dropdown":{}}'
+                    data-toggle="dropdown">
+                    <span class="admin__action-dropdown-text">
+                        <span><?= $periods[$block->getPeriod('30d')] ?></span>
+                    </span>
+                </a>
+                <ul class="admin__action-dropdown-menu">
+                    <?php foreach ($periods as $_period => $_label) : ?>
+                        <li>
+                            <a
+                                href="<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) . 'period/' . $_period ?>"
+                                title="<?= $block->escapeHtml(__($_label)) ?>">
+                                <?= __($_label) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div class="yotpo-at-a-glance">
+                <?= __("Yotpo at a glance") ?>
+            </div>
+            <div class="user-generated-content">
+                <?= __("User-generated content metrics gathered from your Yotpo dashboards.") ?>
+            </div>
+            <?php if (sizeof($block->getTotals()) > 0) : ?>
+                <ul class="yotpo-reviews-totals-list">
+                    <?php foreach ($block->getTotals() as $_total) : ?>
+                        <li class="yotpo-reviews-totals-item <?= $_total['class'] ?>">
+                            <i class="yotpo-reviews-totals-icon"></i>
+                            <strong class="yotpo-reviews-totals-value"><?= $_total['value'] ?></strong>
+                            <span class="yotpo-reviews-totals-label"><?= $_total['label'] ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else : ?>
+                <div class="yotpo-reviews-totals-nodata">
+                    <?= __("No Data Found") ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div><?= $block->getLounchYotpoButtonHtml() ?></div>
+        <div>
+            <a class="yotpo-settings" href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Yotpo Settings") ?>"><?= __("Yotpo Settings") ?></a>
+        </div>
+    </div>
+    <style>
+        .yotpo_yotpo-report-reviews #anchor-content.page-content {
+            background-color: #f8f8f8;
+            margin-top: 115px;
+        }
+        .yotpo_yotpo-report-reviews #anchor-content.page-content > .page-main-actions{
+            margin-top: -100px;
+            margin-bottom: 63px;
+        }
+    </style>
+<?php else : ?>
+    <div class="yotpo-reviews-totals-no-appkey">
+        <div class="yotpo-title-content-container">
+            <h2><?= __("Great brands are built<br>on happy customers") ?></h2>
+            <p><?= __("Yotpo is already installed in your Magento store!<br>Connect your Yotpo account to your store to accelerate growth<br>with a full suite of solutions for customer reviews and visual marketing.") ?></p>
+            <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_reviews') ?></div>
+            <div class="already-have-account">
+                <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
+            </div>
+        </div>
+        <div class="yotpo-shaddow-boxes-container">
+            <div class="yotpo-shaddow-box">
+                <h3><?= __("Reviews & Ratings") ?></h3>
+                <img src='<?= $this->getViewFileUrl('Yotpo_Yotpo::images/reviews_and_ratings.jpg') ?>' alt="<?= __("Reviews & Ratings") ?>">
+                <p><?= __("Turn customer content into sales by collecting and leveraging reviews, ratings, and Q&A with Yotpo’s AI-powered solutions.") ?></p>
+            </div>
+            <div class="yotpo-shaddow-box">
+                <h3><?= __("Visual Marketing") ?></h3>
+                <img src='<?= $this->getViewFileUrl('Yotpo_Yotpo::images/visual_marketing.jpg') ?>' alt="<?= __("Visual Marketing") ?>">
+                <p><?= __("Collect, curate, and showcase customer photos and videos in fully customizable shoppable galleries across your site.") ?></p>
+            </div>
+            <div class="yotpo-shaddow-box">
+                <h3><?= __("Consumer Insights") ?></h3>
+                <img src='<?= $this->getViewFileUrl('Yotpo_Yotpo::images/consumer_insights.png') ?>' alt="<?= __("Consumer Insights") ?>">
+                <p><?= __("Understand what customers are saying about your brand and products and make data-driven business decisions with actionable insights.") ?></p>
+            </div>
+        </div>
+    </div>
+    <style>
+        .yotpo_yotpo-report-reviews .page-wrapper {
+            background-image: linear-gradient(to bottom, #fdffff, #eff9ff);
+        }
+    </style>
+<?php endif; ?>
