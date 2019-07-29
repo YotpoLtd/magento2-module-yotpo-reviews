@@ -135,7 +135,7 @@ class OrdersSync extends AbstractJobs
                     $ordersCount = count($orders);
                     $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync.", "info");
                     if ($ordersCount > 0) {
-                        $resData = $this->yotpoApi->massCreate($orders, $token);
+                        $resData = $this->yotpoApi->massCreate($orders, $storeId);
                         $status = (is_object($resData['body']) && property_exists($resData['body'], "code")) ? $resData['body']->code : $resData['status'];
                         if ($status != 200) {
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
