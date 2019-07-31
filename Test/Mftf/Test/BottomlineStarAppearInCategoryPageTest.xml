@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="BottomlineStarAppearInCategoryPageTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+            <title value="Test that bottomline stars appear in the product page"/>
+            <description value="Test that bottomline stars appear in the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-249"/>
+            <group value="Yotpo"/>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+        </before>
+        <after>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
+                <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
+                <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
+            </actionGroup>
+            <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
+                <argument name="storeView" value="_defaultStore.name"/>
+            </actionGroup>
+            <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+        </after>
+
+        <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
+            <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
+            <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
+        </actionGroup>
+
+        <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
+            <argument name="storeView" value="_defaultStore.name"/>
+        </actionGroup>
+
+        <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+            <argument name="storeView" value="_defaultStore.name"/>
+        </actionGroup>
+
+        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
+
+        <wait time="30" stepKey="waitThirtySeconds"/>
+
+        <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>
+
+        <actionGroup ref="GoToStorefrontCategoryPageByParameters" stepKey="goToStorefrontCategoryPage">
+            <argument name="category" value="$$createCategory.custom_attributes[url_key]$$"/>
+            <argument name="mode" value="grid"/>
+            <argument name="numOfProductsPerPage" value="25"/>
+            <argument name="sortBy" value="price"/>
+            <argument name="sort" value="desc"/>
+        </actionGroup>
+
+        <!-- navigate to the created product page -->
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check that bottomline stars appear in the page -->
+        <seeElement selector="{{YotpoCategoryPage.CategoryStarRatingDiv}}" stepKey="checkYotpoAppearsInTheMenu"/>
+    </test>
+</tests>
