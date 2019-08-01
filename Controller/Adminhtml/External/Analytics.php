@@ -14,9 +14,7 @@ class Analytics extends \Magento\Backend\App\Action
      */
     private $scope;
     private $scopeId;
-    private $isEnabled;
     private $appKey;
-    private $isAppKeyAndSecretSet;
 
     /**
      * @var YotpoConfig
@@ -46,16 +44,12 @@ class Analytics extends \Magento\Backend\App\Action
             $this->scope = ScopeInterface::SCOPE_WEBSITE;
             $this->scopeId = $websiteId;
         }
-        $this->isEnabled = $this->yotpoConfig->isEnabled($this->scopeId, $this->scope);
-        $this->isAppKeyAndSecretSet = $this->yotpoConfig->isAppKeyAndSecretSet($this->scopeId, $this->scope);
 
-        if (!($this->isEnabled && $this->isAppKeyAndSecretSet)) {
+        if (!$this->yotpoConfig->isActivated($this->scopeId, $this->scope)) {
             $this->scope = ScopeInterface::SCOPE_STORE;
             foreach ($this->yotpoConfig->getAllStoreIds(true) as $storeId) {
                 $this->scopeId = $storeId;
-                $this->isEnabled = $this->yotpoConfig->isEnabled($this->scopeId, $this->scope);
-                $this->isAppKeyAndSecretSet = $this->yotpoConfig->isAppKeyAndSecretSet($this->scopeId, $this->scope);
-                if ($this->isEnabled && $this->isAppKeyAndSecretSet) {
+                if ($this->yotpoConfig->isActivated($this->scopeId, $this->scope)) {
                     $this->appKey = $this->yotpoConfig->getAppKey($this->scopeId, $this->scope);
                     break;
                 }

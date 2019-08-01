@@ -36,12 +36,15 @@ class ResetCommand extends Command
 
     /**
      * @method __construct
-     * @param ObjectManagerInterface $objectManager
+     * @param  ObjectManagerInterface $objectManager
+     * @param  ResourceConnection     $resourceConnection
      */
     public function __construct(
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        ResourceConnection $resourceConnection
     ) {
         $this->objectManager = $objectManager;
+        $this->resourceConnection = $resourceConnection;
         parent::__construct();
     }
 
@@ -70,7 +73,6 @@ class ResetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->resourceConnection = $this->objectManager->get(\Magento\Framework\App\ResourceConnection::class);
             if ($this->confirmQuestion(self::RESET_FLAGS_CONFIRM_MESSAGE, $input, $output)) {
                 $output->writeln('<info>' . 'Resetting Yotpo sync flags ...' . '</info>');
                 $this->objectManager->get(\Yotpo\Yotpo\Model\Jobs\ResetSyncFlags::class)

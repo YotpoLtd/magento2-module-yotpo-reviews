@@ -2,6 +2,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <yotpo>
+            <env>
+                <yotpo_api_url>https://api.yotpo.com/</yotpo_api_url>
+                <yotpo_widget_url>//staticw2.yotpo.com/</yotpo_widget_url>
+            </env>
             <settings>
                 <widget_enabled>1</widget_enabled>
                 <category_bottomline_enabled>1</category_bottomline_enabled>

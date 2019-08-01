@@ -93,7 +93,7 @@ class Schema
                         $productsData[$product->getId()] = [
                                 'name'        => $product->getName(),
                                 'url'         => $product->getProductUrl(),
-                                'image'       => $this->yotpoConfig->getProductMainImageUrl($product),
+                                'image'       => $this->getProductMainImageUrl($product),
                                 'description' => $this->escaper->escapeHtml(strip_tags($product->getDescription())),
                                 'price'       => $orderItem->getData('row_total_incl_tax'),
                                 'specs'       => array_filter(
