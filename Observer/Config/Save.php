@@ -86,7 +86,7 @@ class Save implements ObserverInterface
             if (in_array(YotpoConfig::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $changedPaths)) {
                 $this->yotpoConfig->log(
                     "Yotpo Debug mode " . (($this->yotpoConfig->isDebugMode(($scopeId ?: null), ($scope ?: null))) ? 'started' : 'stopped'),
-                    "error",
+                    "info",
                     ['$app_key' => $this->yotpoConfig->getAppKey(($scopeId ?: null), ($scope ?: null)), '$scope' => ($scope ?: 'default'), '$scopeId' => $scopeId]
                 );
             }
