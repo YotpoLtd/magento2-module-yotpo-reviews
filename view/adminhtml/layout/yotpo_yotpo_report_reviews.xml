@@ -12,7 +12,7 @@
             </block>
         </referenceContainer>
         <referenceContainer name="content">
-            <block class="Yotpo\Yotpo\Block\Adminhtml\Report\Reviews" template="Yotpo_Yotpo::report/reviews.phtml"/>
+            <block class="Yotpo\Yotpo\Block\Adminhtml\Report\Reviews" name="yotpo_report_reviews" template="Yotpo_Yotpo::report/reviews.phtml"/>
         </referenceContainer>
     </body>
 </page>
