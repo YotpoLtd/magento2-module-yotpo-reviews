@@ -129,7 +129,7 @@ class AbstractApi
     public function sendApiRequest($path, array $data, $method = "post", $timeout = self::DEFAULT_TIMEOUT, $contentType = 'application/json')
     {
         try {
-            $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - request: ", "info", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
+            $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - request: ", "debug", [["path" => $path, "params" => $data, "method" => $method, "timeout" => $timeout, "contentType" => $contentType]]);
 
             $this->_clearResponseData();
             $this->curl->reset();
@@ -149,7 +149,7 @@ class AbstractApi
                 $data
             );
 
-            $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - response: ", "info", $this->_prepareCurlResponseData());
+            $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - response: ", "debug", $this->_prepareCurlResponseData());
             return $this->_prepareCurlResponseData();
         } catch (\Exception $e) {
             $this->_yotpoConfig->log("AbstractApi::sendApiRequest() Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");

@@ -14,7 +14,7 @@ class CommandList implements \Magento\Framework\Console\CommandListInterface
      *
      * @var ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
     /**
      * @method __construct
@@ -22,7 +22,7 @@ class CommandList implements \Magento\Framework\Console\CommandListInterface
      */
     public function __construct(ObjectManagerInterface $objectManager)
     {
-        $this->_objectManager = $objectManager;
+        $this->objectManager = $objectManager;
     }
 
     /**
@@ -47,7 +47,7 @@ class CommandList implements \Magento\Framework\Console\CommandListInterface
         $commands = [];
         foreach ($this->getCommandsClasses() as $class) {
             if (class_exists($class)) {
-                $commands[] = $this->_objectManager->get($class);
+                $commands[] = $this->objectManager->get($class);
             } else {
                 throw new \Exception('Class ' . $class . ' does not exist');
             }
