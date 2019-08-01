@@ -145,7 +145,7 @@ class AbstractApi
             $this->curl->setOption(CURLOPT_TIMEOUT, $timeout);
 
             $this->curl->{strtolower($method)}(
-                $this->_yotpoConfig->getYotpoSecuredApiUrl($path),
+                $this->_yotpoConfig->getYotpoApiUrl($path),
                 $data
             );
 
