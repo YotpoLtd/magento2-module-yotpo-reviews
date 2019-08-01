@@ -84,6 +84,7 @@ class UpgradeData implements UpgradeDataInterface
     {
         $setup->startSetup();
 
+        // TODO: New logics will be applied here instead of the current, in order to cover all possible scenarios.
         if ($context->getVersion() && version_compare($context->getVersion(), '2.9.0', '<')) {
             $this->output->writeln("<comment>Reseting configurations for 'default' & 'website' scopes (only supports 'store' at the moment)</comment>");
 
