@@ -109,6 +109,20 @@ class OrdersSync extends AbstractJobs
         return $this->limit;
     }
 
+    /**
+     * @method getCollectionIds
+     * @param $collection
+     * @return array
+     */
+    private function getCollectionIds($collection)
+    {
+        $ids = [];
+        foreach ($collection as $item) {
+            $ids[] = $item->getId();
+        }
+        return $ids;
+    }
+
     public function execute()
     {
         try {
@@ -140,7 +154,7 @@ class OrdersSync extends AbstractJobs
                         if ($status != 200) {
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
-                            $this->flagItems('orders', $storeId, $ordersCollection->getAllIds($this->_yotpoConfig->getOrdersSyncLimit(), 0));
+                            $this->flagItems('orders', $storeId, $this->getCollectionIds($ordersCollection));
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
                         }
                     }
