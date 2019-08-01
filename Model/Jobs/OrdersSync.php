@@ -140,7 +140,7 @@ class OrdersSync extends AbstractJobs
                         if ($status != 200) {
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
-                            $this->flagItems('orders', $storeId, $ordersCollection->getAllIds());
+                            $this->flagItems('orders', $storeId, $ordersCollection->getAllIds($this->_yotpoConfig->getOrdersSyncLimit(), 0));
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
                         }
                     }
