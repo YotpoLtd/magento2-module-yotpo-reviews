@@ -3,7 +3,6 @@
 namespace Yotpo\Yotpo\Console\Command;
 
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\ObjectManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
