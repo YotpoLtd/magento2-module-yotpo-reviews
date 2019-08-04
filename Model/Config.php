@@ -2,6 +2,7 @@
 
 namespace Yotpo\Yotpo\Model;
 
+use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -49,6 +50,11 @@ class Config
     private $scopeConfig;
 
     /**
+     * @var ResourceConfig
+     */
+    private $resourceConfig;
+
+    /**
      * @var EncryptorInterface
      */
     private $encryptor;
@@ -77,6 +83,7 @@ class Config
      * @method __construct
      * @param  StoreManagerInterface    $storeManager
      * @param  ScopeConfigInterface     $scopeConfig
+     * @param  ResourceConfig           $resourceConfig
      * @param  EncryptorInterface       $encryptor
      * @param  DateTimeFactory          $datetimeFactory
      * @param  ModuleListInterface      $moduleList
@@ -86,6 +93,7 @@ class Config
     public function __construct(
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
+        ResourceConfig $resourceConfig,
         EncryptorInterface $encryptor,
         DateTimeFactory $datetimeFactory,
         ModuleListInterface $moduleList,
@@ -94,6 +102,7 @@ class Config
     ) {
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
+        $this->resourceConfig = $resourceConfig;
         $this->encryptor = $encryptor;
         $this->datetimeFactory = $datetimeFactory;
         $this->moduleList = $moduleList;
@@ -269,6 +278,31 @@ class Config
     public function isActivated($scopeId = null, $scope = null)
     {
         return ($this->isEnabled($scopeId, $scope) && $this->isAppKeyAndSecretSet($scopeId, $scope)) ? true : false;
+    }
+
+    /**
+     * @method setStoreCredentialsAndIsEnabled
+     * @param  string|null                     $appKey
+     * @param  string|null                     $secret
+     * @param  boolean|int|null                $isEnabled
+     * @param  int|null                        $storeId
+     * @return $this
+     */
+    public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null)
+    {
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, $secret, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        return $this;
+    }
+
+    /**
+     * @method resetStoreCredentials
+     * @param  int|null              $storeId
+     */
+    public function resetStoreCredentials($storeId = null)
+    {
+        return $this->setStoreCredentialsAndIsEnabled(null, null, null, $storeId);
     }
 
     /**
