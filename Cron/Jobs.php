@@ -283,7 +283,7 @@ class Jobs
                         if ($status != 200) {
                             $this->_processOutput("Jobs::ordersSync() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
-                            $this->flagItems('orders', $storeId, $ordersCollection->getAllIds());
+                            $this->flagItems('orders', $storeId, $ordersCollection->getAllIds($this->_yotpoHelper->getOrdersSyncLimit(), 0));
                             $this->_processOutput("Jobs::ordersSync() - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
                         }
                     }
