@@ -436,10 +436,9 @@ class ApiClient extends \Magento\Framework\App\Helper\AbstractHelper
                 'utoken'            => $token,
                 'app_key'           => $appKey,
                 'metadata'          => [
-                    'platform'          => 'Magento',
-                    'version'           => 'Magento 2',
-                    'sub_version'       => "{$this->_yotpoHelper->getMagentoPlatformVersion()} {$this->_yotpoHelper->getMagentoPlatformEdition()}",
-                    'plugin_version'    => $this->_yotpoHelper->getModuleVersion(),
+                    'platform'          => 'magento2',
+                    'version'           => "{$this->_yotpoHelper->getMagentoPlatformVersion()} {$this->_yotpoHelper->getMagentoPlatformEdition()}",
+                    'plugin_version'    => $this->_yotpoHelper->getModuleVersion()
                 ],
             ]);
             if ($result['status'] !== 200) {
