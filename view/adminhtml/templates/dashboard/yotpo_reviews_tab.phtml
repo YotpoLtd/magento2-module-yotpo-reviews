@@ -1,0 +1,34 @@
+<?php
+/**
+ * @var $block Yotpo\Yotpo\Block\Adminhtml\Dashboard\Tab\YotpoReviews
+ */
+?>
+<?php if ($block->isAppKeyAndSecretSet()) : ?>
+    <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
+        <?php if (sizeof($block->getTotals()) > 0) : ?>
+            <ul class="yotpo-reviews-totals-list">
+                <?php foreach ($block->getTotals() as $_total) : ?>
+                    <li class="yotpo-reviews-totals-item <?= $_total['class'] ?>">
+                        <span class="yotpo-reviews-totals-label"><?= $_total['label'] ?></span>
+                        <strong class="yotpo-reviews-totals-value"><?= $_total['value'] ?></strong>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else : ?>
+            <div class="yotpo-reviews-totals-nodata">
+                <?= __("No Data Found") ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
+<?php else : ?>
+    <div class="yotpo-reviews-totals-no-appkey">
+        <div class="collect-and-leverage">
+            <?= __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets.") ?>
+        </div>
+        <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
+        <div class="already-have-account">
+            <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
+        </div>
+    </div>
+<?php endif; ?>

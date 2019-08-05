@@ -1,131 +1,73 @@
-# Bundled Extensions Submission Service (BESS) Example Repository _(bess-example)_
+# Magento 2 [Yotpo](https://www.yotpo.com/) Extension
 
-> Example Bundled Extension submission repository.
+---
 
-This repository forms part of Magento's Bundled Extensions Submission Service (BESS for short). 
+This library includes the files of the Yotpo Reviews extension.
+The directories hierarchy is as positioned in a standard magento 2 project library
 
-With BESS, our intention is to provide Magento Bundled Extension partners with an endpoint that streamlines the experience of submitting, reviewing, testing and approving our partner's extensions.  
+This library will also include different version packages as magento 2 extensions
 
-## Table of Contents
-- [Install](#install)
-- [Usage](#usage)
-    - [Workflow](#workflow)
-    - [Working with Branches](#working-with-branches)
-    - [Directory Structure](#directory-structure)
-- [Support](#support)
-- [Contribute](#contribute)
-- [License](#license)
+---
 
-## Install
-Your repository has already been set up to integrate with BESS and is ready to receive submissions. 
+## Requirements
+Magento 2.0+ (Up to module verion 2.4.5)
 
-### For Git Users
-If you manage your extension's source code using Git, you can begin submitting code for review right away by adding this repository as a new "remote" for your project. Once this is complete, you can push your branches to this new origin.
+Magento 2.1+ (Module version 2.7.5 up to 2.7.7)
 
-#### Adding Remote Repositories
-To add a new remote Git repository as a short name you can reference easily, run `git remote add <shortname> <url>`:
+Magento 2.2+ (Module version 2.8.0 and above)
+
+## ✓ Install via [composer](https://getcomposer.org/download/) (recommended)
+Run the following command under your Magento 2 root dir:
 
 ```
-$ git remote add bess https://github.com/magento/ext-submit-example.git
+composer require yotpo/module-review
+php bin/magento maintenance:enable
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy
+php bin/magento maintenance:disable
+php bin/magento cache:flush
 ```
 
-Now you can use the string `"bess"` on the command line in lieu of the whole URL. For example, if you want to push your `master` branch to this repository, you can run:
-
+## Install manually under app/code
+1. Download & place the contents of [Yotpo's Core Module](https://github.com/YotpoLtd/magento2-module-yotpo-core) under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Core.
+2. Download & place the contents of this repository under {YOUR-MAGENTO2-ROOT-DIR}/app/code/Yotpo/Yotpo  
+3. Run the following commands under your Magento 2 root dir:
 ```
-$ git push bess master
+php bin/magento maintenance:enable
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy
+php bin/magento maintenance:disable
+php bin/magento cache:flush
 ```
-
-For more information, please see Git's official documentation, "Git Basics - Working with Remotes", [here](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes).
-
-### For Non-Git Users
-BESS only accepts submissions from this GitHub repository and does not offer support for other version control systems. If your extension exists outside of Git, we recommend cloning this repository and copying your code into the cloned directory and push your submissions from there. 
-
-You may choose to migrate and manage all of your extension's code from this new repository or only use it for submissions to Magento.
 
 ## Usage
-### Workflow
-![BESS Workflow Diagram](images/BESS-Workflow-Phase1-20180327.png)
 
-1. Partners develop and test locally. When ready, developers push their feature branch to their new remote (this repository).
-2. When changes for a specific release want to be submitted for testing and review, developers must open a Pull Request (PR) in GitHub, from their feature branch against the intended release branch.
-3. When a PR is created, it may not be merged until after smoke testing is successful and a Magento Architect has reviewed and approved it.
-4. Opening a PR against any of the repository's release branches triggers an automated smoke-testing process.
-5. The smoke-testing process verifies that an extension contains a valid `composer.json` file and can be installed without errors on the lastest development version of Magento. The validity of a `composer.json` file is determined by executing the `composer validate` command from a CLI based on the [Composer JSON schema](https://getcomposer.org/doc/04-schema.md).
-6. If smoke-test results are all positive, the system marks the originating PR as approvable by Magento Architects. If not, partner developers are notified via e-mail with an attached copy of the build logs and the PR is closed.
-7. Once a PR is marked for approval, both developers and architects are notified via e-mail, along with a copy of the build logs for that PR run.
-8. See step 7.
-9. Architects review the PR submission and may approve or request changes.
-10. If a PR submission is approved, an architect will merge the PR into the release branch. If not, an architect will mostly likely request changes, in which case, partner developers are notified via e-mail and the PR is closed.
-11. Once a merge happens on a release branch, the code is pulled from that branch, packaged and pushed to an interal artifact repository to be handed-off for further testing.
-12. Developers are notified via e-mail that the PR was approved and merged.
+After the installation, Go to The Magento 2 admin panel
 
-### Working with Branches
-BESS repositories allow Partners to apply any branching strategy they wish to implement. However, to leverage the benefits of BESS, the following requirements must be met:
+Go to Stores -> Settings -> Configuration, change store view (not to be default config) and click on Yotpo Product Reviews Software on the left sidebar
 
-- The submission process (smoke testing, PR approval, etc.) is triggered only by the creation (opening or re-opening) of a Pull Request from a feature branch against a release branch.
-- Release branches must follow this naming convention: `<sem-ver>-release`, where `<sem-ver>` corresponds to the Magento version the extension is compatible and being released with, e.g.: `2.3.0-release`. An extension may have one or more release branches.
-- New Bundled Extension version releases will only be packaged and published from the latest release branch state for each available version.
-- No pre-conditions are imposed on Feature branches.
+Insert Your account app key and secret
 
-> **Note**: _Do not_ create a branch off the `readme` branch. It may lead to confusion and unexpected behavior. Instead, push a new branch directly to the repository.
+## Advanced
 
-#### Branch protection
-Release branches that follow the naming convention above are automatically marked as `protected` in GitHub upon creation. This ensures new version releases follow the BESS process and have been appropriately tested and approved by Magento. This also protects these branches from being accidentally deleted or commited against.
-
-![GitHub Protected Branches Example](images/BESS-ProtectedBranches-Example.png)
-
-### Directory Structure
-All Magento extensions must implement the following directory structure:
-
-###### Modules
-```
-<repo_root>/
-    composer.json (metapackage, required)
-    <Module1>
-        composer.json
-    <Module2>
-        composer.json
-    <Module1SampleData>
-    <Module2SampleData>
-```
-
-###### Metapackage File
-A `composer.json` file must be included with your submission at the root of your extension's directory. Declare the `type` field as `metapackage` and list each module as a dependency in the order they must be installed.
+To insert the widget manually on your product page add the following code in one of your product .phtml files
 
 ```
-{
-  "name": "magento/bess-example-magento-2-module",
-  "description": "Official Magento 2 Extension",
-  "type": "metapackage",
-  "version": "1.0.0",
-  "license": [
-    "GPLv3"
-  ],
-  "require": {
-    "magento/module1": "1.0.0",
-    "magento/module2": "1.0.0",
-    "magento/module3": "1.0.0"
-  }
-}
+<?= $this->helper('Yotpo\Yotpo\Helper\Data')->showWidget($block) ?>
 ```
 
-> **Note**: Make sure your `metapackage` file complies with the `composer.json` [Schema](https://getcomposer.org/doc/04-schema.md#the-composer-json-schema). In particular, that the `name` property of the extension and the modules consist of the vendor and project name, separated by `/`, like in the example above.
-> 
-> If your Bundled Extension is comprised by more than one Extension Module, make sure to add each Module Name and its version number under the `require` section. This way, internal dependencies will be resolved upon running Smoke Tests in BESS.
+To insert the bottomline manually on your catalog page add the following code in Magento\Catalog\view\frontend\templates\product\list.phtml
 
-#### Example Directory
-###### Repository root
-![Bundled Extension File Structure Example 1](images/BundledExtension-FileStructure-Example-1.png)
-###### Extension module
-![Bundled Extension File Structure Example 2](images/BundledExtension-FileStructure-Example-2.png)
+```
+<?= $this->helper('Yotpo\Yotpo\Helper\Data')->showBottomline($block, $_product) ?>
+```
 
-> **Note**: mixing modules, themes and language packs in the same repository is not allowed.
+---
 
-For more information, please see the Magento DevDocs reference, [here](http://devdocs.magento.com/guides/v2.2/extension-dev-guide/build/module-file-structure.html).
+https://www.yotpo.com/
 
-## Support
-### Architects
-For support or questions regarding your the development of your extension, like best practices or approval guidelines, you may contact your assigned architects directly at **grp-Magento-{ext-repo-name}@adobe.com**.
+Copyright © 2018 Yotpo. All rights reserved.  
 
-### Platform
-If you experience any issues with BESS itself, please reach out to Magento's DevOps Team at [BESS Support team](mailto:grp-bess-support@adobe.com) with a description of your issue and accompanying build logs, if applicable.
+![Yotpo Logo](https://yap.yotpo.com/assets/images/logo_login.png)

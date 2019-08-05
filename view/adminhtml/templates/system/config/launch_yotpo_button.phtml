@@ -1,0 +1,12 @@
+<?php
+/**
+ * @var $block \Yotpo\Yotpo\Block\Adminhtml\System\Config\LaunchYotpoButton
+ */
+?>
+<?php if (!$block->isStoreScope()) : ?>
+    <p class="note"><?= __('Yotpo can only be connected, enabled, or disabled via the Store View menu.<br>To connect your App Key and API secret, first select the relevant Store View.') ?></p>
+    <p></p>
+<?php endif; ?>
+<p class="note">
+    Need help? <a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo" target="_blank" title="Setup Guide">Setup Guide</a>
+</p>

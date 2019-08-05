@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <yotpo>
+            <env>
+                <yotpo_api_url>https://api.yotpo.com/</yotpo_api_url>
+                <yotpo_widget_url>//staticw2.yotpo.com/</yotpo_widget_url>
+            </env>
+            <settings>
+                <widget_enabled>1</widget_enabled>
+                <category_bottomline_enabled>1</category_bottomline_enabled>
+                <bottomline_enabled>1</bottomline_enabled>
+                <qna_enabled>1</qna_enabled>
+                <mdr_enabled>1</mdr_enabled>
+                <custom_order_status>complete</custom_order_status>
+            </settings>
+            <sync_settings>
+                <orders_sync_limit>50</orders_sync_limit>
+            </sync_settings>
+        </yotpo>
+    </default>
+</config>

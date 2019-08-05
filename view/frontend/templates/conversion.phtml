@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var $block \Yotpo\Yotpo\Block\Conversation
+ */
+?>
+<?php if (!($block->isEnabled() && $block->hasOrder())) {
+    return;
+} ?>
+<!-- Yotpo - Conversation -->
+<?php if (($jsonData = $block->getJsonData())) : ?>
+    <script>
+        (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="<?= $block->getYotpoWidgetUrl() ?>";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+    </script>
+    <script>
+        yotpoTrackConversionData = <?= $jsonData ?>;
+    </script>
+<?php endif; ?>
+<?php if (($noScriptSrc = $block->getNoscriptSrc())) : ?>
+    <noscript>
+        <img src="<?= $noScriptSrc ?>" width="1" height="1">
+    </noscript>
+<?php endif; ?>
+<!--/ Yotpo - Conversation -->
