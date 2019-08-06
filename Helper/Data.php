@@ -3,9 +3,10 @@
 namespace Yotpo\Yotpo\Helper;
 
 use Magento\Catalog\Model\Product;
+use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\View\Element\AbstractBlock;
 
-class Data
+class Data extends AbstractHelper
 {
     private function renderYotpoProductBlock($blockName, AbstractBlock $parentBlock, Product $product = null)
     {
