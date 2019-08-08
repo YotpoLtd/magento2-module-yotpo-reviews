@@ -25,10 +25,9 @@ class AccountPlatform extends AbstractApi
                 'utoken'            => $token,
                 'app_key'           => $this->_yotpoConfig->getAppKey($storeId),
                 'metadata'          => [
-                    'platform'          => 'Magento',
-                    'version'           => 'Magento 2',
-                    'sub_version'       => "{$this->_yotpoConfig->getMagentoPlatformVersion()} {$this->_yotpoConfig->getMagentoPlatformEdition()}",
-                    'plugin_version'    => $this->_yotpoConfig->getModuleVersion(),
+                    'platform'          => 'magento2',
+                    'version'           => "{$this->_yotpoConfig->getMagentoPlatformVersion()} {$this->_yotpoConfig->getMagentoPlatformEdition()}",
+                    'plugin_version'    => $this->_yotpoConfig->getModuleVersion()
                 ],
             ]);
             if ($result['status'] !== 200) {
