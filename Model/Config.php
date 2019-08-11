@@ -313,8 +313,8 @@ class Config
     public function getYotpoApiUrl($path = "")
     {
         $yotpoApiUrl = $this->getConfig(self::XML_PATH_YOTPO_API_URL);
-        if(preg_match("/yotpo\.com\/$|yotpo\.xyz\/$/", $yotpoApiUrl)) {
-        return $yotpoApiUrl . $path;
+        if (preg_match("/yotpo\.com\/$|yotpo\.xyz\/$/", $yotpoApiUrl)) {
+            return $yotpoApiUrl . $path;
         } else {
             return "https://api.yotpo.com/" . $path;
         }
