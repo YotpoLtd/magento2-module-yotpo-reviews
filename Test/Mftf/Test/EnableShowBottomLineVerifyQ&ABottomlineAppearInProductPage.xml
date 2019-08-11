@@ -21,35 +21,25 @@
 
     <before>
       <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+      <amOnPage url="index.php/admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+      <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
+      <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+      <waitForPageLoad stepKey="waitForSaveConfig"/>
+      <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
     </before>
+
     <after>
       <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-      <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
-        <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
-        <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
-      </actionGroup>
-      <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
-        <argument name="storeView" value="_defaultStore.name"/>
-      </actionGroup>
       <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+      <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
       <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
-      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+      <!--<deleteData createDataKey="createProduct" stepKey="deleteProduct"/>-->
     </after>
 
-    <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
-      <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
-      <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
-    </actionGroup>
+    <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+    <waitForPageLoad stepKey="waitForPageLoad"/>
 
-    <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
-      <argument name="storeView" value="_defaultStore.name"/>
-    </actionGroup>
-
-    <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
-      <argument name="storeView" value="_defaultStore.name"/>
-    </actionGroup>
-
+    <amOnPage url="index.php/admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
     <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
     <wait time="6" stepKey="waitSixSeconds"/>
     <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQandAisEnabled"/>
