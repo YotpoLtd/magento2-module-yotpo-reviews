@@ -140,12 +140,12 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function isRenderBottomline()
     {
-        return $this->yotpoConfig->isBottomlineEnabled();
+        return $this->hasProduct() && ($this->yotpoConfig->isBottomlineEnabled() || $this->getData('fromHelper'));
     }
 
     public function isRenderBottomlineQna()
     {
-        return $this->yotpoConfig->isBottomlineQnaEnabled();
+        return $this->hasProduct() && $this->yotpoConfig->isBottomlineQnaEnabled();
     }
 
     public function escapeString($str)
