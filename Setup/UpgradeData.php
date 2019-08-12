@@ -78,7 +78,7 @@ class UpgradeData implements UpgradeDataInterface
 
             // Clear config values for the 'default' & 'website' scopes
             $setup->getConnection()->delete(
-                $coreConfigTable,
+                $setup->getConnection()->getTableName('core_config_data'),
                 "path IN ('" . implode("','", [YotpoConfig::XML_PATH_YOTPO_APP_KEY, YotpoConfig::XML_PATH_YOTPO_SECRET, YotpoConfig::XML_PATH_YOTPO_ENABLED]) . "') AND scope != '" . ScopeInterface::SCOPE_STORES . "'"
             );
 
