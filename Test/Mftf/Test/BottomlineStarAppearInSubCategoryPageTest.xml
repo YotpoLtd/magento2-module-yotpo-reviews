@@ -35,9 +35,8 @@
             <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
         </after>
 
-        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-        <wait time="30" stepKey="waitThirtySeconds"/>
-
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingEnabled}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
         <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>
 
         <actionGroup ref="GoToStorefrontCategoryPageByParameters" stepKey="goToStorefrontCategoryPage">

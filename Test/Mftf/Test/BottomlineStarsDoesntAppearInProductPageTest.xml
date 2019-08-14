@@ -29,9 +29,8 @@
             <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 
-        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-        <wait time="30" stepKey="waitThirtySeconds"/>
-
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
         <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
         <selectOption userInput="No" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeDisable"/>
         <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>

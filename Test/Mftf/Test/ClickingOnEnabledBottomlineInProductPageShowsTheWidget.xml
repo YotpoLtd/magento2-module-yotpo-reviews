@@ -29,9 +29,8 @@
             <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 
-        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-        <wait time="30" stepKey="waitThirtySeconds"/>
-
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
         <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
         <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
         <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="seeWidgetEnabled"/>

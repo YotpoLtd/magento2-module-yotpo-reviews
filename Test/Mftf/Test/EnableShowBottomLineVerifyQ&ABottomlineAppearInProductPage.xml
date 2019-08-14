@@ -31,8 +31,8 @@
       <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
     </after>
 
-    <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-    <wait time="30" stepKey="waitThirthyeconds"/>
+    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetSettings}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
     <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQandAisEnabled"/>
 
     <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
