@@ -45,12 +45,12 @@ class UpdateMetadata extends AbstractJobs
                 try {
                     $this->emulateFrontendArea($storeId);
                     if (!$this->_yotpoConfig->isEnabled()) {
-                        $this->_processOutput("UpdateMetadata::execute() - Skipping store ID: {$storeId} (disabled)", "info");
+                        $this->_processOutput("UpdateMetadata::execute() - Skipping store ID: {$storeId} (disabled)", "debug");
                         continue;
                     }
-                    $this->_processOutput("UpdateMetadata::execute() - Updating metadata for store ID: {$storeId} ...", "info");
+                    $this->_processOutput("UpdateMetadata::execute() - Updating metadata for store ID: {$storeId} ...", "debug");
                     $result = $this->yotpoApi->updateMetadata($storeId);
-                    $this->_processOutput("UpdateMetadata::execute() - Updating metadata for store ID: {$storeId} [SUCCESS]", "info");
+                    $this->_processOutput("UpdateMetadata::execute() - Updating metadata for store ID: {$storeId} [SUCCESS]", "debug");
                 } catch (\Exception $e) {
                     $this->_processOutput("UpdateMetadata::execute() - Exception on store ID: {$storeId} - " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
                 }

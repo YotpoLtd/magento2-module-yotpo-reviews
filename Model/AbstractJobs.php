@@ -123,6 +123,7 @@ class AbstractJobs
      */
     protected function _processOutput($message, $type = "info", $data = [])
     {
+        $type = ($type === "error") ? $type : "info";
         if ($this->output instanceof OutputInterface) {
             //Output to terminal
             $this->output->writeln('<' . $type . '>' . json_encode($message) . '</' . $type . '>');
@@ -137,7 +138,8 @@ class AbstractJobs
             }
         }
 
-        //Log to var/log/system.log
+        //Log to var/log/system.log or var/log/debug.log
+        $type = ($type === "error") ? $type : "debug";
         $this->_yotpoConfig->log($message, $type, $data);
 
         return $this;
