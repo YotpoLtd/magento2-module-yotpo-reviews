@@ -73,7 +73,7 @@ class OrdersSync extends AbstractJobs
             ];
         }
         return $this->_resourceConnection->getConnection()
-            ->insertOnDuplicate('yotpo_sync', $entityIds, ['store_id', 'entity_type', 'entity_id', 'sync_flag', 'sync_date']);
+            ->insertOnDuplicate($this->_resourceConnection->getTableName('yotpo_sync'), $entityIds, ['store_id', 'entity_type', 'entity_id', 'sync_flag', 'sync_date']);
     }
 
     private function getOrderCollection()
@@ -130,10 +130,10 @@ class OrdersSync extends AbstractJobs
                 try {
                     $this->emulateFrontendArea($storeId);
                     if (!$this->_yotpoConfig->isEnabled()) {
-                        $this->_processOutput("OrdersSync::execute() - Skipping store ID: {$storeId} (disabled)", "info");
+                        $this->_processOutput("OrdersSync::execute() - Skipping store ID: {$storeId} (disabled)", "debug");
                         continue;
                     }
-                    $this->_processOutput("OrdersSync::execute() - Processing orders for store ID: {$storeId} ...", "info");
+                    $this->_processOutput("OrdersSync::execute() - Processing orders for store ID: {$storeId} ...", "debug");
 
                     $ordersCollection = $this->getOrderCollection()
                         ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoConfig->getCustomOrderStatus()])
@@ -147,7 +147,7 @@ class OrdersSync extends AbstractJobs
 
                     $orders = $this->yotpoSchema->prepareOrdersData($ordersCollection);
                     $ordersCount = count($orders);
-                    $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync.", "info");
+                    $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync.", "debug");
                     if ($ordersCount > 0) {
                         $resData = $this->yotpoApi->massCreate($orders, $storeId);
                         $status = (is_object($resData['body']) && property_exists($resData['body'], "code")) ? $resData['body']->code : $resData['status'];
@@ -155,7 +155,7 @@ class OrdersSync extends AbstractJobs
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
                             $this->flagItems('orders', $storeId, $this->getCollectionIds($ordersCollection));
-                            $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "info");
+                            $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "debug");
                         }
                     }
                 } catch (\Exception $e) {
