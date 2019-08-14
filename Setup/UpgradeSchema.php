@@ -78,8 +78,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $installer->startSetup();
 
         if (version_compare($context->getVersion(), '2.7.5', '<')) {
-            $syncTable = $installer->getConnection()->newTable(
-                $installer->getTable('yotpo_sync')
+            $currentDate = $this->datetimeFactory->create()->gmtDate('Y-m-d');
+            $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE, $currentDate, 'default', 0);
+            $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $currentDate, 'default', 0);
+            $this->appConfig->reinit();
+        }
+
+        $salesConnection = $installer->getConnection('sales');
+        $fullTableName = $installer->getTable('yotpo_sync');
+        if (!$salesConnection->isTableExists($fullTableName)) {
+            $defaultConnection = $installer->getConnection();
+            $withDataMigration = $defaultConnection->isTableExists($fullTableName);
+
+            $syncTable = $salesConnection->newTable(
+                $fullTableName
             )->addColumn(
                 'sync_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -127,12 +139,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ['store_id', 'entity_type', 'entity_id'],
                 ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
             );
-            $installer->getConnection()->createTable($syncTable);
+            $salesConnection->createTable($syncTable);
 
-            $currentDate = $this->datetimeFactory->create()->gmtDate('Y-m-d');
-            $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE, $currentDate, 'default', 0);
-            $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $currentDate, 'default', 0);
-            $this->appConfig->reinit();
+            if ($withDataMigration) {
+                $maxBatchSize = 100;
+
+                do {
+                    $selectFromOldTable = $defaultConnection->select()->from($fullTableName)->limit($maxBatchSize);
+                    $existingData = $defaultConnection->query($selectFromOldTable)->fetchAll();
+                    $batchSize = count($existingData);
+                    if ($batchSize) {
+                        $columns = array_keys($existingData[0]);
+                        $salesConnection->insertArray($fullTableName, $columns, $existingData);
+                    }
+                } while ($batchSize === $maxBatchSize);
+                $defaultConnection->dropTable($fullTableName);
+            }
         }
 
         $installer->endSetup();
