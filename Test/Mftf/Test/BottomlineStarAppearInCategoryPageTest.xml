@@ -5,7 +5,6 @@
   * See COPYING.txt for license details.
   */
 -->
-
 <tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="BottomlineStarAppearInCategoryPageTest">
@@ -21,11 +20,7 @@
 
         <before>
             <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-            <amOnPage url="index.php/admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
-            <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
-            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
-            <waitForPageLoad stepKey="waitForSaveConfig"/>
-            <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
             <createData entity="ApiCategory" stepKey="createCategory"/>
             <createData entity="SimpleProduct" stepKey="createSimpleProduct">
                 <requiredEntity createDataKey="createCategory"/>
@@ -33,20 +28,14 @@
         </before>
 
         <after>
-            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-            <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
             <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
             <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
             <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 
-        <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-        <waitForPageLoad stepKey="waitForPageLoad"/>
-
-        <amOnPage url="index.php/admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
         <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
         <wait time="30" stepKey="waitThirtySeconds"/>
 
         <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>

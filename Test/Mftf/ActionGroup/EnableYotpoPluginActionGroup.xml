@@ -8,7 +8,7 @@
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
 <actionGroup name="EnableYotpoPlugin">
-  <amOnPage url="index.php/admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+  <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
 
   <!-- enable Yotpo plugin -->
   <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>

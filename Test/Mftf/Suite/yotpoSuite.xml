@@ -13,9 +13,13 @@
 
     <after>
       <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+      <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
       <magentoCLI command="config:set admin/security/use_form_key 1" stepKey="enableUrlSecretKeys"/>
       <magentoCLI command="config:set cms/wysiwyg/enabled enabled" stepKey="disableWYSYWYG" />
       <magentoCLI command="cache:clean config full_page" stepKey="cleanInvalidatedCaches1"/>
+      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+
     </after>
 
     <include>

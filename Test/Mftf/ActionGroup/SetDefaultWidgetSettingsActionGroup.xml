@@ -8,6 +8,10 @@
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
   <actionGroup name="SetDefaultWidgetSettings">
+    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+    <waitForPageLoad stepKey="waitForPageLoad"/>
+    <wait time="30" stepKey="waitTenSeconds"/>
+
     <!-- Select Yes Show Reviews Widget -->
     <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
     <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
@@ -19,9 +23,6 @@
     <!-- Select Yes Show star rating on product pages -->
     <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
     <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeEnable"/>
-
-    <!-- Check Q&A is Enabled -->
-    <!--<seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQandAisEnabled"/>-->
 
     <!-- Save Configuration -->
     <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
