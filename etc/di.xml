@@ -9,4 +9,11 @@
     <type name="Magento\Catalog\Block\Product\View\Details">
         <plugin name="yotpo_yotpo_catalog_block_product_view_details_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\View\Details" />
     </type>
+    <virtualType name="OmsTableNameArrayIterator">
+        <arguments>
+            <argument name="tableNames" xsi:type="array">
+                <item name="yotpo_sync" xsi:type="string">yotpo_sync</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>
