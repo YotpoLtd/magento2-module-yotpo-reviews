@@ -8,20 +8,10 @@
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
   <actionGroup name="DisableYotpoPlugin">
-    <!-- close general menu which is opned by default-->
-    <click selector="{{AdminLoginToYotpo.GeneralMenu}}" stepKey="ClickOnGeneralMenu"/>
-    <waitForPageLoad stepKey="waitForClickOnGeneralMenu"/>
+    <waitForPageLoad stepKey="waitForYotpoPageToLoad"/>
+    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
 
-    <seeElementInDOM selector="{{AdminLoginToYotpo.YotpoIconInMenu}}" stepKey="checkYotpoAppearsInTheMenu"/>
-
-    <!-- open Yotpo main menu store configuration menu -->
-    <click selector="{{AdminLoginToYotpo.YotpoMenu}}" stepKey="ClickOnYotpoMenu"/>
-    <waitForPageLoad stepKey="waitForProductPageLoad"/>
-    <!-- open Yotpo's sub menu 'Reviews and Visual Marketing' store configuration menu -->
-    <click selector="{{AdminLoginToYotpo.ReviewsAndVisualMarketing}}" stepKey="ClickOnReviewsMenu"/>
-    <waitForPageLoad stepKey="waitForClickOnReviewsMenu"/>
-
-    <!-- enable Yotpo plugin -->
+    <!-- disable Yotpo plugin -->
     <selectOption userInput="0" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="DisableYotpoPlugin"/>
 
     <!-- save Yotpo configuration -->
