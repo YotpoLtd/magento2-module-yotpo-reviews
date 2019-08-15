@@ -18,42 +18,29 @@
             <testCaseId value="MC-251"/>
             <group value="Yotpo"/>
         </annotations>
+
         <before>
             <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
-            
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
             <createData entity="ApiCategory" stepKey="createCategory"/>
             <createData entity="SimpleProduct" stepKey="createSimpleProduct">
                 <requiredEntity createDataKey="createCategory"/>
             </createData>
         </before>
+
         <after>
-          <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
-            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
             <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 
-        <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
-            <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
-            <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
-        </actionGroup>
-
-        <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
-            <argument name="storeView" value="_defaultStore.name"/>
-        </actionGroup>
-
-        <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
-            <argument name="storeView" value="_defaultStore.name"/>
-        </actionGroup>
-
-        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings"/>
-        <wait time="30" stepKey="waitTenSeconds"/>
-
-        <uncheckOption selector="{{YotpoCategoryPage.StarRatingInherit}}" stepKey="checkCheckbox"/>
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+        <uncheckOption selector="{{YotpoCategoryPage.StarRatingCheckBox}}" stepKey="checkCheckbox"/>
 
         <selectOption userInput="No" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="selectStarRatingToBeDisable"/>
 
         <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
-
         <seeOptionIsSelected userInput="No" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeStarRatingDisable"/>
 
         <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings2"/>

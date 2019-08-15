@@ -10,7 +10,7 @@
           xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
   <section name="YotpoCategoryPage">
     <element name="StarRatingEnabled" type="select" selector="//select[@id='yotpo_widget_settings_category_bottomline_enabled']" timeout="30"/>
-    <element name="StarRatingInherit" type="checkbox" selector="//input[@id='yotpo_widget_settings_category_bottomline_enabled_inherit']"/>
+    <element name="StarRatingCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_category_bottomline_enabled_inherit']"/>
     <element name="CategoryStarRatingDiv" type="block" selector="//div[@class='yotpo bottomLine bottomline-position yotpo-small']"/>
   </section>
 </sections>

@@ -1,0 +1,35 @@
+<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../dev/tests/acceptance/vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/Suite/etc/suiteSchema.xsd">
+  <suite name="yotpoSuite">
+    <before>
+      <magentoCLI command="config:set cms/wysiwyg/enabled disabled" stepKey="disableWYSYWYG" />
+      <magentoCLI command="config:set admin/security/use_form_key 0" stepKey="disableUrlSecretKeys"/>
+      <magentoCLI command="cache:clean config full_page" stepKey="cleanInvalidatedCaches2"/>
+      <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+      <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+        <argument name="storeView" value="_defaultStore.name"/>
+      </actionGroup>
+    </before>
+
+    <after>
+      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+      <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+      <magentoCLI command="config:set admin/security/use_form_key 1" stepKey="enableUrlSecretKeys"/>
+      <magentoCLI command="config:set cms/wysiwyg/enabled enabled" stepKey="disableWYSYWYG" />
+      <magentoCLI command="cache:clean config full_page" stepKey="cleanInvalidatedCaches1"/>
+      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+
+    </after>
+
+    <include>
+      <group name="Yotpo"/>
+      <!-- <module name="" file=""/> -->
+    </include>
+    <exclude>
+      <!--  <test name=""/>
+       <group name=""/>
+       <module name="" file=""/> -->
+    </exclude>
+  </suite>
+</suites>
