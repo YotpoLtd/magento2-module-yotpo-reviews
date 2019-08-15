@@ -1,5 +1,5 @@
 {
-    "name": "yotpo/module-review",
+    "name": "yotpo/module-yotpo",
     "description": "Yotpo Reviews extension for Magento2",
     "version": "2.9.0",
     "license": [
@@ -20,7 +20,7 @@
         "magento/module-store": "101.0.*"
     },
     "replace": {
-        "yotpo/module-yotpo": "*"
+        "yotpo/module-review": "*"
     },
     "type": "magento2-module",
     "autoload": {
