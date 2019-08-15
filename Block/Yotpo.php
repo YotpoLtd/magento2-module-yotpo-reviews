@@ -64,7 +64,10 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function getProduct()
     {
-        return $this->coreRegistry->registry('current_product');
+        if (is_null($this->getData('product'))) {
+            $this->setData('product', $this->coreRegistry->registry('current_product'));
+        }
+        return $this->getData('product');
     }
 
     public function hasProduct()
@@ -137,12 +140,12 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function isRenderBottomline()
     {
-        return $this->yotpoConfig->isBottomlineEnabled();
+        return $this->hasProduct() && ($this->yotpoConfig->isBottomlineEnabled() || $this->getData('fromHelper'));
     }
 
     public function isRenderBottomlineQna()
     {
-        return $this->yotpoConfig->isBottomlineQnaEnabled();
+        return $this->hasProduct() && $this->yotpoConfig->isBottomlineQnaEnabled();
     }
 
     public function escapeString($str)
