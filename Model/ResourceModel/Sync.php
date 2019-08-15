@@ -11,6 +11,7 @@ class Sync extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _construct()
     {
+        $this->_setResource('sales');
         $this->_init('yotpo_sync', 'sync_id');
     }
 }
