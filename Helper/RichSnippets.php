@@ -2,13 +2,15 @@
 
 namespace Yotpo\Yotpo\Helper;
 
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Registry;
 use Yotpo\Yotpo\Model\Api\Products as YotpoApi;
 
 /**
  * [!] This class is deprecated & will be removed on future releases, please use \Yotpo\Yotpo\Model\Api\Products instead.
  */
-class RichSnippets
+class RichSnippets extends AbstractHelper
 {
     /**
      * @var YotpoApi
@@ -22,15 +24,18 @@ class RichSnippets
 
     /**
      * @method __construct
-     * @param  YotpoApi $yotpoApi
-     * @param  Registry $coreRegistry
+     * @param  Context     $context
+     * @param  YotpoApi    $yotpoApi
+     * @param  Registry    $coreRegistry
      */
     public function __construct(
+        Context $context,
         YotpoApi $yotpoApi,
         Registry $coreRegistry
     ) {
+        parent::__construct($context);
         $this->yotpoApi = $yotpoApi;
-        $this->registry = $coreRegistry;
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
