@@ -25,7 +25,6 @@
     </before>
 
     <after>
-      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
       <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
       <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
       <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
