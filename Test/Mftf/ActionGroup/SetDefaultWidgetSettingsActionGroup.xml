@@ -10,7 +10,9 @@
   <actionGroup name="SetDefaultWidgetSettings">
     <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
     <waitForPageLoad stepKey="waitForPageLoad"/>
-    <wait time="30" stepKey="waitTenSeconds"/>
+
+    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
 
     <!-- Select Yes Show Reviews Widget -->
     <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
