@@ -125,7 +125,8 @@ class AbstractJobs
     {
         if ($this->output instanceof OutputInterface) {
             //Output to terminal
-            $this->output->writeln('<' . $type . '>' . json_encode($message) . '</' . $type . '>');
+            $outputType = ($type === "error") ? $type : "info";
+            $this->output->writeln('<' . $outputType . '>' . json_encode($message) . '</' . $outputType . '>');
             if ($data) {
                 $this->output->writeln('<comment>' . json_encode($data) . '</comment>');
             }
@@ -137,7 +138,7 @@ class AbstractJobs
             }
         }
 
-        //Log to var/log/system.log
+        //Log to var/log/system.log or var/log/debug.log
         $this->_yotpoConfig->log($message, $type, $data);
 
         return $this;
