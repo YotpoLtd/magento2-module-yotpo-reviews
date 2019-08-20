@@ -11,7 +11,7 @@ class ResetSyncFlags extends AbstractJobs
         try {
             $this->_processOutput("ResetSyncFlags::execute() - (entity: {$entityType}) [STARTED]", "debug");
             $this->_resourceConnection->getConnection('sales')->update(
-                $this->_resourceConnection->getTableName('yotpo_sync'),
+                $this->_resourceConnection->getTableName('yotpo_sync', 'sales'),
                 ['sync_flag' => 0],
                 (($entityType) ? ['entity_type = ?' => "{$entityType}"] : [])
             );

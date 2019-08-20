@@ -72,8 +72,8 @@ class OrdersSync extends AbstractJobs
                 "sync_date" => $this->_yotpoConfig->getCurrentDate(),
             ];
         }
-        return $this->_resourceConnection->getConnection()
-            ->insertOnDuplicate($this->_resourceConnection->getTableName('yotpo_sync'), $entityIds, ['store_id', 'entity_type', 'entity_id', 'sync_flag', 'sync_date']);
+        return $this->_resourceConnection->getConnection('sales')
+            ->insertOnDuplicate($this->_resourceConnection->getTableName('yotpo_sync', 'sales'), $entityIds, ['store_id', 'entity_type', 'entity_id', 'sync_flag', 'sync_date']);
     }
 
     private function getOrderCollection()
