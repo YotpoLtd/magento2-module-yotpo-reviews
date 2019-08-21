@@ -291,7 +291,7 @@ class Config
     public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null)
     {
         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, $secret, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
         return $this;
     }
