@@ -68,10 +68,13 @@ class UpgradeData implements UpgradeDataInterface
                 $appKey = $this->yotpoConfig->getAppKey($storeId, ScopeInterface::SCOPE_STORE);
                 $secret = $this->yotpoConfig->getSecret($storeId, ScopeInterface::SCOPE_STORE);
 
+                if (!$appKey || !$secret) {
+                    $this->yotpoConfig->resetStoreCredentials($storeId);
+                    continue;
+                }
                 if (!isset($appKeysStores[$appKey])) {
-                    $this->yotpoConfig->setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId);
-                } else {
                     $appKeysStores[$appKey] = [];
+                    $this->yotpoConfig->setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId);
                 }
                 $appKeysStores[$appKey][] = $storeId;
             }
@@ -86,7 +89,7 @@ class UpgradeData implements UpgradeDataInterface
             $resetStores = [];
             foreach ($appKeysStores as $_appkey => $stores) {
                 if (count($stores) > 1) {
-                    foreach ($appKeysStores as $storeId) {
+                    foreach ($stores as $storeId) {
                         $this->yotpoConfig->resetStoreCredentials($storeId);
                         $resetStores[] = $storeId;
                     }
@@ -94,7 +97,7 @@ class UpgradeData implements UpgradeDataInterface
             }
             $resetStoresMsg = '';
             if ($resetStores) {
-                $resetStoresMsg = ' *Note that we also reset the credentials on store IDs: ' . implode(",", $resetStores) . ' since they had duplicated credentials & Yotpo requires a unique set of app-key & secret for each store.';
+                $resetStoresMsg = ' *Note that we also reset the credentials on store IDs: ' . implode(",", $resetStores) . ' since they had duplicated/invalid credentials & Yotpo requires a unique set of app-key & secret for each store.';
                 $this->output->writeln("<comment>' . $resetStoresMsg . '</comment>");
             }
 
