@@ -97,12 +97,12 @@ class UpgradeData implements UpgradeDataInterface
             }
             $resetStoresMsg = '';
             if ($resetStores) {
-                $resetStoresMsg = ' *Note that we also reset the credentials on store IDs: ' . implode(",", $resetStores) . ' since they had duplicated/invalid credentials & Yotpo requires a unique set of app-key & secret for each store.';
+                $resetStoresMsg = ' *Note that Yotpo requires unique set of credentials for each store. As we have detected duplicate or invalid credentials, your Yotpo credentials have been reset for the following stores: ' . implode(",", $resetStores) . '. Copy and paste the Yotpo credentials of the aforementioned store(s) within the relevant Store View scope settings.';
                 $this->output->writeln("<comment>' . $resetStoresMsg . '</comment>");
             }
 
             if ($context->getVersion()) {
-                $this->addAdminNotification("Important message from Yotpo regarding the configuration scopes & multi-store support... (module: Yotpo_Yotpo)", "Yotpo can only be connected, enabled, or disabled on the Store View scope. During the last module upgrade we reset the configurations for the 'default' & 'website' scopes & saved all current values on the 'store' scope." . $resetStoresMsg);
+                $this->addAdminNotification("Important message from Yotpo regarding the configuration scopes & multi-store support... (module: Yotpo_Yotpo)", "Note that Yotpo can only be connected and enabled/disabled via the Store View scope. As part of the latest module upgrade, your currently defined values were saved to your default store scope, and your default and website scope configurations were reset. \n Please verify that your Yotpo credentials are correct and connected to the right stores" . $resetStoresMsg);
             }
         }
 
