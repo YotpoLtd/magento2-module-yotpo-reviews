@@ -98,7 +98,7 @@ class Conversion extends \Magento\Framework\View\Element\Template
         }
         return json_encode(
             [
-            "orderId" => $this->getOrderId(),
+            "orderId" => $this->getOrder()->getIncrementId(),
             "orderAmount" => $this->getOrderAmount(),
             "orderCurrency" => $this->getOrderCurrency(),
             ]
