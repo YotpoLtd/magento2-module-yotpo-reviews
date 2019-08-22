@@ -70,7 +70,7 @@
                     <label>Enable Debug Mode</label>
 					<config_path>yotpo/settings/debug_mode_active</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-					<comment>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</comment>
+					<comment>Enable in order to log all Yotpo processes when Magento debug mode enabled.</comment>
         		</field>
             </group>
 			<group id="sync_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" canRestore="0">
