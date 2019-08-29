@@ -5,9 +5,9 @@ namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product\View;
 use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 /**
- * Plugin for product Details Block
+ * Plugin for product Description Block
  */
-class Details
+class Description
 {
     /**
      * @var YotpoConfig
@@ -22,12 +22,12 @@ class Details
 
     /**
      * @method beforeToHtml
-     * @param \Magento\Catalog\Block\Product\View\Details $reviewBlock
+     * @param \Magento\Catalog\Block\Product\View\Description $reviewBlock
      *
      * @return array
      */
     public function beforeToHtml(
-        \Magento\Catalog\Block\Product\View\Details $reviewBlock
+        \Magento\Catalog\Block\Product\View\Description $reviewBlock
     ) {
         /**
          * @var \Magento\Framework\View\Layout $layout
