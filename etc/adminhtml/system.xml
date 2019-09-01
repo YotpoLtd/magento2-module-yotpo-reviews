@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
 	<system>
 		<tab id="yotpo" translate="label" sortOrder="400">
-            <label><![CDATA[<span class='yotpo-icon'></span>Yotpo]]></label>
+            <label>Yotpo</label>
 		</tab>
         <section id="yotpo" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
@@ -57,7 +57,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="qna_enabled" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Enable Q&amp;A</label>
+                    <label>Show Q&amp;A Bottom-line</label>
 					<config_path>yotpo/settings/qna_enabled</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -70,7 +70,7 @@
                     <label>Enable Debug Mode</label>
 					<config_path>yotpo/settings/debug_mode_active</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-					<comment>Enable debug mode in order to log all Yotpo processes (log file: var/log/system.log).</comment>
+					<comment>Enable in order to log all Yotpo processes when Magento debug mode enabled.</comment>
         		</field>
             </group>
 			<group id="sync_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" canRestore="0">

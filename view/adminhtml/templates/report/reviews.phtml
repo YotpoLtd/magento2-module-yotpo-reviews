@@ -3,7 +3,7 @@
  * @var $block Yotpo\Yotpo\Block\Adminhtml\Report\Reviews
  */
 ?>
-<?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()):
+<?php if ($block->isEnabled() && $block->isAppKeyAndSecretSet()) :
     $periods = $block->getPeriods(); ?>
     <div class="yotpo-reviews-totals-container">
         <div class="yotpo-reviews-totals" id="yotpo_reviews_totals">
@@ -19,7 +19,7 @@
                     </span>
                 </a>
                 <ul class="admin__action-dropdown-menu">
-                    <?php foreach ($periods as $_period => $_label): ?>
+                    <?php foreach ($periods as $_period => $_label) : ?>
                         <li>
                             <a
                                 href="<?= $block->getUrl('yotpo_yotpo/report/reviews', ['_current' => true, 'period' => '']) . 'period/' . $_period ?>"
@@ -36,9 +36,9 @@
             <div class="user-generated-content">
                 <?= __("User-generated content metrics gathered from your Yotpo dashboards.") ?>
             </div>
-            <?php if (sizeof($block->getTotals()) > 0): ?>
+            <?php if (sizeof($block->getTotals()) > 0) : ?>
                 <ul class="yotpo-reviews-totals-list">
-                    <?php foreach ($block->getTotals() as $_total): ?>
+                    <?php foreach ($block->getTotals() as $_total) : ?>
                         <li class="yotpo-reviews-totals-item <?= $_total['class'] ?>">
                             <i class="yotpo-reviews-totals-icon"></i>
                             <strong class="yotpo-reviews-totals-value"><?= $_total['value'] ?></strong>
@@ -46,7 +46,7 @@
                         </li>
                     <?php endforeach; ?>
                 </ul>
-            <?php else: ?>
+            <?php else : ?>
                 <div class="yotpo-reviews-totals-nodata">
                     <?= __("No Data Found") ?>
                 </div>
@@ -67,7 +67,7 @@
             margin-bottom: 63px;
         }
     </style>
-<?php else: ?>
+<?php else : ?>
     <div class="yotpo-reviews-totals-no-appkey">
         <div class="yotpo-title-content-container">
             <h2><?= __("Great brands are built<br>on happy customers") ?></h2>

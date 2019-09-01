@@ -5,7 +5,7 @@ namespace Yotpo\Yotpo\Block\Adminhtml\System\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Yotpo\Yotpo\Helper\Data as YotpoHelper;
+use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 class ModuleVersion extends Field
 {
@@ -17,21 +17,21 @@ class ModuleVersion extends Field
     protected $_template = 'Yotpo_Yotpo::system/config/module_version.phtml';
 
     /**
-     * @var YotpoHelper
+     * @var YotpoConfig
      */
-    protected $_yotpoHelper;
+    private $yotpoConfig;
 
     /**
      * @param  Context     $context
-     * @param  YotpoHelper $yotpoHelper
+     * @param  YotpoConfig $yotpoConfig
      * @param  array       $data
      */
     public function __construct(
         Context $context,
-        YotpoHelper $yotpoHelper,
+        YotpoConfig $yotpoConfig,
         array $data = []
     ) {
-        $this->_yotpoHelper = $yotpoHelper;
+        $this->yotpoConfig = $yotpoConfig;
         parent::__construct($context, $data);
     }
 
@@ -65,6 +65,6 @@ class ModuleVersion extends Field
      */
     public function getModuleVersion()
     {
-        return $this->_yotpoHelper->getModuleVersion();
+        return $this->yotpoConfig->getModuleVersion();
     }
 }
