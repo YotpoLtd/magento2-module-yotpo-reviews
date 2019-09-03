@@ -108,7 +108,7 @@ class ResetCommand extends Command
     {
         $this->resourceConnection->getConnection()->delete(
             $this->resourceConnection->getTableName('core_config_data'),
-            "path LIKE '" . \Yotpo\Yotpo\Helper\Data::XML_PATH_ALL . "/%'"
+            "path LIKE '" . \Yotpo\Yotpo\Model\Config::XML_PATH_YOTPO_ALL . "/%'"
         );
     }
 }
