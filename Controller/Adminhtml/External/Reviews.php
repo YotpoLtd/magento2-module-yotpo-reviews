@@ -12,8 +12,8 @@ class Reviews extends \Magento\Backend\App\Action
     /**
      * initialize:
      */
-    private $scope;
-    private $scopeId;
+    private $scope = \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+    private $scopeId = 0;
     private $appKey;
 
     /**
@@ -37,12 +37,10 @@ class Reviews extends \Magento\Backend\App\Action
 
     private function initialize()
     {
-        if (($storeId = $this->getRequest()->getParam("store", 0))) {
+        if (($this->scopeId = $this->getRequest()->getParam("store", 0))) {
             $this->scope = ScopeInterface::SCOPE_STORE;
-            $this->scopeId = $storeId;
-        } elseif (($websiteId = $this->getRequest()->getParam("website", 0))) {
+        } elseif (($this->scopeId = $this->getRequest()->getParam("website", 0))) {
             $this->scope = ScopeInterface::SCOPE_WEBSITE;
-            $this->scopeId = $websiteId;
         }
 
         if (!$this->yotpoConfig->isActivated($this->scopeId, $this->scope)) {
