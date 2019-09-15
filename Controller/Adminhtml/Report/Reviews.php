@@ -12,8 +12,8 @@ class Reviews extends \Magento\Backend\App\Action
     /**
      * initialize:
      */
-    private $scope;
-    private $scopeId;
+    private $scope = \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+    private $scopeId = 0;
     private $isEnabled;
     private $appKey;
     private $isAppKeyAndSecretSet;
@@ -55,7 +55,7 @@ class Reviews extends \Magento\Backend\App\Action
             $this->allStoreIds = $this->yotpoConfig->getAllStoreIds(false);
         }
         $this->allStoreIds = $this->yotpoConfig->filterDisabledStoreIds($this->allStoreIds);
-        $this->scopeId = ($this->allStoreIds) ? $this->allStoreIds[0] : null;
+        $this->scopeId = ($this->allStoreIds) ? $this->allStoreIds[0] : 0;
 
         $this->isEnabled = ($this->allStoreIds) ? true : false;
         $this->isAppKeyAndSecretSet = ($this->allStoreIds) ? true : false;
