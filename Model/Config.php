@@ -131,9 +131,12 @@ class Config
     /**
      * @return mixed
      */
-    public function getConfig($configPath, $scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
+    public function getConfig($configPath, $scopeId = null, $scope = null)
     {
-        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId ?: $this->storeManager->getStore()->getId());
+        if (!$scope && $this->isSingleStoreMode()) {
+            return $this->scopeConfig->getValue($configPath);
+        }
+        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, is_null($scopeId) ? $this->storeManager->getStore()->getId() : $scopeId);
     }
 
     /**
