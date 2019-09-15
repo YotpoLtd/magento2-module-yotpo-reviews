@@ -65,40 +65,58 @@ class Save implements ObserverInterface
             $this->cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
             $this->appConfig->reinit();
 
-            $scope = $scopes = null;
+            $scope = $scopes = \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
             if (($scopeId = $observer->getEvent()->getStore())) {
                 $scope = ScopeInterface::SCOPE_STORE;
                 $scopes = ScopeInterface::SCOPE_STORES;
             } elseif (($scopeId = $observer->getEvent()->getWebsite())) {
                 $scope = ScopeInterface::SCOPE_WEBSITE;
+                $scopes = ScopeInterface::SCOPE_WEBSITES;
+            } else {
+                $scopeId = 0;
             }
-            $appKey = $this->yotpoConfig->getAppKey(($scopeId ?: null), ($scope ?: null));
+
+            $appKey = $this->yotpoConfig->getAppKey($scopeId, $scope);
 
             if (in_array(YotpoConfig::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $changedPaths)) {
                 $this->yotpoConfig->log(
-                    "Yotpo Debug mode " . (($this->yotpoConfig->isDebugMode(($scopeId ?: null), ($scope ?: null))) ? 'started' : 'stopped'),
+                    "Yotpo Debug mode " . (($this->yotpoConfig->isDebugMode($scopeId, $scope)) ? 'started' : 'stopped'),
                     "info",
                     ['$app_key' => $appKey, '$scope' => ($scope ?: 'default'), '$scopeId' => $scopeId]
                 );
             }
 
-            if ($scope !== ScopeInterface::SCOPE_STORE) {
+            if ($scope !== ScopeInterface::SCOPE_STORE && !$this->yotpoConfig->isSingleStoreMode()) {
+                $this->resetStoreCredentials($scopeId, $scopes);
                 return true;
             }
+
             //Check if appKey is unique:
             if ($appKey) {
-                foreach ($this->yotpoConfig->getAllStoreIds(false) as $key => $storeId) {
-                    if ($storeId !== $scopeId && $this->yotpoConfig->getAppKey($storeId) === $appKey) {
-                        $this->yotpoConfig->resetStoreCredentials($scopeId);
+                foreach ($this->yotpoConfig->getAllStoreIds() as $key => $storeId) {
+                    if (($scopeId && $storeId !== $scopeId) && $this->yotpoConfig->getAppKey($storeId) === $appKey) {
+                        $this->resetStoreCredentials($scopeId, $scopes);
                         throw new \Exception(__("The APP KEY you've entered is already in use by another store on this system. Note that Yotpo requires a unique set of APP KEY & SECRET for each store."));
                     }
                 }
             }
 
-            if ($this->yotpoConfig->isEnabled(($scopeId ?: null), ($scope ?: null)) && !($this->yotpoApi->oauthAuthentication(($scopeId ?: null), ($scope ?: null)))) {
-                $this->yotpoConfig->resetStoreCredentials($scopeId);
+            if ($this->yotpoConfig->isEnabled($scopeId, $scope) && !($this->yotpoApi->oauthAuthentication($scopeId, $scope))) {
+                $this->resetStoreCredentials($scopeId, $scopes);
                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
             }
         }
+    }
+
+    /**
+     * @method resetStoreCredentials
+     * @param  int|null              $scopeId
+     * @param  string|null           $scopes
+     */
+    private function resetStoreCredentials($scopeId = null, $scopes = ScopeInterface::SCOPE_STORES)
+    {
+        $this->yotpoConfig->resetStoreCredentials($scopeId, $scopes);
+        $this->cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
+        $this->appConfig->reinit();
     }
 }
