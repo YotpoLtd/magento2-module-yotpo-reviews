@@ -120,6 +120,15 @@ class Config
     }
 
     /**
+     * @method isSingleStoreMode
+     * @return bool
+     */
+    public function isSingleStoreMode()
+    {
+        return $this->storeManager->isSingleStoreMode();
+    }
+
+    /**
      * @return mixed
      */
     public function getConfig($configPath, $scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
@@ -286,23 +295,28 @@ class Config
      * @param  string|null                     $secret
      * @param  boolean|int|null                $isEnabled
      * @param  int|null                        $storeId
+     * @param  string|null                     $scopes
      * @return $this
      */
-    public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null)
+    public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        if (is_null($storeId)) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, $scopes, $storeId);
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), $scopes, $storeId);
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, $scopes, $storeId);
         return $this;
     }
 
     /**
      * @method resetStoreCredentials
      * @param  int|null              $storeId
+     * @param  string|null           $scopes
      */
-    public function resetStoreCredentials($storeId = null)
+    public function resetStoreCredentials($storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        return $this->setStoreCredentialsAndIsEnabled(null, null, null, $storeId);
+        return $this->setStoreCredentialsAndIsEnabled(null, null, null, $storeId, $scopes);
     }
 
     /**
