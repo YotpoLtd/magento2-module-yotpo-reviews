@@ -431,14 +431,18 @@ class Config
     /**
      * @method getAllStoreIds
      * @param  boolean $withDefault
+     * @param  boolean $onlyActive
      * @return array
      */
-    public function getAllStoreIds($withDefault = false)
+    public function getAllStoreIds($withDefault = false, $onlyActive = true)
     {
         $cacheKey = ($withDefault) ? 1 : 0;
         if ($this->allStoreIds[$cacheKey] === null) {
             $this->allStoreIds[$cacheKey] = [];
             foreach ($this->storeManager->getStores($withDefault) as $store) {
+                if ($onlyActive && !$store->isActive()) {
+                    continue;
+                }
                 $this->allStoreIds[$cacheKey][] = $store->getId();
             }
         }
