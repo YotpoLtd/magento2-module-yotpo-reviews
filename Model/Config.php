@@ -129,6 +129,16 @@ class Config
     }
 
     /**
+    * @method getWebsiteIdByStoreId
+    * @param int $storeId
+    * @return int
+    */
+    public function getWebsiteIdByStoreId($storeId)
+    {
+        return $this->storeManager->getStore($storeId)->getWebsiteId();
+    }
+
+    /**
      * @return mixed
      */
     public function getConfig($configPath, $scopeId = null, $scope = null)
