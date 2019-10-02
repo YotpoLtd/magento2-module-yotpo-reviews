@@ -170,7 +170,7 @@ class SyncStatus extends \Magento\Config\Block\System\Config\Form\Field
         $lastSyncDate = $this->yotpoSyncFactory->create()->getCollection()
             ->addFieldToFilter('entity_type', 'orders')
             ->addFieldToFilter('store_id', ['in' => $this->getStoreIds()])
-            ->setOrder('sync_flag', 'DESC')
+            ->setOrder('sync_date', 'DESC')
             ->setPageSize(1)
             ->getFirstItem();
 
