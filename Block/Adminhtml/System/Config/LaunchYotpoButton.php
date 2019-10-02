@@ -112,6 +112,6 @@ class LaunchYotpoButton extends Field
 
     public function isStoreScope()
     {
-        return $this->getRequest()->getParam('store');
+        return $this->getRequest()->getParam('store') || $this->yotpoConfig->isSingleStoreMode();
     }
 }
