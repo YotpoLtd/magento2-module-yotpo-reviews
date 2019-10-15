@@ -150,12 +150,16 @@ class OrdersSync extends AbstractJobs
                     $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync.", "debug");
                     if ($ordersCount > 0) {
                         $resData = $this->yotpoApi->massCreate($orders, $storeId);
-                        $status = (is_object($resData['body']) && property_exists($resData['body'], "code")) ? $resData['body']->code : $resData['status'];
-                        if ($status != 200) {
+                        $status = (int) ((is_object($resData['body']) && property_exists($resData['body'], "code")) ? $resData['body']->code : $resData['status']);
+                        if (!$status || 500 <= $status) {
                             $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [FAILURE]", "error", $resData);
                         } else {
                             $this->flagItems('orders', $storeId, $this->getCollectionIds($ordersCollection));
-                            $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "debug");
+                            if ($status !== 200) {
+                                $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [WARNING] Some of the orders failed to sync due to Yotpo API's internal validation.", "error", $resData);
+                            } else {
+                                $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "debug");
+                            }
                         }
                     }
                 } catch (\Exception $e) {
