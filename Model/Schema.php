@@ -129,14 +129,16 @@ class Schema
 
         try {
             foreach ($ordersCollection as $order) {
-                $ordersData[] = $this->prepareOrderData($order);
+                if (($_order = $this->prepareOrderData($order))) {
+                    $ordersData[] = $_order;
+                }
             }
         } catch (\Exception $e) {
             $this->yotpoConfig->log("Schema::prepareOrdersData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
             return [];
         }
 
-        return array_filter($ordersData);
+        return $ordersData;
     }
 
     /**
