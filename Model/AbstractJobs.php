@@ -156,7 +156,7 @@ class AbstractJobs
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_CRONTAB);
         } catch (\Exception $e) {
-            $this->_processOutput("AbstractJobs::setCrontabAreaCode() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
+            $this->_processOutput("AbstractJobs::setCrontabAreaCode() - Exception:  " . $e->getMessage() . "\n" . $e->getTraceAsString(), "debug");
         }
         return $this;
     }
