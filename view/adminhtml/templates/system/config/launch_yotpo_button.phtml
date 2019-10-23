@@ -4,9 +4,11 @@
  */
 ?>
 <?php if (!$block->isStoreScope()) : ?>
-    <p class="note"><?= __('Yotpo can only be connected, enabled, or disabled via the Store View menu.<br>To connect your App Key and API secret, first select the relevant Store View.') ?></p>
+    <p class="note"><?= $block->escapeHtml(__('Yotpo can only be connected, enabled, or disabled via the Store View menu.'))?><br>
+        <?= $block->escapeHtml(__('To connect your App Key and API secret, first select the relevant Store View.')) ?>
+    </p>
     <p></p>
 <?php endif; ?>
 <p class="note">
-    Need help? <a href="https://support.yotpo.com/en/article/magento-2-installing-yotpo" target="_blank" title="Setup Guide">Setup Guide</a>
+    <?= $block->escapeHtml(__('Need help?')) ?> <a href="https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html" target="_blank" title="<?= $block->escapeHtmlAttr(__('Setup Guide')) ?>"><?= $block->escapeHtml(__('Setup Guide')) ?></a>
 </p>
