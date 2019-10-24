@@ -63,7 +63,7 @@ class UpgradeData implements UpgradeDataInterface
             $appKeysStores = [];
 
             //Move all configurations to the 'store' scope.
-            foreach ($this->yotpoConfig->getAllStoreIds(false) as $key => $storeId) {
+            foreach ($this->yotpoConfig->getAllStoreIds(false, false) as $key => $storeId) {
                 $isEnabled = $this->yotpoConfig->isEnabled($storeId, ScopeInterface::SCOPE_STORE);
                 $appKey = $this->yotpoConfig->getAppKey($storeId, ScopeInterface::SCOPE_STORE);
                 $secret = $this->yotpoConfig->getSecret($storeId, ScopeInterface::SCOPE_STORE);

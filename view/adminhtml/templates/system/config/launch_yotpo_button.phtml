@@ -6,6 +6,7 @@
 <?php if (!$block->isStoreScope()) : ?>
     <p class="note"><?= __('Yotpo can only be connected, enabled, or disabled via the Store View menu.<br>To connect your App Key and API secret, first select the relevant Store View.') ?></p>
     <p></p>
+    <style>tr#row_yotpo_settings_active,tr#row_yotpo_settings_app_key,tr#row_yotpo_settings_secret{display:none!important;}</style>
 <?php endif; ?>
 <p class="note">
     Need help? <a href="https://support.yotpo.com/en/article/setting-up-yotpo-on-magento-v22-and-above" target="_blank" title="Setup Guide">Setup Guide</a>
