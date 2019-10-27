@@ -5,7 +5,7 @@ class Richsnippet extends \Magento\Framework\Model\AbstractModel
 {
     protected function _construct()
     {
-        $this->_init('Yotpo\Yotpo\Model\ResourceModel\Richsnippet');
+        $this->_init(\Yotpo\Yotpo\Model\ResourceModel\Richsnippet::class);
     }
 
     public function isValid()
