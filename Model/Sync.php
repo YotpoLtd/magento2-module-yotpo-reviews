@@ -8,6 +8,6 @@ class Sync extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Yotpo\Yotpo\Model\ResourceModel\Sync');
+        $this->_init(\Yotpo\Yotpo\Model\ResourceModel\Sync::class);
     }
 }
