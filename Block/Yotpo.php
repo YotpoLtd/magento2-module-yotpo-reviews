@@ -64,7 +64,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function getProduct()
     {
-        if (is_null($this->getData('product'))) {
+        if ($this->getData('product') === null) {
             $this->setData('product', $this->coreRegistry->registry('current_product'));
         }
         return $this->getData('product');
