@@ -146,7 +146,7 @@ class Config
         if (!$scope && $this->isSingleStoreMode()) {
             return $this->scopeConfig->getValue($configPath);
         }
-        $scopeId = ($scopeId !== null) ?: $this->storeManager->getStore()->getId();
+        $scopeId = ($scopeId !== null) ?: $this->getCurrentStoreId();
 
         return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId);
     }
