@@ -31,10 +31,10 @@
                 </ul>
             </div>
             <div class="yotpo-at-a-glance">
-                <?= __("Yotpo at a glance") ?>
+                <?= $block->escapeHtml(__("Yotpo at a glance")) ?>
             </div>
             <div class="user-generated-content">
-                <?= __("User-generated content metrics gathered from your Yotpo dashboards.") ?>
+                <?= $block->escapeHtml(__("User-generated content metrics gathered from your Yotpo dashboards.")) ?>
             </div>
             <?php if (sizeof($block->getTotals()) > 0) : ?>
                 <ul class="yotpo-reviews-totals-list">
@@ -48,13 +48,13 @@
                 </ul>
             <?php else : ?>
                 <div class="yotpo-reviews-totals-nodata">
-                    <?= __("No Data Found") ?>
+                    <?= $block->escapeHtml(__("No Data Found")) ?>
                 </div>
             <?php endif; ?>
         </div>
         <div><?= $block->getLounchYotpoButtonHtml() ?></div>
         <div>
-            <a class="yotpo-settings" href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Yotpo Settings") ?>"><?= __("Yotpo Settings") ?></a>
+            <a class="yotpo-settings" href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Yotpo Settings")) ?>"><?= $block->escapeHtml(__("Yotpo Settings")) ?></a>
         </div>
     </div>
     <style>
@@ -74,7 +74,7 @@
             <p><?= __("Yotpo is already installed in your Magento store!<br>Connect your Yotpo account to your store to accelerate growth<br>with a full suite of solutions for customer reviews and visual marketing.") ?></p>
             <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_reviews') ?></div>
             <div class="already-have-account">
-                <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
+                <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Connect Yotpo")) ?>"><?= __("Connect Yotpo") ?></a>
             </div>
         </div>
         <div class="yotpo-shaddow-boxes-container">
