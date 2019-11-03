@@ -28,7 +28,7 @@
         </div>
         <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
         <div class="already-have-account">
-            <?= $block->escapeHtml(__("Already have an account?")) ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtml(__("Connect Yotpo")) ?>"><?= $block->escapeHtml(__("Connect Yotpo")) ?></a>
+            <?= $block->escapeHtml(__("Already have an account?")) ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Connect Yotpo")) ?>"><?= $block->escapeHtml(__("Connect Yotpo")) ?></a>
         </div>
     </div>
 <?php endif; ?>

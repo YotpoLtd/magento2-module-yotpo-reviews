@@ -54,7 +54,7 @@
         </div>
         <div><?= $block->getLounchYotpoButtonHtml() ?></div>
         <div>
-            <a class="yotpo-settings" href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtml(__("Yotpo Settings")) ?>"><?= $block->escapeHtml(__("Yotpo Settings")) ?></a>
+            <a class="yotpo-settings" href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Yotpo Settings")) ?>"><?= $block->escapeHtml(__("Yotpo Settings")) ?></a>
         </div>
     </div>
     <style>
@@ -74,7 +74,7 @@
             <p><?= __("Yotpo is already installed in your Magento store!<br>Connect your Yotpo account to your store to accelerate growth<br>with a full suite of solutions for customer reviews and visual marketing.") ?></p>
             <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_reviews') ?></div>
             <div class="already-have-account">
-                <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
+                <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Connect Yotpo")) ?>"><?= __("Connect Yotpo") ?></a>
             </div>
         </div>
         <div class="yotpo-shaddow-boxes-container">
