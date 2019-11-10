@@ -24,6 +24,7 @@
     <element name="StarRatingProductPageCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_bottomline_enabled_inherit']" timeout="30"/>
 
     <element name="EnableQandA" type="select" selector="//select[@id='yotpo_widget_settings_qna_enabled']" timeout="30"/>
+    <element name="EnableQandACheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_qna_enabled_inherit']" timeout="30"/>
 
     <element name="SaveConfiguration" type="button" selector="//span[text()='Save Config']" timeout="30"/>
     <element name="SavedConfiguration" type="button" selector="//div[text()='You saved the configuration.']" timeout="30"/>

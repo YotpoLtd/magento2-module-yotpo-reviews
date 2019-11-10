@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="DisableYotpoReviewsTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Disable Yotpo reviews and verify it does not appear on product page1" />
+            <title value="Test that reviews does not appear on the product page1"/>
+            <description value="Test that reviews does not appear on the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-290"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+            <createData entity="_defaultCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <field key="price">10.00</field>
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+        </before>
+
+        <after>
+            <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+                <argument name="storeView" value="_defaultStore.name"/>
+            </actionGroup>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+
+        <!-- navigate to the created product page -->
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check that the main widget does not appear on the product page page -->
+        <dontSeeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesNotAppearsOnPage"/>
+    </test>
+</tests>
