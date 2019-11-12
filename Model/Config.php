@@ -329,7 +329,10 @@ class Config
      */
     public function resetStoreCredentials($storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        return $this->setStoreCredentialsAndIsEnabled(null, null, null, $storeId, $scopes);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_ENABLED, $scopes, $storeId);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_APP_KEY, $scopes, $storeId);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_SECRET, $scopes, $storeId);
+        return $this;
     }
 
     /**
