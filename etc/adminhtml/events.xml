@@ -3,4 +3,7 @@
     <event name="admin_system_config_changed_section_yotpo">
         <observer name="yotpo_yotpo_admin_system_config_changed_section_yotpo" instance="Yotpo\Yotpo\Observer\Config\Save" />
     </event>
+    <event name="admin_system_config_changed_section_general">
+        <observer name="yotpo_yotpo_admin_system_config_changed_single_store_mode" instance="Yotpo\Yotpo\Observer\Config\SingleStoreModeSwitch" />
+    </event>
 </config>
