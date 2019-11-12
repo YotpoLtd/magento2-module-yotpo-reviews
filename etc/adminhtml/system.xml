@@ -29,8 +29,8 @@
                     <label>API Secret</label>
 					<config_path>yotpo/settings/secret</config_path>
 					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-					<frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
-                    <comment><![CDATA[<a href="https://support.yotpo.com/en/article/finding-your-app-key-and-your-secret-key" target="_blank" title="I can't find my API Secret" style="color:#2b7dbd">I can't find my API Secret</a>]]></comment>
+                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
+                    <comment><![CDATA[<a href="https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html#enable-yotpo-and-connect-your-magento-store" target="_blank" title="I can't find my API Secret" style="color:#2b7dbd">I can't find my API Secret</a>]]></comment>
                 </field>
 				<field id="module_version" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
 					<label>Module Version</label>
