@@ -39,7 +39,7 @@ Yotpo,Yotpo
 "Reviews and Visual Marketing","Reviews and Visual Marketing"
 Setup,Setup
 "Enable Yotpo","Enable Yotpo"
-"To connect Yotpo to your store, enter your <a href=""https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret"" title=""App Key and API Secret"" target=""_blank"" style=""color:#2b7dbd"">App Key and API Secret</a> in the fields below and save your configuration.","To connect Yotpo to your store, enter your <a href=""https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret"" title=""App Key and API Secret"" target=""_blank"" style=""color:#2b7dbd"">App Key and API Secret</a> in the fields below and save your configuration."
+"To connect Yotpo to your store, enter your <a href=""https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html#enable-yotpo-and-connect-your-magento-store"" title=""App Key and API Secret"" target=""_blank"" style=""color:#2b7dbd"">App Key and API Secret</a> in the fields below and save your configuration.","To connect Yotpo to your store, enter your <a href=""https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html#enable-yotpo-and-connect-your-magento-store"" title=""App Key and API Secret"" target=""_blank"" style=""color:#2b7dbd"">App Key and API Secret</a> in the fields below and save your configuration."
 "App Key","App Key"
 "Note: Additional stores must be connected to their own App Key via Store View settings.","Note: Additional stores must be connected to their own App Key via Store View settings."
 "API Secret","API Secret"
