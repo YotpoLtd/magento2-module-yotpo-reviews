@@ -16,7 +16,7 @@
                     <label>Enable Yotpo</label>
                     <config_path>yotpo/settings/active</config_path>
                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
-                    <comment><![CDATA[To connect Yotpo to your store, enter your <a href="https://support.yotpo.com/en/article/finding-your-yotpo-app-key-and-api-secret" title="App Key and API Secret" target="_blank" style="color:#2b7dbd">App Key and API Secret</a> in the fields below and save your configuration.]]></comment>
+                    <comment><![CDATA[To connect Yotpo to your store, enter your <a href="https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html#enable-yotpo-and-connect-your-magento-store" title="App Key and API Secret" target="_blank" style="color:#2b7dbd">App Key and API Secret</a> in the fields below and save your configuration.]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="app_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
