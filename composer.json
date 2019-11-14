@@ -1,7 +1,7 @@
 {
     "name": "yotpo/module-review",
     "description": "Yotpo Reviews extension for Magento2",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -13,7 +13,6 @@
     "type": "magento2-module",
     "autoload": {
         "files": [
-            "cli_commands.php",
             "registration.php"
         ],
         "psr-4": {

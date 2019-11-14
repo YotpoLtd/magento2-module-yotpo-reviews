@@ -120,11 +120,33 @@ class Config
     }
 
     /**
+     * @method isSingleStoreMode
+     * @return bool
+     */
+    public function isSingleStoreMode()
+    {
+        return $this->storeManager->isSingleStoreMode();
+    }
+
+    /**
+    * @method getWebsiteIdByStoreId
+    * @param int $storeId
+    * @return int
+    */
+    public function getWebsiteIdByStoreId($storeId)
+    {
+        return $this->storeManager->getStore($storeId)->getWebsiteId();
+    }
+
+    /**
      * @return mixed
      */
-    public function getConfig($configPath, $scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
+    public function getConfig($configPath, $scopeId = null, $scope = null)
     {
-        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId ?: $this->storeManager->getStore()->getId());
+        if (!$scope && $this->isSingleStoreMode()) {
+            return $this->scopeConfig->getValue($configPath);
+        }
+        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, is_null($scopeId) ? $this->storeManager->getStore()->getId() : $scopeId);
     }
 
     /**
@@ -286,23 +308,31 @@ class Config
      * @param  string|null                     $secret
      * @param  boolean|int|null                $isEnabled
      * @param  int|null                        $storeId
+     * @param  string|null                     $scopes
      * @return $this
      */
-    public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null)
+    public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
-        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, ScopeInterface::SCOPE_STORES, $storeId ?: $this->storeManager->getStore()->getId());
+        if (is_null($storeId)) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, $scopes, $storeId);
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), $scopes, $storeId);
+        $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, $scopes, $storeId);
         return $this;
     }
 
     /**
      * @method resetStoreCredentials
      * @param  int|null              $storeId
+     * @param  string|null           $scopes
      */
-    public function resetStoreCredentials($storeId = null)
+    public function resetStoreCredentials($storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        return $this->setStoreCredentialsAndIsEnabled(null, null, null, $storeId);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_ENABLED, $scopes, $storeId);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_APP_KEY, $scopes, $storeId);
+        $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_SECRET, $scopes, $storeId);
+        return $this;
     }
 
     /**
@@ -404,14 +434,18 @@ class Config
     /**
      * @method getAllStoreIds
      * @param  boolean $withDefault
+     * @param  boolean $onlyActive
      * @return array
      */
-    public function getAllStoreIds($withDefault = false)
+    public function getAllStoreIds($withDefault = false, $onlyActive = true)
     {
         $cacheKey = ($withDefault) ? 1 : 0;
         if ($this->allStoreIds[$cacheKey] === null) {
             $this->allStoreIds[$cacheKey] = [];
             foreach ($this->storeManager->getStores($withDefault) as $store) {
+                if ($onlyActive && !$store->isActive()) {
+                    continue;
+                }
                 $this->allStoreIds[$cacheKey][] = $store->getId();
             }
         }

@@ -7,8 +7,8 @@
         <referenceBlock name="content.aside">
             <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_widget_div" template="Yotpo_Yotpo::widget_div.phtml" ifconfig="yotpo/settings/active"/>
         </referenceBlock>
-       <referenceContainer name="product.info.main">
+        <referenceContainer name="product.info.main">
             <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_bottomline" template="Yotpo_Yotpo::bottomline.phtml" before="product.info.addto" ifconfig="yotpo/settings/active"/>
-       </referenceContainer>
+        </referenceContainer>
     </body>
 </page>
