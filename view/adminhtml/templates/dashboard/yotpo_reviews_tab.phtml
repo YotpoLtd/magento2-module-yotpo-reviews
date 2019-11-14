@@ -16,7 +16,7 @@
             </ul>
         <?php else : ?>
             <div class="yotpo-reviews-totals-nodata">
-                <?= __("No Data Found") ?>
+                <?= $block->escapeHtml(__("No Data Found")) ?>
             </div>
         <?php endif; ?>
     </div>
@@ -24,11 +24,12 @@
 <?php else : ?>
     <div class="yotpo-reviews-totals-no-appkey">
         <div class="collect-and-leverage">
-            <?= __("Collect and leverage customer reviews, ratings, and Q&A<br>with Yotpo's AI-powered tools and on-site widgets.") ?>
+            <?= $block->escapeHtml(__("Collect and leverage customer reviews, ratings, and Q&A")) ?><br>
+            <?= $block->escapeHtml(__("with Yotpo's AI-powered tools and on-site widgets.")) ?>
         </div>
         <div><?= $block->getLounchYotpoButtonHtml('MagentoAdmin_Dashboard') ?></div>
         <div class="already-have-account">
-            <?= __("Already have an account?") ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= __("Connect Yotpo") ?>"><?= __("Connect Yotpo") ?></a>
+            <?= $block->escapeHtml(__("Already have an account?")) ?> <a href="<?= $block->getYotpoConfigUrl() ?>" title="<?= $block->escapeHtmlAttr(__("Connect Yotpo")) ?>"><?= $block->escapeHtml(__("Connect Yotpo")) ?></a>
         </div>
     </div>
 <?php endif; ?>
