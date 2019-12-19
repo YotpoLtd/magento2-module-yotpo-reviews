@@ -45,8 +45,8 @@ class InstallSchema implements InstallSchemaInterface
             'Store Id'
         )->addColumn(
             'average_score',
-            \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
-            null,
+            \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+            '10,2',
             ['nullable' => false],
             'Average Score'
         )->addColumn(
