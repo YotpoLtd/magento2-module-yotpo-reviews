@@ -28,19 +28,27 @@ class Schema
     private $escaper;
 
     /**
+     * @var OrderStatusHistoryFactory
+     */
+    private $orderStatusHistoryFactory;
+
+    /**
      * @method __construct
-     * @param  YotpoConfig    $yotpoConfig
-     * @param  ProductFactory $productFactory
-     * @param  Escaper        $escaper
+     * @param  YotpoConfig               $yotpoConfig
+     * @param  ProductFactory            $productFactory
+     * @param  Escaper                   $escaper
+     * @param  OrderStatusHistoryFactory $orderStatusHistoryFactory
      */
     public function __construct(
         YotpoConfig $yotpoConfig,
         ProductFactory $productFactory,
-        Escaper $escaper
+        Escaper $escaper,
+        OrderStatusHistoryFactory $orderStatusHistoryFactory
     ) {
         $this->yotpoConfig = $yotpoConfig;
         $this->productFactory = $productFactory;
         $this->escaper = $escaper;
+        $this->orderStatusHistoryFactory = $orderStatusHistoryFactory;
     }
 
     /**
@@ -157,21 +165,45 @@ class Schema
             }
             $orderData['order_id'] = $order->getIncrementId();
             $orderData['order_date'] = $order->getCreatedAt();
+            $orderData['fulfillment_date'] = $this->getOrderFulfillmentDate($order);
             $orderData['currency_iso'] = $order->getOrderCurrency()->getCode();
             $orderData['email'] = $order->getCustomerEmail();
             $orderData['customer_name'] = trim($order->getCustomerFirstName() . ' ' . $order->getCustomerLastName());
+            $orderData['platform'] = 'magento';
             if (!$orderData['customer_name'] && ($billingAddress = $order->getBillingAddress())) {
                 $orderData['customer_name'] = trim($billingAddress->getFirstname() . ' ' . $billingAddress->getLastname());
             }
             if (!$order->getCustomerIsGuest()) {
                 $orderData['user_reference'] = $order->getCustomerId();
             }
-            $orderData['platform'] = 'magento';
+            if (($fulfillmentDate = $this->getOrderFulfillmentDate($order))) {
+                $orderData['fulfillment_status'] = 'fulfilled';
+                $orderData['fulfillment_status_date'] = $fulfillmentDate;
+            }
         } catch (\Exception $e) {
             $this->yotpoConfig->log("Schema::prepareOrderData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
             return [];
         }
 
         return $orderData;
+    }
+
+    private function getOrderFulfillmentDate(Order $order)
+    {
+        $lastStatus = $this->orderStatusHistoryFactory->create()->getCollection()
+            ->addFieldToSelect(["id","created_at"])
+            ->addFieldToFilter("order_id", $order->getId())
+            ->addFieldToFilter("store_id", $order->getStoreId())
+            ->setOrder('created_at', 'desc')
+            ->setOrder('id', 'desc')
+            ->setPageSize(1)
+            ->getFirstItem();
+        if ($lastStatus && $lastStatus->getId()) {
+            return $lastStatus->getCreatedAt();
+        } elseif (($lastStatus = $order->getStatusHistoryCollection()->getFirstItem())) {
+            return $lastStatus->getCreatedAt();
+        } else {
+            return null;
+        }
     }
 }
