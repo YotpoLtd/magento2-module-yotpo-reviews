@@ -64,7 +64,7 @@ class Products extends AbstractApi
                     $snippet->setStoreId($storeId);
                 }
 
-                $snippet->setAverageScore($averageScore);
+                $snippet->setAverageScore(round($averageScore, 2));
                 $snippet->setReviewsCount($reviewsCount);
                 $snippet->setExpirationTime(date('Y-m-d H:i:s', time() + $ttl));
                 $snippet->save();

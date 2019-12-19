@@ -220,6 +220,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
+        if (version_compare($context->getVersion(), '2.9.4', '<')) {
+            $installer->getConnection()->changeColumn(
+                $installer->getTable('yotpo_rich_snippets'),
+                'average_score',
+                'average_score',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '10,2',
+                    'comment' => 'Average Score'
+                ]
+            );
+            $installer->getConnection()->truncateTable($installer->getTable('yotpo_rich_snippets'));
+        }
+
         $installer->endSetup();
     }
 }
