@@ -85,13 +85,15 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         $salesConnection = $installer->getConnection('sales');
-        $fullTableName = $installer->getTable('yotpo_sync');
-        if (!$salesConnection->isTableExists($fullTableName)) {
+        $yotpoSyncFullTableName = $installer->getTable('yotpo_sync');
+        $yotpoOrderStatusHistoryFullTableName = $installer->getTable('yotpo_order_status_history');
+
+        if (!$salesConnection->isTableExists($yotpoSyncFullTableName)) {
             $defaultConnection = $installer->getConnection();
-            $withDataMigration = $defaultConnection->isTableExists($fullTableName);
+            $withDataMigration = $defaultConnection->isTableExists($yotpoSyncFullTableName);
 
             $syncTable = $salesConnection->newTable(
-                $fullTableName
+                $yotpoSyncFullTableName
             )->addColumn(
                 'sync_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -103,7 +105,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['unsigned' => true, 'nullable' => true],
-                'Store ID'
+                'Store Id'
             )
             ->addColumn(
                 'entity_type',
@@ -117,7 +119,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['unsigned' => true, 'nullable' => true],
-                'Entity ID'
+                'Entity Id'
             )->addColumn(
                 'sync_flag',
                 \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
@@ -145,15 +147,76 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $maxBatchSize = 100;
 
                 do {
-                    $selectFromOldTable = $defaultConnection->select()->from($fullTableName)->limit($maxBatchSize);
+                    $selectFromOldTable = $defaultConnection->select()->from($yotpoSyncFullTableName)->limit($maxBatchSize);
                     $existingData = $defaultConnection->query($selectFromOldTable)->fetchAll();
                     $batchSize = count($existingData);
                     if ($batchSize) {
                         $columns = array_keys($existingData[0]);
-                        $salesConnection->insertArray($fullTableName, $columns, $existingData);
+                        $salesConnection->insertArray($yotpoSyncFullTableName, $columns, $existingData);
                     }
                 } while ($batchSize === $maxBatchSize);
-                $defaultConnection->dropTable($fullTableName);
+                $defaultConnection->dropTable($yotpoSyncFullTableName);
+            }
+        }
+
+        if (!$salesConnection->isTableExists($yotpoOrderStatusHistoryFullTableName)) {
+            $defaultConnection = $installer->getConnection();
+            $withDataMigration = $defaultConnection->isTableExists($yotpoOrderStatusHistoryFullTableName);
+
+            $yotpoOrderStatusHistoryTable = $salesConnection->newTable(
+                $yotpoOrderStatusHistoryFullTableName
+            )->addColumn(
+                'id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+                'Id'
+            )->addColumn(
+                'order_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'nullable' => true],
+                'Order Id'
+            )->addColumn(
+                'store_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'nullable' => true],
+                'Store Id'
+            )->addColumn(
+                'old_status',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                32,
+                ['nullable' => true],
+                'Old Status'
+            )->addColumn(
+                'new_status',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                32,
+                ['nullable' => true],
+                'New Status'
+            )->addColumn(
+                'created_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME,
+                null,
+                ['nullable' => true],
+                'Created At'
+            );
+            $salesConnection->createTable($yotpoOrderStatusHistoryTable);
+
+            if ($withDataMigration) {
+                $maxBatchSize = 100;
+
+                do {
+                    $selectFromOldTable = $defaultConnection->select()->from($yotpoOrderStatusHistoryFullTableName)->limit($maxBatchSize);
+                    $existingData = $defaultConnection->query($selectFromOldTable)->fetchAll();
+                    $batchSize = count($existingData);
+                    if ($batchSize) {
+                        $columns = array_keys($existingData[0]);
+                        $salesConnection->insertArray($yotpoOrderStatusHistoryFullTableName, $columns, $existingData);
+                    }
+                } while ($batchSize === $maxBatchSize);
+                $defaultConnection->dropTable($yotpoOrderStatusHistoryFullTableName);
             }
         }
 
