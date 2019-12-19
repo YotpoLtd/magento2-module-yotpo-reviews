@@ -1,7 +1,7 @@
 {
     "name": "yotpo/module-review",
     "description": "Yotpo Reviews extension for Magento2",
-    "version": "2.9.2",
+    "version": "2.9.3",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
