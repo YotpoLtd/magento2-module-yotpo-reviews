@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+  <test name="NavigateToYotpoPageFromMarketingPageTest">
+    <annotations>
+      <features value="Yotpo"/>
+      <stories value="Navigation To Yotpo Page From Magento Marketing Page" />
+      <title value="Navigation To Yotpo Page From Magento Marketing Page"/>
+      <description value="Test navigation To Yotpo Page From Magento Marketing Page"/>
+      <severity value="AVERAGE"/>
+      <testCaseId value="MC-248"/>
+      <group value="magento-navigation-to-yotpo"/>
+    </annotations>
+
+    <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+
+    <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+      <argument name="storeView" value="_defaultStore.name"/>
+    </actionGroup>
+
+    <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToYotpoReviewsFromMarketingMenu">
+      <argument name="menuUiId" value="{{AdminMenuMarketing.dataUiId}}"/>
+      <argument name="submenuUiId" value="{{AdminMenuMarketingYotpoReviews.dataUiId}}"/>
+    </actionGroup>
+
+    <click selector="{{AdminLoginToYotpo.YotpoSettings}}" stepKey="ClickOnYotpoSettings"/>
+
+    <!-- Check You are now on Yotpo page and Yotpo is enabled -->
+    <seeElement selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoReviewTitle" />
+  </test>
+</tests>
