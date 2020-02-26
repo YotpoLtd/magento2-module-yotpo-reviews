@@ -126,7 +126,7 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
         $this->_responseHeaders = [];
         $this->_responseBody = '';
         $this->_responseStatus = 0;
-        $this->_timeout = 300;
+        $this->_timeout = 45;
         $this->_redirectCount = 0;
         $this->_ch = null;
         $this->_curlUserOptions = [];
