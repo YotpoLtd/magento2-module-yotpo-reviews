@@ -157,6 +157,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
+        $richSnippetsTable = $installer->getConnection()->describeTable($installer->getTable('yotpo_rich_snippets'));
+        if (isset($richSnippetsTable['average_score']) && $richSnippetsTable['average_score']['DATA_TYPE'] !== \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL) {
+            $installer->getConnection()->changeColumn(
+                $installer->getTable('yotpo_rich_snippets'),
+                'average_score',
+                'average_score',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '10,2',
+                    'comment' => 'Average Score'
+                ]
+            );
+            $installer->getConnection()->truncateTable($installer->getTable('yotpo_rich_snippets'));
+        }
+
         $installer->endSetup();
     }
 }
