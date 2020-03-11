@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+        <policy id="form-action">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="yotpo_main" type="host">yotpo.com</value>
+                <value id="yotpo_main_www" type="host">www.yotpo.com</value>
+                <value id="yotpo_p" type="host">p.yotpo.com</value>
+                <value id="yotpo_staticw2" type="host">staticw2.yotpo.com</value>
+                <value id="yotpo_w2" type="host">w2.yotpo.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
