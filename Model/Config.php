@@ -146,9 +146,9 @@ class Config
         if (!$scope && $this->isSingleStoreMode()) {
             return $this->scopeConfig->getValue($configPath);
         }
-        $scopeId = ($scopeId !== null) ?: $this->getCurrentStoreId();
+        $storeId = ($storeId === null) ? $this->getCurrentStoreId() : $storeId;
 
-        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId);
+        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
@@ -315,7 +315,7 @@ class Config
      */
     public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
     {
-        $storeId = ($storeId !== null) ?: $this->storeManager->getStore()->getId();
+        $storeId = ($storeId === null) ? $this->getCurrentStoreId() : $storeId;
         
         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, $scopes, $storeId);
         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), $scopes, $storeId);
