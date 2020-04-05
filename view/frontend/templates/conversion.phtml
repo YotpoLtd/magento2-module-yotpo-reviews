@@ -1,12 +1,12 @@
 <?php
 /**
- * @var $block \Yotpo\Yotpo\Block\Conversation
+ * @var $block \Yotpo\Yotpo\Block\Conversion
  */
 ?>
 <?php if (!($block->isEnabled() && $block->hasOrder())) {
     return;
 } ?>
-<!-- Yotpo - Conversation -->
+<!-- Yotpo - Conversion -->
 <?php if (($jsonData = $block->getJsonData())) : ?>
     <script>
         (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="<?= $block->getYotpoWidgetUrl() ?>";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
@@ -20,4 +20,4 @@
         <img src="<?= $noScriptSrc ?>" width="1" height="1">
     </noscript>
 <?php endif; ?>
-<!--/ Yotpo - Conversation -->
+<!--/ Yotpo - Conversion -->
