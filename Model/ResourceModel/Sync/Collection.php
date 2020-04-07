@@ -10,8 +10,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-        	\Yotpo\Yotpo\Model\Sync::class,
-        	\Yotpo\Yotpo\Model\ResourceModel\Sync::class
+            \Yotpo\Yotpo\Model\Sync::class,
+            \Yotpo\Yotpo\Model\ResourceModel\Sync::class
         );
     }
 }
