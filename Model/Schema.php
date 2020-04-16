@@ -117,7 +117,7 @@ class Schema
                                     'upc'          => $product->getUpc(),
                                     'isbn'         => $product->getIsbn(),
                                     'mpn'          => $product->getMpn(),
-                                    'brand'        => $product->getBrand(),
+                                    'brand'        => $product->getBrand() ? $product->getAttributeText('brand') : null,
                                     ]
                                 ),
                             ];
