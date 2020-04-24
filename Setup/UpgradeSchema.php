@@ -87,6 +87,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $salesConnection = $installer->getConnection('sales');
         $yotpoSyncFullTableName = $installer->getTable('yotpo_sync');
         $yotpoOrderStatusHistoryFullTableName = $installer->getTable('yotpo_order_status_history');
+        $yotpoRichSnippetsTable = $installer->getTable('yotpo_rich_snippets');
 
         if (!$salesConnection->isTableExists($yotpoSyncFullTableName)) {
             $defaultConnection = $installer->getConnection();
@@ -218,6 +219,52 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 } while ($batchSize === $maxBatchSize);
                 $defaultConnection->dropTable($yotpoOrderStatusHistoryFullTableName);
             }
+        }
+
+        if (!$salesConnection->isTableExists($yotpoRichSnippetsTable)) {
+            $defaultConnection = $installer->getConnection();
+            $withDataMigration = $defaultConnection->isTableExists($yotpoSyncFullTableName);
+
+            $richSnippetsTable = $salesConnection->newTable(
+                $yotpoRichSnippetsTable
+            )->addColumn(
+                'rich_snippet_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'nullable' => false, 'primary' => true],
+                'Id'
+            )->addColumn(
+                'product_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false],
+                'Product Id'
+            )->addColumn(
+                'store_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false],
+                'Store Id'
+            )->addColumn(
+                'average_score',
+                \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                '10,2',
+                ['nullable' => false],
+                'Average Score'
+            )->addColumn(
+                'reviews_count',
+                \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
+                null,
+                ['nullable' => false],
+                'Reviews Count'
+            )->addColumn(
+                'expiration_time',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false],
+                'Expiry Time'
+            );
+            $salesConnection->createTable($richSnippetsTable);
         }
 
         $richSnippetsTable = $installer->getConnection()->describeTable($installer->getTable('yotpo_rich_snippets'));
