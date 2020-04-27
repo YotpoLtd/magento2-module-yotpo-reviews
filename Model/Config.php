@@ -13,6 +13,7 @@ use Magento\Sales\Model\Order;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
+use Yotpo\Yotpo\Model\Logger as YotpoLogger;
 
 class Config
 {
@@ -80,6 +81,11 @@ class Config
     private $logger;
 
     /**
+     * @var YotpoLogger
+     */
+    private $yotpoLogger;
+
+    /**
      * @method __construct
      * @param  StoreManagerInterface    $storeManager
      * @param  ScopeConfigInterface     $scopeConfig
@@ -89,6 +95,7 @@ class Config
      * @param  ModuleListInterface      $moduleList
      * @param  ProductMetadataInterface $productMetadata
      * @param  LoggerInterface          $logger
+     * @param  YotpoLogger              $yotpoLogger
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -98,7 +105,8 @@ class Config
         DateTimeFactory $datetimeFactory,
         ModuleListInterface $moduleList,
         ProductMetadataInterface $productMetadata,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        YotpoLogger $yotpoLogger
     ) {
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
@@ -108,6 +116,7 @@ class Config
         $this->moduleList = $moduleList;
         $this->productMetadata = $productMetadata;
         $this->logger = $logger;
+        $this->yotpoLogger = $yotpoLogger;
     }
 
     /**
@@ -398,6 +407,7 @@ class Config
                     $this->logger->debug($prefix . json_encode($message), $data);
                     break;
             }
+            $this->yotpoLogger->info($prefix . json_encode($message), $data);
         }
         return $this;
     }
