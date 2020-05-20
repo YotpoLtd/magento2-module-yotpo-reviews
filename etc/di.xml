@@ -25,4 +25,18 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="Yotpo\Yotpo\Model\Logger\YotpoHandler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Yotpo\Yotpo\Model\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">yotpoLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Yotpo\Yotpo\Model\Logger\YotpoHandler</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
