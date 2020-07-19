@@ -5,6 +5,7 @@ namespace Yotpo\Yotpo\Model\Jobs;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\State as AppState;
 use Magento\Framework\Notification\NotifierInterface;
+use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Store\Model\App\Emulation as AppEmulation;
 use Yotpo\Yotpo\Model\AbstractJobs;
@@ -76,7 +77,12 @@ class OrdersSync extends AbstractJobs
             ->insertOnDuplicate($this->_resourceConnection->getTableName('yotpo_sync', 'sales'), $entityIds, ['store_id', 'entity_type', 'entity_id', 'sync_flag', 'sync_date']);
     }
 
-    private function getOrderCollection()
+    /**
+     * @method getOrderCollection
+     * @return OrderCollection
+     * @api
+     */
+    public function getOrderCollection()
     {
         $collection = $this->orderCollectionFactory->create();
         $collection->getSelect()->joinLeft(
@@ -86,6 +92,40 @@ class OrdersSync extends AbstractJobs
                 'yotpo_sync_flag'=>'yotpo_sync.sync_flag'
             ]
         );
+        return $collection;
+    }
+
+    /**
+     * @method addOrderCollectionFilters
+     * @param  OrderCollection           $collection
+     * @param  int|null                  $storeId
+     * @return OrderCollection
+     * @api
+     */
+    public function addOrderCollectionFilters(OrderCollection $collection, $storeId = null)
+    {
+        $storeId = is_null($storeId) ? $this->_yotpoConfig->getCurrentStoreId() : $storeId;
+        return $collection
+            ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoConfig->getCustomOrderStatus()])
+            ->addAttributeToFilter('main_table.store_id', $storeId)
+            ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoConfig->getOrdersSyncAfterDate()])
+            ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
+            ->addAttributeToSort('main_table.created_at', 'ASC');
+    }
+
+    /**
+     * @method setOrderCollectionLimit
+     * @param  OrderCollection         $collection
+     * @return OrderCollection
+     * @api
+     */
+    public function setOrderCollectionLimit(OrderCollection $collection, $limit = null)
+    {
+        if (!is_null($limit)) {
+            $collection->setPageSize($limit);
+        } elseif (($limit = ($this->limit === null) ? $this->_yotpoConfig->getOrdersSyncLimit() : $this->limit)) {
+            $collection->setPageSize($limit);
+        }
         return $collection;
     }
 
@@ -111,7 +151,7 @@ class OrdersSync extends AbstractJobs
 
     /**
      * @method getCollectionIds
-     * @param $collection
+     * @param  $collection
      * @return array
      */
     private function getCollectionIds($collection)
@@ -135,15 +175,9 @@ class OrdersSync extends AbstractJobs
                     }
                     $this->_processOutput("OrdersSync::execute() - Processing orders for store ID: {$storeId} ...", "debug");
 
-                    $ordersCollection = $this->getOrderCollection()
-                        ->addAttributeToFilter('main_table.status', ['in' => $this->_yotpoConfig->getCustomOrderStatus()])
-                        ->addAttributeToFilter('main_table.store_id', $storeId)
-                        ->addAttributeToFilter('main_table.created_at', ['gteq' => $this->_yotpoConfig->getOrdersSyncAfterDate()])
-                        ->addAttributeToFilter('yotpo_sync.sync_flag', [['null' => true],['eq' => 0]])
-                        ->addAttributeToSort('main_table.created_at', 'ASC');
-                    if (($limit = ($this->limit === null) ? $this->_yotpoConfig->getOrdersSyncLimit() : $this->limit)) {
-                        $ordersCollection->setPageSize($limit);
-                    }
+                    $ordersCollection = $this->getOrderCollection();
+                    $ordersCollection = $this->addOrderCollectionFilters($ordersCollection, $storeId);
+                    $ordersCollection = $this->setOrderCollectionLimit($ordersCollection);
 
                     $orders = $this->yotpoSchema->prepareOrdersData($ordersCollection);
                     $ordersCount = count($orders);
