@@ -84,12 +84,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->appConfig->reinit();
         }
 
+        $defaultConnection = $installer->getConnection();
         $salesConnection = $installer->getConnection('sales');
         $yotpoSyncFullTableName = $installer->getTable('yotpo_sync');
         $yotpoOrderStatusHistoryFullTableName = $installer->getTable('yotpo_order_status_history');
+        $yotpoRichSnippetsTable = $installer->getTable('yotpo_rich_snippets');
 
         if (!$salesConnection->isTableExists($yotpoSyncFullTableName)) {
-            $defaultConnection = $installer->getConnection();
             $withDataMigration = $defaultConnection->isTableExists($yotpoSyncFullTableName);
 
             $syncTable = $salesConnection->newTable(
@@ -160,7 +161,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (!$salesConnection->isTableExists($yotpoOrderStatusHistoryFullTableName)) {
-            $defaultConnection = $installer->getConnection();
             $withDataMigration = $defaultConnection->isTableExists($yotpoOrderStatusHistoryFullTableName);
 
             $yotpoOrderStatusHistoryTable = $salesConnection->newTable(
@@ -220,10 +220,53 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
-        $richSnippetsTable = $installer->getConnection()->describeTable($installer->getTable('yotpo_rich_snippets'));
+        if (!$defaultConnection->isTableExists($yotpoRichSnippetsTable)) {
+            $richSnippetsTable = $defaultConnection->newTable(
+                $yotpoRichSnippetsTable
+            )->addColumn(
+                'rich_snippet_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'nullable' => false, 'primary' => true],
+                'Id'
+            )->addColumn(
+                'product_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false],
+                'Product Id'
+            )->addColumn(
+                'store_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false],
+                'Store Id'
+            )->addColumn(
+                'average_score',
+                \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                '10,2',
+                ['nullable' => false],
+                'Average Score'
+            )->addColumn(
+                'reviews_count',
+                \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
+                null,
+                ['nullable' => false],
+                'Reviews Count'
+            )->addColumn(
+                'expiration_time',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false],
+                'Expiry Time'
+            );
+            $defaultConnection->createTable($richSnippetsTable);
+        }
+
+        $richSnippetsTable = $defaultConnection->describeTable($yotpoRichSnippetsTable);
         if (isset($richSnippetsTable['average_score']) && $richSnippetsTable['average_score']['DATA_TYPE'] !== \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL) {
-            $installer->getConnection()->changeColumn(
-                $installer->getTable('yotpo_rich_snippets'),
+            $defaultConnection->changeColumn(
+                $yotpoRichSnippetsTable,
                 'average_score',
                 'average_score',
                 [
@@ -232,7 +275,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Average Score'
                 ]
             );
-            $installer->getConnection()->truncateTable($installer->getTable('yotpo_rich_snippets'));
+            $defaultConnection->truncateTable($yotpoRichSnippetsTable);
         }
 
         $installer->endSetup();
