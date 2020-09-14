@@ -46,6 +46,7 @@ class UpdateMetadata extends AbstractJobs
                     $this->emulateFrontendArea($storeId);
                     if (!$this->_yotpoConfig->isEnabled()) {
                         $this->_processOutput("UpdateMetadata::execute() - Skipping store ID: {$storeId} (disabled)", "debug");
+                        $this->stopEnvironmentEmulation();
                         continue;
                     }
                     $this->_processOutput("UpdateMetadata::execute() - Updating metadata for store ID: {$storeId} ...", "debug");

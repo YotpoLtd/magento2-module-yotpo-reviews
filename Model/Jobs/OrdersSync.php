@@ -171,6 +171,7 @@ class OrdersSync extends AbstractJobs
                     $this->emulateFrontendArea($storeId);
                     if (!$this->_yotpoConfig->isEnabled()) {
                         $this->_processOutput("OrdersSync::execute() - Skipping store ID: {$storeId} (disabled)", "debug");
+                        $this->stopEnvironmentEmulation();
                         continue;
                     }
                     $this->_processOutput("OrdersSync::execute() - Processing orders for store ID: {$storeId} ...", "debug");
