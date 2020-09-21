@@ -146,8 +146,9 @@ class OrdersSync extends AbstractJobs
                     }
 
                     $orders = $this->yotpoSchema->prepareOrdersData($ordersCollection);
+                    $ordersCollectionCount = $ordersCollection->count();
                     $ordersCount = count($orders);
-                    $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync (" . ($ordersCollection->getSize() - $ordersCount) . " skipped).", "debug");
+                    $this->_processOutput("OrdersSync::execute() - Found {$ordersCount} orders for sync (" . ($ordersCollectionCount - $ordersCount) . " skipped).", "debug");
                     if ($ordersCount > 0) {
                         $resData = $this->yotpoApi->massCreate($orders, $storeId);
                         $status = (int) ((is_object($resData['body']) && property_exists($resData['body'], "code")) ? $resData['body']->code : $resData['status']);
@@ -161,7 +162,7 @@ class OrdersSync extends AbstractJobs
                                 $this->_processOutput("OrdersSync::execute() - Orders sync for store ID: {$storeId} [SUCCESS]", "debug");
                             }
                         }
-                    } elseif ($ordersCollection->getSize()) {
+                    } elseif ($ordersCollectionCount) {
                         $this->flagItems('orders', $storeId, $this->getCollectionIds($ordersCollection));
                     }
                 } catch (\Exception $e) {
