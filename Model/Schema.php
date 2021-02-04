@@ -93,6 +93,7 @@ class Schema
                     }
 
                     if (!($product && $product->getId())) {
+                        $this->yotpoConfig->log("Skipped ProductId :  " . $orderItem->getProductId(), "debug");
                         continue;
                     }
                     if (
@@ -100,6 +101,7 @@ class Schema
                         $orderItem->getData('qty_ordered') <= ($orderItem->getData('qty_refunded') + $orderItem->getData('qty_canceled'))
                     ) {
                         //Skip if item is fully canceled or refunded
+                        $this->yotpoConfig->log("Skipped Canceled or refunded ProductId :  " . $orderItem->getProductId(), "debug");
                         continue;
                     }
                     if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE && isset($productsData[$product->getId()])) {
@@ -122,6 +124,7 @@ class Schema
                                 ),
                             ];
                     }
+                    $this->yotpoConfig->log("Processed ProductId :  " . $orderItem->getProductId(), "debug");
                 } catch (\Exception $e) {
                     $this->yotpoConfig->log("Schema::prepareProductsData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
                 }
@@ -166,8 +169,10 @@ class Schema
         $orderData = [];
 
         try {
+            $this->yotpoConfig->log("Processing OrderId :  " . $order->getIncrementId(), "debug");
             $orderData['products'] = $this->prepareProductsData($order);
             if (!$orderData['products']) {
+                $this->yotpoConfig->log("Skipped OrderId :  " . $order->getIncrementId(), "debug");
                 return [];
             }
             $orderData['order_id'] = $order->getIncrementId();
