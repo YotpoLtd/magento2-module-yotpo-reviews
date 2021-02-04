@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminCheckYotpoReviewMetricsTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Create Yotpo Review and check if it is display in admin metrics"/>
+            <title value="Test admin metrics"/>
+            <description value="Test admin metrics"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-290"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
+            <createData entity="_defaultCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <field key="price">10.00</field>
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+        </before>
+
+        <after>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData  createDataKey="createCategory" stepKey="deleteCategory"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <!-- Get actual value from Collected Reviews -->
+        <actionGroup ref="AdminCheckYotpoReviewMetrics1dBeforeActionGroup" stepKey="getCheckingElementMetricsValueBeforeTest">
+            <argument name="checkingElementClass" value="{{AdminYotpoReviewMetricsSection.collectedReviews}}"/>
+        </actionGroup>
+        <!-- Go to product page -->
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createSimpleProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+        <!-- Add new Yotpo Review -->
+        <actionGroup ref="StorefrontAddYotpoReviewActionGroup" stepKey="addNewYotpoReview"/>
+        <wait time="50" stepKey="waitForRefreshAdminInformation"/>
+        <!-- Assert Yotpo Metrics in Admin -->
+        <actionGroup ref="AdminCheckYotpoReviewMetrics1dActionGroup" stepKey="checkYotpoReviewMetrics">
+            <argument name="checkingElementClass" value="{{AdminYotpoReviewMetricsSection.collectedReviews}}"/>
+            <argument name="valueBeforeTest" value="$getValueGetCheckingElementMetricsValueBeforeTest"/>
+        </actionGroup>
+    </test>
+</tests>

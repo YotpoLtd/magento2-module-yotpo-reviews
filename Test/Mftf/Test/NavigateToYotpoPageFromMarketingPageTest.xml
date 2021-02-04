@@ -5,6 +5,7 @@
   * See COPYING.txt for license details.
   */
 -->
+
 <tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
   <test name="NavigateToYotpoPageFromMarketingPageTest">
@@ -15,14 +16,16 @@
       <description value="Test navigation To Yotpo Page From Magento Marketing Page"/>
       <severity value="AVERAGE"/>
       <testCaseId value="MC-248"/>
-      <group value="magento-navigation-to-yotpo"/>
+      <group value="Yotpo"/>
     </annotations>
 
-    <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+    <before>
+      <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
+    </before>
 
-    <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
-      <argument name="storeView" value="_defaultStore.name"/>
-    </actionGroup>
+    <after>
+      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+    </after>
 
     <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToYotpoReviewsFromMarketingMenu">
       <argument name="menuUiId" value="{{AdminMenuMarketing.dataUiId}}"/>

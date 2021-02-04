@@ -12,25 +12,26 @@
         <annotations>
             <features value="Yotpo"/>
             <stories value="Enable show bottomline and verify that bottomline appear on product page" />
-            <title value="Test that bottomline stars appear in the product page"/>
-            <description value="Test that bottomline stars appear in the product page"/>
+            <title value="Test that bottomline stars does not appear in the product page"/>
+            <description value="Test that bottomline stars does not appear in the product page"/>
             <severity value="AVERAGE"/>
             <testCaseId value="MC-251"/>
             <group value="Yotpo"/>
         </annotations>
 
         <before>
-            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
             <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
             <createData entity="ApiCategory" stepKey="createCategory"/>
-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+            <createData entity="SimpleProduct" stepKey="createProduct">
                 <requiredEntity createDataKey="createCategory"/>
             </createData>
         </before>
 
         <after>
-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
             <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
             <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 

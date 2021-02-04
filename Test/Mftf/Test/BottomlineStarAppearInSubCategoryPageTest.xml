@@ -11,16 +11,16 @@
     <test name="BottomlineStarAppearInSubCategoryPageTest">
         <annotations>
             <features value="Yotpo"/>
-            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
-            <title value="Test that bottomline stars appear in the product page"/>
-            <description value="Test that bottomline stars appear in the product page"/>
+            <stories value="Enable show bottomline and verify that bottomline appear on category page" />
+            <title value="Test that bottomline stars appear in the subcategory page"/>
+            <description value="Test that bottomline stars appear in the subcategory page"/>
             <severity value="AVERAGE"/>
             <testCaseId value="MC-250"/>
             <group value="Yotpo"/>
         </annotations>
 
         <before>
-            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
             <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
             <createData entity="SimpleSubCategory" stepKey="createCategory"/>
             <createData entity="SimpleProduct" stepKey="createSimpleProduct">

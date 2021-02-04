@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminCheckOrdersSyncLimitTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Set order limit to 1 and verify if it working"/>
+            <title value="Test sync orders limit"/>
+            <description value="Test sync orders limit"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-290"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
+            <magentoCLI command="config:set yotpo/sync_settings/orders_sync_limit 1 --scope=stores --scope-code=default" stepKey="changeSyncLimit"/>
+            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
+            <createData entity="CashOnDeliveryPaymentMethodDefault" stepKey="cashOnDeliveryPaymentMethod"/>
+            <createData entity="Simple_US_Customer_CA" stepKey="simpleCustomer"/>
+            <createData entity="SimpleProduct_25" stepKey="simpleProduct">
+                <field key="price">5</field>
+            </createData>
+        </before>
+
+        <after>
+            <deleteData createDataKey="simpleCustomer" stepKey="deleteSimpleCustomer"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+            <magentoCLI command="config:set yotpo/sync_settings/orders_sync_limit 50 --scope=stores --scope-code=default" stepKey="restoreOrderSyncLimit"/>
+        </after>
+
+        <actionGroup ref="prepareYotpoConfigurationToTestSync" stepKey="prepareYotpoConfiguration">
+            <argument name="syncStatus" value="pending"/>
+        </actionGroup>
+
+        <!-- create first order -->
+        <actionGroup ref="NavigateToNewOrderPageExistingCustomerActionGroup" stepKey="navigateToNewOrderWithExistingCustomer1">
+            <argument name="customer" value="$$simpleCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="AddSimpleProductToOrderActionGroup" stepKey="addSimpleProductToOrder1">
+            <argument name="product" value="$$simpleProduct$$"/>
+            <argument name="productQty" value="1"/>
+        </actionGroup>
+        <actionGroup ref="SelectCashOnDeliveryPaymentMethodActionGroup" stepKey="selectPaymentMethod1"/>
+        <actionGroup ref="OrderSelectFlatRateShippingActionGroup" stepKey="orderSelectFlatRateShippingMethod1"/>
+        <actionGroup ref="AdminSubmitOrderActionGroup" stepKey="submitOrder1"/>
+        <actionGroup ref="VerifyCreatedOrderInformationActionGroup" stepKey="verifyCreatedOrderInformation1"/>
+        <grabTextFrom selector="|Order # (\d+)|" stepKey="getOrderId1"/>
+        <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder1">
+            <argument name="orderId" value="$getOrderId1"/>
+        </actionGroup>
+
+        <!-- create second order -->
+        <actionGroup ref="NavigateToNewOrderPageExistingCustomerActionGroup" stepKey="navigateToNewOrderWithExistingCustomer2">
+            <argument name="customer" value="$$simpleCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="AddSimpleProductToOrderActionGroup" stepKey="addSimpleProductToOrder2">
+            <argument name="product" value="$$simpleProduct$$"/>
+            <argument name="productQty" value="1"/>
+        </actionGroup>
+        <actionGroup ref="SelectCashOnDeliveryPaymentMethodActionGroup" stepKey="selectPaymentMethod2"/>
+        <actionGroup ref="OrderSelectFlatRateShippingActionGroup" stepKey="orderSelectFlatRateShippingMethod2"/>
+        <actionGroup ref="AdminSubmitOrderActionGroup" stepKey="submitOrder2"/>
+        <actionGroup ref="VerifyCreatedOrderInformationActionGroup" stepKey="verifyCreatedOrderInformation2"/>
+        <grabTextFrom selector="|Order # (\d+)|" stepKey="getOrderId2"/>
+        <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder2">
+            <argument name="orderId" value="$getOrderId2"/>
+        </actionGroup>
+
+        <!-- assertContains processing first order -->
+        <actionGroup ref="testOrderSync" stepKey="assertFirstOrder"/>
+
+        <!-- assertContains processing secound order -->
+        <actionGroup ref="testOrderSync" stepKey="assertSecondOrder"/>
+    </test>
+</tests>

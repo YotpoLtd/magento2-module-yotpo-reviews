@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontAddYotpoReviewActionGroup">
+        <arguments>
+            <argument name="scoreStar" type="string" defaultValue="5"/>
+            <argument name="username" type="string" defaultValue="Tester"/>
+            <argument name="email" type="string" defaultValue="John.Doe@example.com"/>
+        </arguments>
+        <click selector="{{StorefrontYotpoReviewProductPageSection.writeReviewButton}}" stepKey="showYotpoReviewForm"/>
+        <click selector="{{StorefrontYotpoReviewProductPageSection.score(scoreStar)}}" stepKey="selectScore"/>
+        <fillField userInput="TestReview" selector="{{StorefrontYotpoReviewProductPageSection.title}}" stepKey="writeTitle"/>
+        <fillField userInput="TestReviewCotent" selector="{{StorefrontYotpoReviewProductPageSection.reviewContent}}" stepKey="fillReviewContent"/>
+        <fillField userInput="{{username}}" selector="{{StorefrontYotpoReviewProductPageSection.username}}" stepKey="fillUserName"/>
+        <fillField userInput="{{email}}" selector="{{StorefrontYotpoReviewProductPageSection.email}}" stepKey="fillEmail"/>
+        <click selector="{{StorefrontYotpoReviewProductPageSection.saveButton}}" stepKey="saveReview"/>
+        <waitForAjaxLoad stepKey="waitForSaveReview"/>
+        <seeElement selector="{{StorefrontYotpoReviewProductPageSection.thankYouHeader}}" stepKey="seeThankYouYotpoReview"/>
+    </actionGroup>
+</actionGroups>
