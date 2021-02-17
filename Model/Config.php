@@ -37,6 +37,7 @@ class Config
     const XML_PATH_YOTPO_API_URL = "yotpo/env/yotpo_api_url";
     const XML_PATH_YOTPO_WIDGET_URL = "yotpo/env/yotpo_widget_url";
     const XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE = "yotpo/module_info/yotpo_installation_date";
+    const XML_PATH_YOTPO_TOKEN = "yotpo/settings/token";
 
     private $allStoreIds = [0 => null, 1 => null];
 
