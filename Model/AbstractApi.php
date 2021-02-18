@@ -194,14 +194,16 @@ class AbstractApi
      * @method oauthAuthentication
      * @param  int|null $scopeId
      * @param  string|null $scope
+     * @param bool $forceFlag
      * @return mixed
      */
-    public function oauthAuthentication($scopeId = null, $scope = null)
+    public function oauthAuthentication($scopeId = null, $scope = null, $forceFlag = false)
     {
         try {
-            if (($token = $this->checkIfTokenExist($scopeId))) {
+            if (($token = $this->checkIfTokenExist($scopeId)) && !$forceFlag) {
                 return $token;
             }
+            $this->resourceConfig->deleteConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, 'stores', $scopeId);
             $app_key = $this->_yotpoConfig->getAppKey($scopeId, $scope);
             $secret = $this->_yotpoConfig->getSecret($scopeId, $scope);
             if (!($app_key && $secret)) {

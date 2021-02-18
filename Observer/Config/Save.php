@@ -101,7 +101,7 @@ class Save implements ObserverInterface
                 }
             }
 
-            if ($this->yotpoConfig->isEnabled($scopeId, $scope) && !($this->yotpoApi->oauthAuthentication($scopeId, $scope))) {
+            if ($this->yotpoConfig->isEnabled($scopeId, $scope) && !($this->yotpoApi->oauthAuthentication($scopeId, $scope, true))) {
                 $this->resetStoreCredentials($scopeId, $scopes);
                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
             }
