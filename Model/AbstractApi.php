@@ -7,6 +7,7 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
 use Yotpo\Yotpo\Model\Config as YotpoConfig;
 use Yotpo\Yotpo\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class AbstractApi
 {
@@ -175,10 +176,16 @@ class AbstractApi
             );
 
             if (($this->_getCurlStatus() == 401) && (self::$_retryCount < self::NUMBER_OF_RETRY)) {
-                $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - response: ", "debug", $this->_prepareCurlResponseData());
-                $this->resourceConfig->deleteConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, 'stores', $this->_yotpoConfig->getCurrentStoreId());
-                $token = $this->oauthAuthentication($this->_yotpoConfig->getCurrentStoreId());
-                $data['utoken'] = $token;
+                $this->_yotpoConfig->log(
+                    "AbstractApi::sendApiRequest() - response: ",
+                    "debug",
+                    $this->_prepareCurlResponseData()
+                );
+                $data['utoken'] = $this->oauthAuthentication(
+                    $this->_yotpoConfig->getCurrentStoreId(),
+                    ScopeInterface::SCOPE_STORES,
+                    true
+                );
                 $this->sendApiRequest($path, $data, $method, $timeout, $contentType);
                 self::$_retryCount++;
             }
@@ -192,18 +199,17 @@ class AbstractApi
 
     /**
      * @method oauthAuthentication
-     * @param  int|null $scopeId
-     * @param  string|null $scope
-     * @param bool $forceFlag
+     * @param int|null $scopeId
+     * @param string|null $scope
+     * @param bool $forceCreateTokenFlag
      * @return mixed
      */
-    public function oauthAuthentication($scopeId = null, $scope = null, $forceFlag = false)
+    public function oauthAuthentication($scopeId = null, $scope = null, $forceCreateTokenFlag = false)
     {
         try {
-            if (($token = $this->checkIfTokenExist($scopeId)) && !$forceFlag) {
+            if (($token = $this->checkIfTokenExist($scopeId)) && !$forceCreateTokenFlag) {
                 return $token;
             }
-            $this->resourceConfig->deleteConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, 'stores', $scopeId);
             $app_key = $this->_yotpoConfig->getAppKey($scopeId, $scope);
             $secret = $this->_yotpoConfig->getSecret($scopeId, $scope);
             if (!($app_key && $secret)) {
@@ -227,7 +233,12 @@ class AbstractApi
                 $this->_yotpoConfig->log("AbstractApi::oauthAuthentication({$scopeId}, {$scope}) - error: no access token received", "error", ['$app_key' => $app_key]);
                 return null;
             }
-            $this->resourceConfig->saveConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, $this->encryptor->encrypt($token), 'stores', $scopeId);
+            $this->resourceConfig->saveConfig(
+                YotpoConfig::XML_PATH_YOTPO_TOKEN,
+                $this->encryptor->encrypt($token),
+                ScopeInterface::SCOPE_STORES,
+                $scopeId
+            );
             return $token;
         } catch (\Exception $e) {
             $this->_yotpoConfig->log("AbstractApi::oauthAuthentication({$scopeId}, {$scope}) - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
@@ -241,7 +252,7 @@ class AbstractApi
      * @param  string|null $scope
      * @return mixed
      */
-    protected function checkIfTokenExist($scopeId = null, $scope = 'stores')
+    protected function checkIfTokenExist($scopeId = null, $scope = ScopeInterface::SCOPE_STORES)
     {
         $token = $this->resourceConfig->getConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, $scope, $scopeId);
         return $token ? $this->encryptor->decrypt($token) : false;
