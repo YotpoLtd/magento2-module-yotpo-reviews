@@ -7,6 +7,8 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
 use Yotpo\Yotpo\Model\AbstractApi;
 use Yotpo\Yotpo\Model\Config as YotpoConfig;
 use Yotpo\Yotpo\Model\Richsnippet;
+use Yotpo\Yotpo\Model\ResourceModel\Config as ResourceConfig;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class Products extends AbstractApi
 {
@@ -20,18 +22,22 @@ class Products extends AbstractApi
 
     /**
      * @method __construct
-     * @param  Curl           $curl
-     * @param  ProductFactory $productFactory
-     * @param  YotpoConfig    $yotpoConfig
-     * @param  Richsnippet    $richsnippet
+     * @param  Curl                $curl
+     * @param  ProductFactory      $productFactory
+     * @param  YotpoConfig         $yotpoConfig
+     * @param  ResourceConfig      $resourceConfig
+     * @param  Richsnippet         $richsnippet
+     * @param  EncryptorInterface  $encryptor
      */
     public function __construct(
         Curl $curl,
         ProductFactory $productFactory,
         YotpoConfig $yotpoConfig,
-        Richsnippet $richsnippet
+        ResourceConfig $resourceConfig,
+        Richsnippet $richsnippet,
+        EncryptorInterface $encryptor
     ) {
-        parent::__construct($curl, $productFactory, $yotpoConfig);
+        parent::__construct($curl, $productFactory, $yotpoConfig, $resourceConfig, $encryptor);
         $this->richsnippet = $richsnippet;
     }
 
