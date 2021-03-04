@@ -1,13 +1,13 @@
 {
     "name": "yotpo/magento2-module-yotpo-reviews",
     "description": "Yotpo Reviews extension for Magento2",
-    "version": "3.1.0",
+    "version": "3.1.0-p1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
     ],
     "require": {
-        "php": "~7.1.3||~7.2.0||~7.3.0",
+        "php": "~7.1.3||~7.2.0||~7.3.0||~7.4.0",
         "magento/framework": "102.0.*",
         "magento/module-backend": "101.0.*",
         "magento/module-catalog": "103.0.*",
