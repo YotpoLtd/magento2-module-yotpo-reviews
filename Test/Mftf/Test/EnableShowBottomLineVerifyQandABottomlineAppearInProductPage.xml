@@ -8,7 +8,7 @@
 
 <tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
-  <test name="EnableShowBottomLineVerifyQandABottomlineAppearInProductPage">
+  <test name="EnableShowBottomLineVerifyQandABottomlineAppearInProductPageTest">
     <annotations>
       <features value="Yotpo"/>
       <stories value="Enable show bottomline and verify Q and A bottomline appear on the product page" />
@@ -20,8 +20,9 @@
     </annotations>
 
     <before>
-      <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+      <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
       <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+      <createData entity="SimpleProduct2" stepKey="createProduct"/>
     </before>
 
     <after>
@@ -32,6 +33,9 @@
 
     <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetSettings}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
     <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+    <uncheckOption selector="{{AdminLoginToYotpo.EnableQandACheckBox}}" stepKey="UncheckQnACheckbox"/>
+    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="selectQnAToBeEnable"/>
+    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
     <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQandAisEnabled"/>
 
     <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
@@ -42,6 +46,6 @@
     <waitForPageLoad stepKey="waitForProductPageLoad"/>
 
     <!-- Check that Q&A bottomline appear in the page -->
-    <seeElement selector="{{YotpoProductPageSection.QuestionAndAnswerBottomLine}}" stepKey="checkQuestionAndAnswerBottomLineAppears"/>
+    <seeElementInDOM selector="{{YotpoProductPageSection.QuestionAndAnswerBottomLine}}" stepKey="checkQuestionAndAnswerBottomLineAppears"/>
   </test>
 </tests>

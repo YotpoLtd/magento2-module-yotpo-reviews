@@ -9,8 +9,8 @@
 <sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
   <section name="YotpoCategoryPage">
-    <element name="StarRatingEnabled" type="select" selector="//select[@id='yotpo_widget_settings_category_bottomline_enabled']" timeout="30"/>
+    <element name="StarRatingEnabled" type="select" selector="//select[@id='yotpo_widget_settings_category_bottomline_enabled']"/>
     <element name="StarRatingCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_category_bottomline_enabled_inherit']"/>
-    <element name="CategoryStarRatingDiv" type="block" selector="//div[@class='yotpo bottomLine bottomline-position yotpo-small']"/>
+    <element name="CategoryStarRatingDiv" type="block" selector="//div[@class='yotpo bottomLine bottomline-position yotpo-small']" timeout="30"/>
   </section>
 </sections>

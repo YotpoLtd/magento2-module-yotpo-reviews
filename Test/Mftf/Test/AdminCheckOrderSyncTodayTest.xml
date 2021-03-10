@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminCheckOrderSyncTodayTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Set order sync date to today and verify it working"/>
+            <title value="Test sync orders from date"/>
+            <description value="Test sync orders from date"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-290"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
+            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
+            <createData entity="CashOnDeliveryPaymentMethodDefault" stepKey="cashOnDeliveryPaymentMethod"/>
+            <createData entity="Simple_US_Customer_CA" stepKey="simpleCustomer"/>
+            <createData entity="SimpleProduct_25" stepKey="simpleProduct">
+                <field key="price">5</field>
+            </createData>
+        </before>
+
+        <after>
+            <deleteData createDataKey="simpleCustomer" stepKey="deleteSimpleCustomer"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <!-- get current orders sync from date -->
+        <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+        <grabValueFrom selector="{{AdminLoginToYotpo.OrdersSyncFromDate}}" stepKey="getCurrentSyncFromDate"/>
+
+        <!-- prepare configuration for test -->
+        <actionGroup ref="prepareYotpoConfigurationToTestSync" stepKey="prepareYotpoConfiguration">
+            <argument name="syncStatus" value="pending"/>
+        </actionGroup>
+
+        <!-- create order -->
+        <actionGroup ref="NavigateToNewOrderPageExistingCustomerActionGroup" stepKey="navigateToNewOrderWithExistingCustomer">
+            <argument name="customer" value="$$simpleCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="AddSimpleProductToOrderActionGroup" stepKey="addSimpleProductToOrder">
+            <argument name="product" value="$$simpleProduct$$"/>
+            <argument name="productQty" value="1"/>
+        </actionGroup>
+        <actionGroup ref="SelectCashOnDeliveryPaymentMethodActionGroup" stepKey="selectPaymentMethod"/>
+        <actionGroup ref="OrderSelectFlatRateShippingActionGroup" stepKey="orderSelectFlatRateShippingMethod"/>
+        <actionGroup ref="AdminSubmitOrderActionGroup" stepKey="submitOrder"/>
+        <actionGroup ref="VerifyCreatedOrderInformationActionGroup" stepKey="verifyCreatedOrderInformation"/>
+        <grabTextFrom selector="|Order # (\d+)|" stepKey="getOrderId"/>
+        <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder">
+            <argument name="orderId" value="$getOrderId"/>
+        </actionGroup>
+
+        <!-- assertContains processing 1 order -->
+        <actionGroup ref="testOrderSync" stepKey="checkOrdersSync"/>
+
+        <!-- restore changes to default -->
+        <actionGroup ref="AdminRestoreDefaultYotpoConfigurationActionGroup" stepKey="restoreChanges">
+            <argument name="orderSyncFromDate" value="getCurrentSyncFromDate"/>
+        </actionGroup>
+    </test>
+</tests>

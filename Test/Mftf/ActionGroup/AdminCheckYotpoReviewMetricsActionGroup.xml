@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminCheckYotpoReviewMetrics1dActionGroup">
+        <arguments>
+            <argument name="checkingElementClass" type="string" defaultValue="li.yotpo-totals-total-reviews>.yotpo-reviews-totals-value"/>
+            <argument name="valueBeforeTest" type="string" defaultValue="1"/>
+        </arguments>
+        <amOnPage url="admin/yotpo_yotpo/report/reviews/period/1d" stepKey="reportYotpoMetricsPage"/>
+        <waitForPageLoad stepKey="waitForMetricsLoad" time="30"/>
+        <grabTextFrom selector="{{checkingElementClass}}" stepKey="getValueFromReviewElement"/>
+        <assertLessThanOrEqual actual="{{valueBeforeTest}}" expected="$getValueFromReviewElement" stepKey="assertLessValue"/>
+    </actionGroup>
+    <actionGroup name="AdminCheckYotpoReviewMetrics1dBeforeActionGroup">
+        <arguments>
+            <argument name="checkingElementClass" type="string" defaultValue="li.yotpo-totals-total-reviews>.yotpo-reviews-totals-value"/>
+        </arguments>
+        <amOnPage url="admin/yotpo_yotpo/report/reviews/period/1d" stepKey="reportYotpoMetricsPage"/>
+        <waitForPageLoad stepKey="waitForMetricsLoad" time="30"/>
+        <grabTextFrom selector="{{checkingElementClass}}" stepKey="getValue"/>
+    </actionGroup>
+</actionGroups>

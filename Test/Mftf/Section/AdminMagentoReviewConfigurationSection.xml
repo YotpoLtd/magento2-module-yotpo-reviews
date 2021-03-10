@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminMagentoReviewConfigurationSection">
+        <element name="ReviewSettings" type="button" selector="//a[@id='catalog_review-head']"/>
+        <element name="ReviewEnabled" type="select" selector="//select[@id='catalog_review_active']"/>
+        <element name="ReviewEnabledInherit" type="checkbox" selector="//input[@id='catalog_review_active_inherit']"/>
+        <element name="SaveConfiguration" type="button" selector="//span[text()='Save Config']"/>
+        <element name="SavedConfiguration" type="button" selector="//div[text()='You saved the configuration.']" timeout="30"/>
+    </section>
+</sections>

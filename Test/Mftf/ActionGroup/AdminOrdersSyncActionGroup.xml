@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="prepareYotpoConfigurationToTestSync">
+        <arguments>
+            <argument name="syncStatus" type="string"/>
+        </arguments>
+
+        <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+        <generateDate date="now" format="Y-m-d" stepKey="currentDate"/>
+        <uncheckOption selector="{{AdminLoginToYotpo.OrderSyncFromDateCheckbox}}" stepKey="ClickOnOrderSyncFromDateEnabledCheckbox"/>
+        <fillField userInput="{$currentDate}" selector="{{AdminLoginToYotpo.OrdersSyncFromDate}}" stepKey="setTodayDate" />
+        <uncheckOption selector="{{AdminLoginToYotpo.OrderSyncCustomStatusesCheckbox}}" stepKey="ClickOnCustomStatusesEnabledCheckbox"/>
+        <selectOption userInput="{{syncStatus}}" selector="{{AdminLoginToYotpo.OrdersSyncStatuses}}" stepKey="setOrdersSyncStatuses"/>
+        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+        <waitForPageLoad stepKey="waitForSaveConfig"/>
+        <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+    </actionGroup>
+
+    <actionGroup name="testOrderSync">
+        <magentoCLI command="yotpo:sync" stepKey="runSyncScript"/>
+        <assertContains stepKey="assertSyncResult" expected="Working on it" expectedType="string" actual="$runSyncScript"/>
+    </actionGroup>
+</actionGroups>

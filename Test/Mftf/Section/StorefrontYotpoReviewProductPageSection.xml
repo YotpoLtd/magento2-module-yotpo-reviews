@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="StorefrontYotpoReviewProductPageSection">
+        <element name="writeReviewButton" type="button" selector="div.write-review-button:nth-of-type(3)" timeout="30"/>
+        <element name="title" type="input" selector=".yotpo-display-wrapper input[name='review_title']" timeout="30"/>
+        <element name="score" type="radio" selector="span.review-star:nth-child({{var1}})" timeout="30" parameterized="true"/>
+        <element name="reviewContent" type="textarea" selector=".yotpo-display-wrapper textarea[name='review_content']" timeout="30"/>
+        <element name="username" type="input" selector=".yotpo-display-wrapper input[name='display_name']" timeout="30"/>
+        <element name="email" type="input" selector=".yotpo-display-wrapper input[name='email']"  timeout="30"/>
+        <element name="saveButton" type="button" selector="input.yotpo-submit" timeout="30"/>
+        <element name="thankYouHeader" type="text" selector="div.yotpo-thank-you" timeout="30"/>
+    </section>
+</sections>

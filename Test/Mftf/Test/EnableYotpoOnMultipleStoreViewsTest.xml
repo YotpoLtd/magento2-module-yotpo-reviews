@@ -16,11 +16,17 @@
             <description value="Yotpo reviews should appear on different storefront views"/>
             <severity value="AVERAGE"/>
             <testCaseId value="MC-292"/>
-            <group value="YotpoMultiStore"/>
+            <group value="Yotpo"/>
         </annotations>
 
         <before>
-            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <createData entity="SimpleProduct2" stepKey="createProduct"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
+            <!-- create additional store view -->
+            <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createSecondStoreView">
+                <argument name="customStore" value="NewStoreViewData"/>
+            </actionGroup>
+
             <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView"/>
 
             <!-- switch to second store view -->
@@ -30,6 +36,11 @@
         </before>
 
         <after>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <!-- remove the additional store view -->
+            <actionGroup ref="AdminDeleteStoreViewActionGroup" stepKey="deleteStoreView">
+                <argument name="customStore" value="NewStoreViewData"/>
+            </actionGroup>
             <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
 
@@ -38,6 +49,7 @@
 
         <!-- Check that configuration was saved -->
         <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+
 
         <!-- navigate to the to default store view product page -->
         <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">

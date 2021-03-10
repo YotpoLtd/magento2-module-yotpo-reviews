@@ -8,12 +8,12 @@
 
 <tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
-    <test name="DisableYotpoReviewsTest">
+    <test name="AdminEnableMagentoReviewsTest">
         <annotations>
             <features value="Yotpo"/>
-            <stories value="Disable Yotpo reviews and verify it does not appear on product page1" />
-            <title value="Test that reviews does not appear on the product page"/>
-            <description value="Test that reviews does not appear on the product page"/>
+            <stories value="Enable Magento reviews and verify it appears on product page"/>
+            <title value="Test that Magento reviews appear on the product page"/>
+            <description value="Test that Magento reviews appear on the product page"/>
             <severity value="AVERAGE"/>
             <testCaseId value="MC-290"/>
             <group value="YotpoDisable"/>
@@ -21,28 +21,26 @@
 
         <before>
             <actionGroup ref="LoginAsAdmin" stepKey="LoginAsAdmin"/>
-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+            <!-- Enable Magento Reviews Module -->
+            <actionGroup ref="AdminEnableMagentoReviews" stepKey="EnableMagentoReviews"/>
             <createData entity="_defaultCategory" stepKey="createCategory"/>
-            <createData entity="SimpleProduct" stepKey="createProduct">
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
                 <field key="price">10.00</field>
                 <requiredEntity createDataKey="createCategory"/>
             </createData>
         </before>
 
         <after>
-            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
-            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminDisableMagentoReviews" stepKey="DisableMagentoReviews"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData  createDataKey="createCategory" stepKey="deleteCategory"/>
             <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
         </after>
-
-
-        <!-- navigate to the created product page -->
+        <!-- Go to product page -->
         <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+            <argument name="productUrlKey" value="$$createSimpleProduct.custom_attributes[url_key]$$"/>
         </actionGroup>
         <waitForPageLoad stepKey="waitForProductPageLoad"/>
-
-        <!-- Check that the main widget does not appear on the product page page -->
-        <dontSeeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesNotAppearsOnPage"/>
+        <seeElement selector="{{StorefrontMagentoReviewsProductPageSection.productReviewsSummary}}" stepKey="checkProductReviewsSummaryIsAppearsOnPage"/>
     </test>
 </tests>
