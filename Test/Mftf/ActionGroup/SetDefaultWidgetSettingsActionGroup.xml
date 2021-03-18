@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+  <actionGroup name="SetDefaultWidgetSettings">
+    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+    <waitForPageLoad stepKey="waitForPageLoad"/>
+
+    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+
+    <!-- Select Yes Show Reviews Widget -->
+    <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
+    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
+
+    <!-- Select Yes Show star rating on category pages -->
+    <uncheckOption selector="{{YotpoCategoryPage.StarRatingCheckBox}}" stepKey="checkCheckbox"/>
+    <selectOption userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="selectWidgetEnabledCheckBox"/>
+
+    <!-- Select Yes Show star rating on product pages -->
+    <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
+    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeEnable"/>
+
+    <!-- Save Configuration -->
+    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+    <waitForPageLoad stepKey="waitForSaveConfig"/>
+  </actionGroup>
+</actionGroups>
+
+

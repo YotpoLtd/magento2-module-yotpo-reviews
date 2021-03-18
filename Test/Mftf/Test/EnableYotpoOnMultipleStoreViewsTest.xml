@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="EnableYotpoOnMultipleStoreViewsTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Enable Yotpo on multiple store views"/>
+            <title value="Enable Yotpo on multiple store views"/>
+            <description value="Yotpo reviews should appear on different storefront views"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-292"/>
+            <group value="YotpoMultiStore"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView"/>
+
+            <!-- switch to second store view -->
+            <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+                <argument name="storeView" value="NewStoreViewData.name"/>
+            </actionGroup>
+        </before>
+
+        <after>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <actionGroup ref="EnableYotpoOnAdditionalStorePlugin" stepKey="enableYotpoOnAdditionalStore">
+        </actionGroup>
+
+        <!-- Check that configuration was saved -->
+        <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+
+        <!-- navigate to the to default store view product page -->
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+
+        <!-- Check Yotpo widget appears -->
+        <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesAppearsOnFirstStoreViewProductPage"/>
+
+        <!-- Switch Storefront StoreView -->
+        <actionGroup ref="StorefrontSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+            <argument name="storeView" value="NewStoreViewData"/>
+        </actionGroup>
+
+        <!-- navigate to the second store view product page -->
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPageOnSecondStoreView">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+
+        <!-- Check Yotpo widget appears on the second store view -->
+        <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesAppearsOnSecondStoreViewProductPage"/>
+    </test>
+</tests>

@@ -1,0 +1,45 @@
+<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Suite/etc/suiteSchema.xsd">
+  <suite name="YotpoMultiStoreSuite">
+    <before>
+      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+      <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+        <argument name="storeView" value="_defaultStore.name"/>
+      </actionGroup>
+
+      <!-- create additional store view -->
+      <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createSecondStoreView">
+        <argument name="customStore" value="NewStoreViewData"/>
+      </actionGroup>
+
+      <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView" />
+
+      <!-- navigate to correct store -->
+      <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+        <argument name="storeView" value="NewStoreViewData.name"/>
+      </actionGroup>
+
+      <!-- enable yotpo on additional store -->
+      <actionGroup ref="EnableYotpoOnAdditionalStorePlugin" stepKey="enableYotpoOnAdditionalStorePlugin"/>
+    </before>
+
+    <after>
+      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+
+      <!-- remove the additional store view -->
+      <actionGroup ref="AdminDeleteStoreViewActionGroup" stepKey="deleteStoreView">
+        <argument name="customStore" value="NewStoreViewData"/>
+      </actionGroup>
+
+      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+    </after>
+
+    <include>
+      <group name="YotpoMultiStore"/>
+    </include>
+    <exclude>
+    </exclude>
+  </suite>
+</suites>

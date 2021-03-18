@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="BottomlineQnADoesntAppearInProductPageTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <title value="Disable QnA"/>
+            <stories value="Disable QnA and verify that it does not appear on the product page" />
+            <description value="Disable QnA and verify that it does not appear on the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-248"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+        </before>
+
+        <after>
+            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+        <uncheckOption selector="{{AdminLoginToYotpo.EnableQandACheckBox}}" stepKey="UncheckQnACheckbox"/>
+        <selectOption userInput="No" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="selectQnAToBeDisable"/>
+        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+        <seeOptionIsSelected userInput="No" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQnADisable"/>
+
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+
+        <!-- navigate to the created product page -->
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check that QnA does not appear in the page -->
+        <dontSeeElement selector="{{YotpoProductPageSection.QuestionAndAnswerBottomLine}}" stepKey="checkQnADoesntAppear"/>
+    </test>
+</tests>

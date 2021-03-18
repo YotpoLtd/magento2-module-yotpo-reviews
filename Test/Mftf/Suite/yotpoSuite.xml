@@ -1,0 +1,24 @@
+<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Suite/etc/suiteSchema.xsd">
+  <suite name="yotpoSuite">
+    <before>
+      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+      <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+        <argument name="storeView" value="_defaultStore.name"/>
+      </actionGroup>
+    </before>
+
+    <after>
+      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+    </after>
+
+    <include>
+      <group name="Yotpo"/>
+    </include>
+    <exclude>
+    </exclude>
+  </suite>
+</suites>
