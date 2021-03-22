@@ -150,36 +150,37 @@ class Config
     /**
      * @return mixed
      */
-    public function getConfig($configPath, $scopeId = null, $scope = null)
+    public function getConfig($configPath, $scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        if (!$scope && $this->isSingleStoreMode()) {
-            return $this->scopeConfig->getValue($configPath);
-        }
-        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, is_null($scopeId) ? $this->storeManager->getStore()->getId() : $scopeId);
+        return $this->scopeConfig->getValue(
+            $configPath, 
+            $scope,
+            is_null($scopeId) ? $this->storeManager->getStore()->getId() : $scopeId
+        );
     }
 
     /**
      * @return boolean
      */
-    public function isEnabled($scopeId = null, $scope = null)
+    public function isEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return boolean
      */
-    public function isDebugMode($scope = null, $scopeId = null)
+    public function isDebugMode($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $scope, $scopeId)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return string
      */
-    public function getAppKey($scopeId = null, $scope = null)
+    public function getAppKey($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return $this->getConfig(self::XML_PATH_YOTPO_APP_KEY, $scopeId, $scope);
+        return $this->scopeConfig->getValue(self::XML_PATH_YOTPO_APP_KEY, $scopeId, $scope);
     }
 
     /**
@@ -200,55 +201,56 @@ class Config
     /**
      * @return string
      */
-    public function getSecret($scopeId = null, $scope = null)
+    public function getSecret($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return (($secret = $this->getConfig(self::XML_PATH_YOTPO_SECRET, $scopeId, $scope))) ? $this->encryptor->decrypt($secret) : null;
+        $secret = $this->getConfig(self::XML_PATH_YOTPO_SECRET, $scopeId, $scope);
+        return ($secret) ? $this->encryptor->decrypt($secret) : null;
     }
 
     /**
      * @return boolean
      */
-    public function isWidgetEnabled($scopeId = null, $scope = null)
+    public function isWidgetEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_WIDGET_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_WIDGET_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return boolean
      */
-    public function isCategoryBottomlineEnabled($scopeId = null, $scope = null)
+    public function isCategoryBottomlineEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_YOTPO_CATEGORY_BOTTOMLINE_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_YOTPO_CATEGORY_BOTTOMLINE_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return boolean
      */
-    public function isBottomlineEnabled($scopeId = null, $scope = null)
+    public function isBottomlineEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_BOTTOMLINE_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_BOTTOMLINE_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return boolean
      */
-    public function isBottomlineQnaEnabled($scopeId = null, $scope = null)
+    public function isBottomlineQnaEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_BOTTOMLINE_QNA_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_BOTTOMLINE_QNA_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return boolean
      */
-    public function isMdrEnabled($scopeId = null, $scope = null)
+    public function isMdrEnabled($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_MDR_ENABLED, $scopeId, $scope)) ? true : false;
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_YOTPO_MDR_ENABLED, $scope, $scopeId);
     }
 
     /**
      * @return array
      */
-    public function getCustomOrderStatus($scopeId = null, $scope = null)
+    public function getCustomOrderStatus($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
         $orderStatuses = $this->getConfig(self::XML_PATH_YOTPO_CUSTOM_ORDER_STATUS, $scopeId, $scope);
         return ($orderStatuses) ? array_map('strtolower', explode(',', $orderStatuses)) : [Order::STATE_COMPLETE];
@@ -259,7 +261,7 @@ class Config
      * @param  string                 $format
      * @return date
      */
-    public function getOrdersSyncAfterDate($scopeId = null, $scope = null, $format = 'Y-m-d H:i:s')
+    public function getOrdersSyncAfterDate($scopeId = null, $scope = ScopeInterface::SCOPE_STORE, $format = 'Y-m-d H:i:s')
     {
         $timestamp = strtotime($this->getConfig(self::XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE, $scopeId, $scope) ?: $this->getCurrentDate());
         return date($format, $timestamp);
@@ -298,17 +300,17 @@ class Config
     /**
      * @return boolean
      */
-    public function isAppKeyAndSecretSet($scopeId = null, $scope = null)
+    public function isAppKeyAndSecretSet($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->getAppKey($scopeId, $scope) && $this->getSecret($scopeId, $scope)) ? true : false;
+        return ($this->getAppKey($scopeId, $scope) && $this->getSecret($scopeId, $scope));
     }
 
     /**
      * @return boolean
      */
-    public function isActivated($scopeId = null, $scope = null)
+    public function isActivated($scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return ($this->isEnabled($scopeId, $scope) && $this->isAppKeyAndSecretSet($scopeId, $scope)) ? true : false;
+        return ($this->isEnabled($scopeId, $scope) && $this->isAppKeyAndSecretSet($scopeId, $scope));
     }
 
     /**
@@ -336,7 +338,7 @@ class Config
      * @param  int|null              $storeId
      * @param  string|null           $scopes
      */
-    public function resetStoreCredentials($storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
+    public function resetStoreCredentials($storeId = null, $scopes = ScopeInterface::SCOPE_STORE)
     {
         $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_ENABLED, $scopes, $storeId);
         $this->resourceConfig->deleteConfig(self::XML_PATH_YOTPO_APP_KEY, $scopes, $storeId);
@@ -470,7 +472,7 @@ class Config
     public function filterDisabledStoreIds(array $storeIds = [])
     {
         foreach ($storeIds as $key => $storeId) {
-            if (!($this->isEnabled($storeId, ScopeInterface::SCOPE_STORE) && $this->isAppKeyAndSecretSet($storeId, ScopeInterface::SCOPE_STORE))) {
+            if (!($this->isEnabled($storeId) && $this->isAppKeyAndSecretSet($storeId))) {
                 unset($storeIds[$key]);
             }
         }
