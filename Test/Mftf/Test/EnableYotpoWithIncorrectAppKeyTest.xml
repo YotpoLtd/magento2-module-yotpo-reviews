@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="EnableYotpoWithIncorrectAppKeyTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Enable Yotpo with incorrect credentials"/>
+            <title value="Enable Yotpo with incorrect credentials"/>
+            <description value="Enable Yotpo with incorrect credentials should fail"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-291"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+        </before>
+
+        <after>
+            <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+                <argument name="storeView" value="_defaultStore.name"/>
+            </actionGroup>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <actionGroup ref="EnableYotpoPluginWithCustomCredentials" stepKey="enableYotpoPlugin">
+            <argument name="appKey" value="123"/>
+            <argument name="secret" value="123"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check an error message appears -->
+        <seeElement selector="{{YotpoConfigurationSection.ErrorMessage}}" stepKey="checkErrorMessageAppearsOnPage"/>
+    </test>
+</tests>

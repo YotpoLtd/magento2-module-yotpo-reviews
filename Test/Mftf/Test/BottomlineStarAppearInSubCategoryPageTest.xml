@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="BottomlineStarAppearInSubCategoryPageTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+            <title value="Test that bottomline stars appear in the product page"/>
+            <description value="Test that bottomline stars appear in the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-250"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+            <createData entity="SimpleSubCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+        </before>
+
+        <after>
+            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+        </after>
+
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingEnabled}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+        <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>
+
+        <actionGroup ref="GoToStorefrontCategoryPageByParametersActionGroup" stepKey="goToStorefrontCategoryPage">
+            <argument name="category" value="$$createCategory.custom_attributes[url_key]$$"/>
+            <argument name="mode" value="grid"/>
+            <argument name="numOfProductsPerPage" value="25"/>
+            <argument name="sortBy" value="price"/>
+            <argument name="sort" value="desc"/>
+        </actionGroup>
+
+        <!-- navigate to the created product page -->
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check that bottomline stars appear in the page -->
+        <seeElement selector="{{YotpoCategoryPage.CategoryStarRatingDiv}}" stepKey="checkYotpoAppearsInTheMenu"/>
+    </test>
+</tests>

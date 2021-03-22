@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+  <actionGroup name="EnableYotpoOnAdditionalStorePlugin">
+    <arguments>
+      <argument name="yotpo_app_key_2" type="string" defaultValue="{{_CREDS.yotpo/yotpo_app_key_2}}"/>
+      <argument name="yotpo_secret_2" type="string" defaultValue="{{_CREDS.yotpo/yotpo_secret_2}}"/>
+    </arguments>
+
+    <!-- enable Yotpo plugin -->
+    <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
+    <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
+
+    <!-- set Yotpo credentials -->
+    <fillField userInput="{{yotpo_app_key_2}}" selector="{{AdminLoginToYotpo.yotpoAppKey}}" stepKey="fillAppKey"/>
+    <fillField userInput="{{yotpo_secret_2}}" selector="{{AdminLoginToYotpo.yotpoSecret}}" stepKey="fillSecret"/>
+
+    <!-- save Yotpo configuration -->
+    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+
+    <!-- Check that configuration was saved -->
+    <waitForPageLoad stepKey="waitForSaveConfig"/>
+  </actionGroup>
+</actionGroups>

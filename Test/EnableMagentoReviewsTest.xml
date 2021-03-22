@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="EnableMagentoReviewsTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Enable Magento reviews and verify it does not appear on product page"/>
+            <title value="Test that reviews does not appear on the product page"/>
+            <description value="Test that reviews does not appear on the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-290"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+            <uncheckOption selector="{{AdminLoginToYotpo.HideMagentoReviewsCheckbox}}" stepKey="ClickOnHideMagentoReviewsEnabledCheckbox"/>
+            <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.HideMagentoReviews}}" stepKey="hideMagentoReviews"/>
+            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+            <waitForPageLoad stepKey="waitForSaveConfig"/>
+            <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+            <createData entity="_defaultCategory" stepKey="createCategory"/>
+            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+                <field key="price">10.00</field>
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+        </before>
+
+        <after>
+            <actionGroup ref="DisableMagentoReviews" stepKey="DisableMagentoReviews"/>
+            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+            <deleteData  createDataKey="createCategory" stepKey="deleteCategory"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+            <checkOption selector="{{AdminLoginToYotpo.HideMagentoReviewsCheckbox}}" stepKey="ClickOnHideMagentoReviewsDisabledCheckbox"/>
+            <selectOption userInput="No" selector="{{AdminLoginToYotpo.HideMagentoReviews}}" stepKey="hideMagentoReviews"/>
+            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+            <waitForPageLoad stepKey="waitForSaveConfig"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <actionGroup ref="EnableMagentoReviews" stepKey="EnableMagentoReviews"/>
+
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <seeElement selector="{{MagentoReviewsProductPageSection.productReviews}}" stepKey="checkProductReviewsSummaryIsAppearsOnPage"/>
+    </test>
+</tests>

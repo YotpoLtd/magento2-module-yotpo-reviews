@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+  <section name="YotpoCategoryPage">
+    <element name="StarRatingEnabled" type="select" selector="//select[@id='yotpo_widget_settings_category_bottomline_enabled']" timeout="30"/>
+    <element name="StarRatingCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_category_bottomline_enabled_inherit']"/>
+    <element name="CategoryStarRatingDiv" type="block" selector="//div[@class='yotpo bottomLine bottomline-position yotpo-small']"/>
+  </section>
+</sections>

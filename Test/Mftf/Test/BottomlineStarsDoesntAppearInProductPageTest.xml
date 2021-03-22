@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="BottomlineStarsDoesntAppearInProductPageTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Disable show bottomline and verify that bottomline does not appear on the product page" />
+            <title value="Disable show bottomline and verify that bottomline does not appear on the product page"/>
+            <description value="Test that bottomline stars doesnt appear in the product page"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-248"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+        </before>
+
+        <after>
+            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+        <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
+        <selectOption userInput="No" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeDisable"/>
+        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+        <seeOptionIsSelected userInput="No" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="seeStarRatingDisable"/>
+
+        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        </actionGroup>
+
+        <!-- navigate to the created product page -->
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Check that bottomline stars appear in the page -->
+        <dontSeeElement selector="{{YotpoProductPageSection.BottomLine}}" stepKey="checkBottomLineDoesntAppearsInTheMenu"/>
+    </test>
+</tests>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="LaunchYotpoButtonTest">
+        <annotations>
+            <features value="Yotpo"/>
+            <stories value="Launch Yotpo" />
+            <title value="Test that click on Launch Yotpo redirects to Yotpo`s admin"/>
+            <description value="Test that click on Launch Yotpo redirects to Yotpo`s admin"/>
+            <severity value="AVERAGE"/>
+            <testCaseId value="MC-"/>
+            <group value="Yotpo"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+            <amOnPage url="/admin/admin/dashboard/" stepKey="navigateToDashboard" />
+        </before>
+
+        <after>
+            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+        </after>
+
+        <click selector="{{YotpoDashboardSection.YotpoReviewsTab}}" stepKey="clickYotpoReviewsTab"/>
+        <click selector="{{YotpoDashboardSection.LaunchYotpoButton}}" stepKey="clickLaunchYotpoButton"/>
+
+        <!-- Check that new Yotpo Admin tab opened  -->
+        <switchToNextTab stepKey="switchToNewTab"/>
+        <seeInCurrentUrl url="https://yap.yotpo.com/#/preferredAppKey=" stepKey="seeAssertYotpoAdminUrl"/>
+    </test>
+</tests>
