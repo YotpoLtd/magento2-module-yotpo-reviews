@@ -1,13 +1,13 @@
 <?php
 
-namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product\View;
+namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product;
 
 use Yotpo\Yotpo\Model\Config as YotpoConfig;
 
 /**
  * Plugin for product Details Block
  */
-class Details
+class View
 {
     /**
      * @var YotpoConfig
@@ -22,20 +22,24 @@ class Details
 
     /**
      * @method beforeToHtml
-     * @param \Magento\Catalog\Block\Product\View\Details $reviewBlock
+     * @param \Magento\Catalog\Block\Product\View $reviewBlock
      *
      * @return array
      */
     public function beforeToHtml(
-        \Magento\Catalog\Block\Product\View\Details $reviewBlock
+        \Magento\Catalog\Block\Product\View $reviewBlock
     ) {
         /**
          * @var \Magento\Framework\View\Layout $layout
         */
         $layout = $reviewBlock->getLayout();
-
-        if ($this->yotpoConfig->isEnabled() && $this->yotpoConfig->isMdrEnabled() && $layout->getBlock('reviews.tab')) {
-            $layout->unsetElement('reviews.tab');
+        if ($this->yotpoConfig->isEnabled() && $this->yotpoConfig->isMdrEnabled()) {
+            if ($layout->getBlock('product.reviews.wrapper')) {
+                $layout->unsetElement('product.reviews.wrapper');
+            }
+            if ($layout->getBlock('reviews.tab')) {
+                $layout->unsetElement('reviews.tab');
+            }
         }
     }
 }

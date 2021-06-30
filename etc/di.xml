@@ -15,8 +15,8 @@
     <type name="Magento\Review\Block\Product\ReviewRenderer">
         <plugin name="yotpo_yotpo_review_block_product_reviewrenderer_plugin" type="Yotpo\Yotpo\Plugin\Review\Block\Product\ReviewRenderer" />
     </type>
-    <type name="Magento\Catalog\Block\Product\View\Details">
-        <plugin name="yotpo_yotpo_catalog_block_product_view_details_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\View\Details" />
+    <type name="Magento\Catalog\Block\Product\View">
+        <plugin name="yotpo_yotpo_catalog_block_product_view_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\View" />
     </type>
     <virtualType name="OmsTableNameArrayIterator">
         <arguments>
