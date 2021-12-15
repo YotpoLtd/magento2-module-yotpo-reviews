@@ -23,6 +23,7 @@
         </policy>
         <policy id="img-src">
             <values>
+                <value id="gravatar" type="host">https://www.gravatar.com</value>
                 <value id="yotpo_main" type="host">*.yotpo.com</value>
             </values>
         </policy>
