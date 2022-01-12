@@ -1,0 +1,2460 @@
+diff --git a/ActionGroup/CheckOrdersSyncActionGroup.xml b/ActionGroup/CheckOrdersSyncActionGroup.xml
+deleted file mode 100644
+index fae5981..0000000
+--- a/ActionGroup/CheckOrdersSyncActionGroup.xml
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-    <actionGroup name="CheckOrdersSync">
+-        <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-        <generateDate date="now" format="Y-m-d" stepKey="currentDate"/>
+-        <fillField userInput="{$currentDate}" selector="{{AdminLoginToYotpo.OrdersSyncFromDate}}" stepKey="setTodayDate" />
+-        <uncheckOption selector="{{AdminLoginToYotpo.OrderSyncCustomStatusesCheckbox}}" stepKey="ClickOnCustomStatusesEnabledCheckbox"/>
+-        <selectOption userInput="pending" selector="{{AdminLoginToYotpo.OrdersSyncStatuses}}" stepKey="setOrdersSyncStatuses"/>
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-        <waitForPageLoad stepKey="waitForSaveConfig"/>
+-        <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-
+-        <magentoCLI command="yotpo:sync" stepKey="runSyncScript"/>
+-        <grabTextFrom selector="//tr[@id='row_yotpo_sync_settings_sync_status']//td[@class='value']//div[contains(text(), 'Total orders synced with Yotpo:')]" stepKey="syncStatus"/>
+-        <assertContains stepKey="assertSyncResult" expected="SUCCESS" expectedType="string" actual="$runSyncScript"/>
+-    </actionGroup>
+-</actionGroups>
+diff --git a/ActionGroup/DisableMagentoReviewsActionGroup.xml b/ActionGroup/DisableMagentoReviewsActionGroup.xml
+deleted file mode 100644
+index ebb5e29..0000000
+--- a/ActionGroup/DisableMagentoReviewsActionGroup.xml
++++ /dev/null
+@@ -1,11 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8" ?>
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-    <actionGroup name="DisableMagentoReviews">
+-        <waitForPageLoad stepKey="waitForMagentoReviewPageToLoad"/>
+-        <amOnPage url="admin/admin/system_config/edit/section/catalog/" stepKey="navigateToMagentoReviewConfiguration"/>
+-        <selectOption userInput="0" selector="{{AdminMagentoReviewConfigurationSection.ReviewEnabled}}" stepKey="EnableMagentoReviews"/>
+-        <click stepKey="ClickOnSaveConfig" selector="{{AdminMagentoReviewConfigurationSection.SaveConfiguration}}"/>
+-        <waitForPageLoad stepKey="waitForSaveConfig"/>
+-        <seeElement selector="{{AdminMagentoReviewConfigurationSection.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-    </actionGroup>
+-</actionGroups>
+diff --git a/ActionGroup/EnableMagentoReviewsActionGroup.xml b/ActionGroup/EnableMagentoReviewsActionGroup.xml
+deleted file mode 100644
+index 225b0c9..0000000
+--- a/ActionGroup/EnableMagentoReviewsActionGroup.xml
++++ /dev/null
+@@ -1,11 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8" ?>
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-    <actionGroup name="EnableMagentoReviews">
+-        <waitForPageLoad stepKey="waitForMagentoReviewPageToLoad"/>
+-        <amOnPage url="admin/admin/system_config/edit/section/catalog/" stepKey="navigateToMagentoReviewConfiguration"/>
+-        <selectOption userInput="1" selector="{{AdminMagentoReviewConfigurationSection.ReviewEnabled}}" stepKey="EnableMagentoReviews"/>
+-        <click stepKey="ClickOnSaveConfig" selector="{{AdminMagentoReviewConfigurationSection.SaveConfiguration}}"/>
+-        <waitForPageLoad stepKey="waitForSaveConfig"/>
+-        <seeElement selector="{{AdminMagentoReviewConfigurationSection.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-    </actionGroup>
+-</actionGroups>
+diff --git a/Block/Yotpo.php b/Block/Yotpo.php
+index 077f471..de83184 100644
+--- a/Block/Yotpo.php
++++ b/Block/Yotpo.php
+@@ -64,7 +64,7 @@ class Yotpo extends \Magento\Framework\View\Element\Template
+ 
+     public function getProduct()
+     {
+-        if ($this->getData('product') === null) {
++        if (is_null($this->getData('product'))) {
+             $this->setData('product', $this->coreRegistry->registry('current_product'));
+         }
+         return $this->getData('product');
+diff --git a/Model/AbstractApi.php b/Model/AbstractApi.php
+index 6eec003..7c7a202 100644
+--- a/Model/AbstractApi.php
++++ b/Model/AbstractApi.php
+@@ -5,10 +5,14 @@ namespace Yotpo\Yotpo\Model;
+ use Magento\Catalog\Model\ProductFactory;
+ use Yotpo\Yotpo\Lib\Http\Client\Curl;
+ use Yotpo\Yotpo\Model\Config as YotpoConfig;
++use Yotpo\Yotpo\Model\ResourceModel\Config as ResourceConfig;
++use Magento\Framework\Encryption\EncryptorInterface;
++use Magento\Store\Model\ScopeInterface;
+ 
+ class AbstractApi
+ {
+     const DEFAULT_TIMEOUT = 45;
++    const NUMBER_OF_RETRY = 1;
+ 
+     /**
+      * @var int
+@@ -40,20 +44,42 @@ class AbstractApi
+      */
+     protected $_yotpoConfig;
+ 
++    /**
++     * @var int
++     */
++    protected static $_retryCount = 0;
++
++    /**
++     * @var ResourceConfig
++     */
++    protected $resourceConfig;
++
++    /**
++     * @var EncryptorInterface
++     */
++    protected $encryptor;
++
++
+     /**
+      * @method __construct
+      * @param  Curl           $curl
+      * @param  ProductFactory $productFactory
+      * @param  YotpoConfig    $yotpoConfig
++     * @param  ResourceConfig $resourceConfig
++     * @param  EncryptorInterface $encryptor
+      */
+     public function __construct(
+         Curl $curl,
+         ProductFactory $productFactory,
+-        YotpoConfig $yotpoConfig
++        YotpoConfig $yotpoConfig,
++        ResourceConfig $resourceConfig,
++        EncryptorInterface $encryptor
+     ) {
+         $this->curl = $curl;
+         $this->productFactory = $productFactory;
+         $this->_yotpoConfig = $yotpoConfig;
++        $this->resourceConfig = $resourceConfig;
++        $this->encryptor = $encryptor;
+     }
+ 
+     /**
+@@ -149,6 +175,21 @@ class AbstractApi
+                 $data
+             );
+ 
++            if (($this->_getCurlStatus() == 401) && (self::$_retryCount < self::NUMBER_OF_RETRY)) {
++                $this->_yotpoConfig->log(
++                    "AbstractApi::sendApiRequest() - response: ",
++                    "debug",
++                    $this->_prepareCurlResponseData()
++                );
++                $data['utoken'] = $this->oauthAuthentication(
++                    $this->_yotpoConfig->getCurrentStoreId(),
++                    ScopeInterface::SCOPE_STORES,
++                    true
++                );
++                $this->sendApiRequest($path, $data, $method, $timeout, $contentType);
++                self::$_retryCount++;
++            }
++            self::$_retryCount = 0;
+             $this->_yotpoConfig->log("AbstractApi::sendApiRequest() - response: ", "debug", $this->_prepareCurlResponseData());
+             return $this->_prepareCurlResponseData();
+         } catch (\Exception $e) {
+@@ -158,13 +199,17 @@ class AbstractApi
+ 
+     /**
+      * @method oauthAuthentication
+-     * @param  int|null $scopeId
+-     * @param  string|null $scope
++     * @param int|null $scopeId
++     * @param string|null $scope
++     * @param bool $forceCreateTokenFlag
+      * @return mixed
+      */
+-    public function oauthAuthentication($scopeId = null, $scope = null)
++    public function oauthAuthentication($scopeId = null, $scope = null, $forceCreateTokenFlag = false)
+     {
+         try {
++            if (($token = $this->checkIfTokenExist($scopeId)) && !$forceCreateTokenFlag) {
++                return $token;
++            }
+             $app_key = $this->_yotpoConfig->getAppKey($scopeId, $scope);
+             $secret = $this->_yotpoConfig->getSecret($scopeId, $scope);
+             if (!($app_key && $secret)) {
+@@ -188,10 +233,28 @@ class AbstractApi
+                 $this->_yotpoConfig->log("AbstractApi::oauthAuthentication({$scopeId}, {$scope}) - error: no access token received", "error", ['$app_key' => $app_key]);
+                 return null;
+             }
++            $this->resourceConfig->saveConfig(
++                YotpoConfig::XML_PATH_YOTPO_TOKEN,
++                $this->encryptor->encrypt($token),
++                ScopeInterface::SCOPE_STORES,
++                $scopeId
++            );
+             return $token;
+         } catch (\Exception $e) {
+             $this->_yotpoConfig->log("AbstractApi::oauthAuthentication({$scopeId}, {$scope}) - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
+             return null;
+         }
+     }
++
++    /**
++     * @method checkIfTokenExist
++     * @param  int|null $scopeId
++     * @param  string|null $scope
++     * @return mixed
++     */
++    protected function checkIfTokenExist($scopeId = null, $scope = ScopeInterface::SCOPE_STORES)
++    {
++        $token = $this->resourceConfig->getConfig(YotpoConfig::XML_PATH_YOTPO_TOKEN, $scope, $scopeId);
++        return $token ? $this->encryptor->decrypt($token) : false;
++    }
+ }
+diff --git a/Model/Api/AccountPlatform.php b/Model/Api/AccountPlatform.php
+index 9ce1890..14ff422 100644
+--- a/Model/Api/AccountPlatform.php
++++ b/Model/Api/AccountPlatform.php
+@@ -22,12 +22,12 @@ class AccountPlatform extends AbstractApi
+             }
+ 
+             $result = $this->sendApiRequest(self::PATH . "/update_metadata", [
+-                'utoken'            => $token,
+-                'app_key'           => $this->_yotpoConfig->getAppKey($storeId),
+-                'metadata'          => [
+-                    'platform'          => 'magento2',
+-                    'version'           => "{$this->_yotpoConfig->getMagentoPlatformVersion()} {$this->_yotpoConfig->getMagentoPlatformEdition()}",
+-                    'plugin_version'    => $this->_yotpoConfig->getModuleVersion()
++                'utoken'   => $token,
++                'app_key'  => $this->_yotpoConfig->getAppKey($storeId),
++                'metadata' => [
++                    'platform'       => 'magento2',
++                    'version'        => "{$this->_yotpoConfig->getMagentoPlatformVersion()} {$this->_yotpoConfig->getMagentoPlatformEdition()}",
++                    'plugin_version' => $this->_yotpoConfig->getModuleVersion(),
+                 ],
+             ]);
+             if ($result['status'] !== 200) {
+diff --git a/Model/Api/Products.php b/Model/Api/Products.php
+index 1ab10a4..aad1ad3 100644
+--- a/Model/Api/Products.php
++++ b/Model/Api/Products.php
+@@ -7,6 +7,8 @@ use Yotpo\Yotpo\Lib\Http\Client\Curl;
+ use Yotpo\Yotpo\Model\AbstractApi;
+ use Yotpo\Yotpo\Model\Config as YotpoConfig;
+ use Yotpo\Yotpo\Model\Richsnippet;
++use Yotpo\Yotpo\Model\ResourceModel\Config as ResourceConfig;
++use Magento\Framework\Encryption\EncryptorInterface;
+ 
+ class Products extends AbstractApi
+ {
+@@ -20,18 +22,22 @@ class Products extends AbstractApi
+ 
+     /**
+      * @method __construct
+-     * @param  Curl           $curl
+-     * @param  ProductFactory $productFactory
+-     * @param  YotpoConfig    $yotpoConfig
+-     * @param  Richsnippet    $richsnippet
++     * @param  Curl                $curl
++     * @param  ProductFactory      $productFactory
++     * @param  YotpoConfig         $yotpoConfig
++     * @param  ResourceConfig      $resourceConfig
++     * @param  Richsnippet         $richsnippet
++     * @param  EncryptorInterface  $encryptor
+      */
+     public function __construct(
+         Curl $curl,
+         ProductFactory $productFactory,
+         YotpoConfig $yotpoConfig,
+-        Richsnippet $richsnippet
++        ResourceConfig $resourceConfig,
++        Richsnippet $richsnippet,
++        EncryptorInterface $encryptor
+     ) {
+-        parent::__construct($curl, $productFactory, $yotpoConfig);
++        parent::__construct($curl, $productFactory, $yotpoConfig, $resourceConfig, $encryptor);
+         $this->richsnippet = $richsnippet;
+     }
+ 
+diff --git a/Model/Config.php b/Model/Config.php
+index 93c26d9..838e673 100644
+--- a/Model/Config.php
++++ b/Model/Config.php
+@@ -20,8 +20,8 @@ class Config
+     const MODULE_NAME = 'Yotpo_Yotpo';
+ 
+     //= General Settings
+-    const XML_PATH_YOTPO_ALL = 'yotpo';
+-    const XML_PATH_YOTPO_ENABLED = 'yotpo/settings/active';
++    const XML_PATH_YOTPO_ALL = "yotpo";
++    const XML_PATH_YOTPO_ENABLED = "yotpo/settings/active";
+     const XML_PATH_YOTPO_APP_KEY = 'yotpo/settings/app_key';
+     const XML_PATH_YOTPO_SECRET = 'yotpo/settings/secret';
+     const XML_PATH_YOTPO_WIDGET_ENABLED = 'yotpo/settings/widget_enabled';
+@@ -29,14 +29,15 @@ class Config
+     const XML_PATH_YOTPO_BOTTOMLINE_ENABLED = 'yotpo/settings/bottomline_enabled';
+     const XML_PATH_YOTPO_BOTTOMLINE_QNA_ENABLED = 'yotpo/settings/qna_enabled';
+     const XML_PATH_YOTPO_MDR_ENABLED = 'yotpo/settings/mdr_enabled';
+-    const XML_PATH_YOTPO_DEBUG_MODE_ENABLED = 'yotpo/settings/debug_mode_active';
+-    const XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE = 'yotpo/sync_settings/orders_sync_start_date';
++    const XML_PATH_YOTPO_DEBUG_MODE_ENABLED = "yotpo/settings/debug_mode_active";
++    const XML_PATH_YOTPO_ORDERS_SYNC_FROM_DATE = "yotpo/sync_settings/orders_sync_start_date";
+     const XML_PATH_YOTPO_CUSTOM_ORDER_STATUS = 'yotpo/settings/custom_order_status';
+-    const XML_PATH_YOTPO_ORDERS_SYNC_LIMIT = 'yotpo/sync_settings/orders_sync_limit';
++    const XML_PATH_YOTPO_ORDERS_SYNC_LIMIT = "yotpo/sync_settings/orders_sync_limit";
+     //= Not visible on system.xml
+-    const XML_PATH_YOTPO_API_URL = 'yotpo/env/yotpo_api_url';
+-    const XML_PATH_YOTPO_WIDGET_URL = 'yotpo/env/yotpo_widget_url';
+-    const XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE = 'yotpo/module_info/yotpo_installation_date';
++    const XML_PATH_YOTPO_API_URL = "yotpo/env/yotpo_api_url";
++    const XML_PATH_YOTPO_WIDGET_URL = "yotpo/env/yotpo_widget_url";
++    const XML_PATH_YOTPO_MODULE_INFO_INSTALLATION_DATE = "yotpo/module_info/yotpo_installation_date";
++    const XML_PATH_YOTPO_TOKEN = "yotpo/settings/token";
+ 
+     private $allStoreIds = [0 => null, 1 => null];
+ 
+@@ -138,10 +139,10 @@ class Config
+     }
+ 
+     /**
+-     * @method getWebsiteIdByStoreId
+-     * @param int $storeId
+-     * @return int
+-     */
++    * @method getWebsiteIdByStoreId
++    * @param int $storeId
++    * @return int
++    */
+     public function getWebsiteIdByStoreId($storeId)
+     {
+         return $this->storeManager->getStore($storeId)->getWebsiteId();
+@@ -155,9 +156,7 @@ class Config
+         if (!$scope && $this->isSingleStoreMode()) {
+             return $this->scopeConfig->getValue($configPath);
+         }
+-        $scopeId = ($scopeId === null) ? $this->getCurrentStoreId() : $scopeId;
+-
+-        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId);
++        return $this->scopeConfig->getValue($configPath, $scope ?: ScopeInterface::SCOPE_STORE, is_null($scopeId) ? $this->storeManager->getStore()->getId() : $scopeId);
+     }
+ 
+     /**
+@@ -324,8 +323,9 @@ class Config
+      */
+     public function setStoreCredentialsAndIsEnabled($appKey, $secret, $isEnabled, $storeId = null, $scopes = ScopeInterface::SCOPE_STORES)
+     {
+-        $storeId = ($storeId === null) ? $this->getCurrentStoreId() : $storeId;
+-        
++        if (is_null($storeId)) {
++            $storeId = $this->storeManager->getStore()->getId();
++        }
+         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_APP_KEY, $appKey, $scopes, $storeId);
+         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_SECRET, ($secret ? $this->encryptor->encrypt($secret) : null), $scopes, $storeId);
+         $this->resourceConfig->saveConfig(self::XML_PATH_YOTPO_ENABLED, $isEnabled, $scopes, $storeId);
+@@ -353,8 +353,8 @@ class Config
+     public function getYotpoApiUrl($path = "")
+     {
+         $yotpoApiUrl = $this->getConfig(self::XML_PATH_YOTPO_API_URL);
+-        if(preg_match("/yotpo\.com\/$|yotpo\.xyz\/$/", $yotpoApiUrl)) {
+-        return $yotpoApiUrl . $path;
++        if (preg_match("/yotpo\.com\/$|yotpo\.xyz\/$/", $yotpoApiUrl)) {
++            return $yotpoApiUrl . $path;
+         } else {
+             return "https://api.yotpo.com/" . $path;
+         }
+diff --git a/Model/OrderStatusHistory.php b/Model/OrderStatusHistory.php
+new file mode 100644
+index 0000000..f5812b4
+--- /dev/null
++++ b/Model/OrderStatusHistory.php
+@@ -0,0 +1,13 @@
++<?php
++namespace Yotpo\Yotpo\Model;
++
++class OrderStatusHistory extends \Magento\Framework\Model\AbstractModel
++{
++    /**
++     * Define main table
++     */
++    protected function _construct()
++    {
++        $this->_init(\Yotpo\Yotpo\Model\ResourceModel\OrderStatusHistory::class);
++    }
++}
+diff --git a/Model/ResourceModel/Config.php b/Model/ResourceModel/Config.php
+new file mode 100644
+index 0000000..2cb0ebc
+--- /dev/null
++++ b/Model/ResourceModel/Config.php
+@@ -0,0 +1,37 @@
++<?php
++/**
++ * Copyright © Yotpo, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++
++namespace Yotpo\Yotpo\Model\ResourceModel;
++
++class Config extends \Magento\Config\Model\ResourceModel\Config
++{
++    /**
++     * Get config value
++     * @param string $path
++     * @param string $scope
++     * @param int $scopeId
++     * @return string
++     * @throws \Magento\Framework\Exception\LocalizedException
++     */
++    public function getConfig($path, $scope = 'stores', $scopeId = 0)
++    {
++        $connection = $this->getConnection();
++        $select = $connection->select()->from(
++            $this->getMainTable(),
++            ['value']
++        )->where(
++            'path = ?',
++            $path
++        )->where(
++            'scope = ?',
++            $scope
++        )->where(
++            'scope_id = ?',
++            $scopeId
++        );
++        return $connection->fetchOne($select);
++    }
++}
+diff --git a/Model/ResourceModel/OrderStatusHistory.php b/Model/ResourceModel/OrderStatusHistory.php
+new file mode 100644
+index 0000000..1eb492f
+--- /dev/null
++++ b/Model/ResourceModel/OrderStatusHistory.php
+@@ -0,0 +1,17 @@
++<?php
++
++namespace Yotpo\Yotpo\Model\ResourceModel;
++
++class OrderStatusHistory extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
++{
++    /**
++     * Initialize resource model
++     *
++     * @return void
++     */
++    protected function _construct()
++    {
++        $this->_setResource('sales');
++        $this->_init('yotpo_order_status_history', 'id');
++    }
++}
+diff --git a/Model/ResourceModel/OrderStatusHistory/Collection.php b/Model/ResourceModel/OrderStatusHistory/Collection.php
+new file mode 100644
+index 0000000..028722d
+--- /dev/null
++++ b/Model/ResourceModel/OrderStatusHistory/Collection.php
+@@ -0,0 +1,17 @@
++<?php
++
++namespace Yotpo\Yotpo\Model\ResourceModel\OrderStatusHistory;
++
++class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
++{
++    /**
++     * Define model & resource model
++     */
++    protected function _construct()
++    {
++        $this->_init(
++            \Yotpo\Yotpo\Model\OrderStatusHistory::class,
++            \Yotpo\Yotpo\Model\ResourceModel\OrderStatusHistory::class
++        );
++    }
++}
+diff --git a/Model/ResourceModel/Richsnippet/Collection.php b/Model/ResourceModel/Richsnippet/Collection.php
+index 62a6259..38b2800 100644
+--- a/Model/ResourceModel/Richsnippet/Collection.php
++++ b/Model/ResourceModel/Richsnippet/Collection.php
+@@ -7,8 +7,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
+     protected function _construct()
+     {
+         $this->_init(
+-            \Yotpo\Yotpo\Model\Richsnippet::class,
+-            \Yotpo\Yotpo\Model\ResourceModel\Richsnippet::class
++        	\Yotpo\Yotpo\Model\Richsnippet::class,
++        	\Yotpo\Yotpo\Model\ResourceModel\Richsnippet::class
+         );
+     }
+ }
+diff --git a/Model/ResourceModel/Sync/Collection.php b/Model/ResourceModel/Sync/Collection.php
+index b3eab0c0..e4c4ba8 100644
+--- a/Model/ResourceModel/Sync/Collection.php
++++ b/Model/ResourceModel/Sync/Collection.php
+@@ -10,8 +10,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
+     protected function _construct()
+     {
+         $this->_init(
+-            \Yotpo\Yotpo\Model\Sync::class,
+-            \Yotpo\Yotpo\Model\ResourceModel\Sync::class
++        	\Yotpo\Yotpo\Model\Sync::class,
++        	\Yotpo\Yotpo\Model\ResourceModel\Sync::class
+         );
+     }
+ }
+diff --git a/Model/Schema.php b/Model/Schema.php
+index 9680d10..71b0c05 100644
+--- a/Model/Schema.php
++++ b/Model/Schema.php
+@@ -27,20 +27,28 @@ class Schema
+      */
+     private $escaper;
+ 
++    /**
++     * @var OrderStatusHistoryFactory
++     */
++    private $orderStatusHistoryFactory;
++
+     /**
+      * @method __construct
+-     * @param  YotpoConfig    $yotpoConfig
+-     * @param  ProductFactory $productFactory
+-     * @param  Escaper        $escaper
++     * @param  YotpoConfig               $yotpoConfig
++     * @param  ProductFactory            $productFactory
++     * @param  Escaper                   $escaper
++     * @param  OrderStatusHistoryFactory $orderStatusHistoryFactory
+      */
+     public function __construct(
+         YotpoConfig $yotpoConfig,
+         ProductFactory $productFactory,
+-        Escaper $escaper
++        Escaper $escaper,
++        OrderStatusHistoryFactory $orderStatusHistoryFactory
+     ) {
+         $this->yotpoConfig = $yotpoConfig;
+         $this->productFactory = $productFactory;
+         $this->escaper = $escaper;
++        $this->orderStatusHistoryFactory = $orderStatusHistoryFactory;
+     }
+ 
+     /**
+@@ -164,16 +172,21 @@ class Schema
+             }
+             $orderData['order_id'] = $order->getIncrementId();
+             $orderData['order_date'] = $order->getCreatedAt();
++            $orderData['fulfillment_date'] = $this->getOrderFulfillmentDate($order);
+             $orderData['currency_iso'] = $order->getOrderCurrency()->getCode();
+             $orderData['email'] = $order->getCustomerEmail();
+             $orderData['customer_name'] = trim($order->getCustomerFirstName() . ' ' . $order->getCustomerLastName());
++            $orderData['platform'] = 'magento';
+             if (!$orderData['customer_name'] && ($billingAddress = $order->getBillingAddress())) {
+                 $orderData['customer_name'] = trim($billingAddress->getFirstname() . ' ' . $billingAddress->getLastname());
+             }
+             if (!$order->getCustomerIsGuest()) {
+                 $orderData['user_reference'] = $order->getCustomerId();
+             }
+-            $orderData['platform'] = 'magento';
++            if (($fulfillmentDate = $this->getOrderFulfillmentDate($order))) {
++                $orderData['fulfillment_status'] = 'fulfilled';
++                $orderData['fulfillment_status_date'] = $fulfillmentDate;
++            }
+         } catch (\Exception $e) {
+             $this->yotpoConfig->log("Schema::prepareOrderData() - exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
+             return [];
+@@ -181,4 +194,23 @@ class Schema
+ 
+         return $orderData;
+     }
++
++    private function getOrderFulfillmentDate(Order $order)
++    {
++        $lastStatus = $this->orderStatusHistoryFactory->create()->getCollection()
++            ->addFieldToSelect(["id","created_at"])
++            ->addFieldToFilter("order_id", $order->getId())
++            ->addFieldToFilter("store_id", $order->getStoreId())
++            ->setOrder('created_at', 'desc')
++            ->setOrder('id', 'desc')
++            ->setPageSize(1)
++            ->getFirstItem();
++        if ($lastStatus && $lastStatus->getId()) {
++            return $lastStatus->getCreatedAt();
++        } elseif (($lastStatus = $order->getStatusHistoryCollection()->getFirstItem())) {
++            return $lastStatus->getCreatedAt();
++        } else {
++            return null;
++        }
++    }
+ }
+diff --git a/Observer/Config/Save.php b/Observer/Config/Save.php
+index 8dbe83c..d7194f0 100644
+--- a/Observer/Config/Save.php
++++ b/Observer/Config/Save.php
+@@ -101,7 +101,7 @@ class Save implements ObserverInterface
+                 }
+             }
+ 
+-            if ($this->yotpoConfig->isEnabled($scopeId, $scope) && !($this->yotpoApi->oauthAuthentication($scopeId, $scope))) {
++            if ($this->yotpoConfig->isEnabled($scopeId, $scope) && !($this->yotpoApi->oauthAuthentication($scopeId, $scope, true))) {
+                 $this->resetStoreCredentials($scopeId, $scopes);
+                 throw new \Exception(__("Please make sure the APP KEY and SECRET you've entered are correct"));
+             }
+diff --git a/Observer/OrderSaveAfter.php b/Observer/OrderSaveAfter.php
+new file mode 100644
+index 0000000..e5a0536
+--- /dev/null
++++ b/Observer/OrderSaveAfter.php
+@@ -0,0 +1,55 @@
++<?php
++
++namespace Yotpo\Yotpo\Observer;
++
++use Magento\Framework\Event\Observer;
++use Magento\Framework\Event\ObserverInterface;
++use Yotpo\Yotpo\Model\Config as YotpoConfig;
++use Yotpo\Yotpo\Model\OrderStatusHistoryFactory;
++
++class OrderSaveAfter implements ObserverInterface
++{
++    /**
++     * @var YotpoConfig
++     */
++    private $yotpoConfig;
++
++    /**
++     * @var YotpoConfig
++     */
++    private $orderStatusHistoryFactory;
++
++    /**
++     * @method __construct
++     * @param  YotpoConfig               $yotpoConfig
++     * @param  OrderStatusHistoryFactory $orderStatusHistoryFactory
++     */
++    public function __construct(
++        YotpoConfig $yotpoConfig,
++        OrderStatusHistoryFactory $orderStatusHistoryFactory
++    ) {
++        $this->yotpoConfig = $yotpoConfig;
++        $this->orderStatusHistoryFactory = $orderStatusHistoryFactory;
++    }
++
++    /**
++     * @param Observer $observer
++     */
++    public function execute(Observer $observer)
++    {
++        try {
++            $order = $observer->getEvent()->getOrder();
++            if ($order->getOrigData('status') !== $order->getData('status')) {
++                $this->orderStatusHistoryFactory->create()
++                    ->setOrderId($order->getId())
++                    ->setStoreId($order->getStoreId())
++                    ->setOldStatus($order->getOrigData('status'))
++                    ->setNewStatus($order->getData('status'))
++                    ->setCreatedAt($this->yotpoConfig->getCurrentDate())
++                    ->save();
++            }
++        } catch (\Exception $e) {
++            $this->yotpoConfig->log("OrderSaveAfter::execute() - Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), "error");
++        }
++    }
++}
+diff --git a/Plugin/Catalog/Block/Product/View/Details.php b/Plugin/Catalog/Block/Product/View.php
+similarity index 68%
+rename from Plugin/Catalog/Block/Product/View/Details.php
+rename to Plugin/Catalog/Block/Product/View.php
+index 293bf40..9cdbc9d 100644
+--- a/Plugin/Catalog/Block/Product/View/Details.php
++++ b/Plugin/Catalog/Block/Product/View.php
+@@ -1,13 +1,13 @@
+ <?php
+ 
+-namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product\View;
++namespace Yotpo\Yotpo\Plugin\Catalog\Block\Product;
+ 
+ use Yotpo\Yotpo\Model\Config as YotpoConfig;
+ 
+ /**
+- * Plugin for product Details Block
++ * Plugin for product View Block
+  */
+-class Details
++class View
+ {
+     /**
+      * @var YotpoConfig
+@@ -22,17 +22,17 @@ class Details
+ 
+     /**
+      * @method beforeToHtml
+-     * @param \Magento\Catalog\Block\Product\View\Details $reviewBlock
++     * @param \Magento\Catalog\Block\Product\View $viewBlock
+      *
+      * @return array
+      */
+     public function beforeToHtml(
+-        \Magento\Catalog\Block\Product\View\Details $reviewBlock
++        \Magento\Catalog\Block\Product\View $viewBlock
+     ) {
+         /**
+          * @var \Magento\Framework\View\Layout $layout
+         */
+-        $layout = $reviewBlock->getLayout();
++        $layout = $viewBlock->getLayout();
+ 
+         if ($this->yotpoConfig->isEnabled() && $this->yotpoConfig->isMdrEnabled() && $layout->getBlock('reviews.tab')) {
+             $layout->unsetElement('reviews.tab');
+diff --git a/README.md b/README.md
+index 09a48ae..360308e 100644
+--- a/README.md
++++ b/README.md
+@@ -26,7 +26,7 @@ php bin/magento setup:upgrade
+ php bin/magento setup:di:compile
+ php bin/magento setup:static-content:deploy
+ php bin/magento maintenance:disable
+-php bin/magento cache:flush
++php bin/magento cache:clean
+ ```
+ 
+ ## Install manually under app/code
+@@ -39,7 +39,7 @@ php bin/magento setup:upgrade
+ php bin/magento setup:di:compile
+ php bin/magento setup:static-content:deploy
+ php bin/magento maintenance:disable
+-php bin/magento cache:flush
++php bin/magento cache:clean
+ ```
+ 
+ ## Usage
+diff --git a/Section/AdminLoginToYotpoSection.xml b/Section/AdminLoginToYotpoSection.xml
+deleted file mode 100644
+index b6e9947..0000000
+--- a/Section/AdminLoginToYotpoSection.xml
++++ /dev/null
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-  <section name="AdminLoginToYotpo">
+-    <element name="YotpoIconInMenu" type="text" selector="#system_config_tabs .yotpo-icon" timeout="30"/>
+-    <element name="yotpoAppKey" type="text" selector="input#yotpo_settings_app_key" timeout="30"/>
+-    <element name="yotpoSecret" type="text" selector="input#yotpo_settings_secret" timeout="30"/>
+-
+-    <element name="GeneralMenu" type="button" selector="#system_config_tabs > div:nth-child(1) > div" timeout="30"/>
+-    <element name="YotpoMenu" type="button" selector="#system_config_tabs > div:nth-child(6) > div" timeout="30"/>
+-    <element name="WidgetSettings" type="button" selector="//a[@id='yotpo_widget_settings-head']" timeout="30"/>
+-    <element name="YotpoEnabled" type="select" selector="//select[@id='yotpo_settings_active']" timeout="30"/>
+-    <element name="WidgetEnabled" type="select" selector="//select[@id='yotpo_widget_settings_widget_enabled']" timeout="30"/>
+-    <element name="WidgetEnabledCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_widget_enabled_inherit']" timeout="30"/>
+-    <element name="HideMagentoReviews" type="select" selector="//select[@id='yotpo_widget_settings_mdr_enabled']" timeout="30"/>
+-    <element name="HideMagentoReviewsCheckbox" type="checkbox" selector="//input[@id='yotpo_widget_settings_mdr_enabled_inherit']" timeout="30"/>
+-
+-    <element name="OrdersSyncFromDate" type="text" selector="//input[@id='yotpo_sync_settings_orders_sync_start_date']" timeout="30"/>
+-    <element name="OrdersSyncStatuses" type="select" selector="//select[@id='yotpo_sync_settings_custom_order_status']" timeout="30"/>
+-    <element name="OrderSyncFromDateCheckbox" type="checkbox" selector="//input[@id='yotpo_sync_settings_orders_sync_start_date_inherit']" timeout="30"/>
+-    <element name="OrderSyncCustomStatusesCheckbox" type="checkbox" selector="//input[@id='yotpo_sync_settings_custom_order_status_inherit']" timeout="30"/>
+-
+-    <element name="StarRatingProductPage" type="select" selector="//select[@id='yotpo_widget_settings_bottomline_enabled']" timeout="30"/>
+-    <element name="StarRatingProductPageCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_bottomline_enabled_inherit']" timeout="30"/>
+-
+-    <element name="EnableQandA" type="select" selector="//select[@id='yotpo_widget_settings_qna_enabled']" timeout="30"/>
+-    <element name="EnableQandACheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_qna_enabled_inherit']" timeout="30"/>
+-
+-    <element name="SaveConfiguration" type="button" selector="//span[text()='Save Config']" timeout="30"/>
+-    <element name="SavedConfiguration" type="button" selector="//div[text()='You saved the configuration.']" timeout="30"/>
+-    <element name="ReviewsAndVisualMarketing" type="button" selector="//a[contains(@class, 'item-nav')]//span[text()='Reviews and Visual Marketing']" timeout="30"/>
+-    <element name="YotpoSettings" type="button" selector="a.yotpo-settings" timeout="30"/>
+-
+-  </section>
+-</sections>
+diff --git a/Test/CheckOrderSyncTodayTest.xml b/Test/CheckOrderSyncTodayTest.xml
+deleted file mode 100644
+index 82bbf28..0000000
+--- a/Test/CheckOrderSyncTodayTest.xml
++++ /dev/null
+@@ -1,55 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="CheckOrderSyncTodayTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Set order sync date to today and verify it working"/>
+-            <title value="Test sync orders from date"/>
+-            <description value="Test sync orders from date"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-290"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-            <uncheckOption selector="{{AdminLoginToYotpo.OrderSyncFromDateCheckbox}}" stepKey="ClickOnOrderSyncFromDateEnabledCheckbox"/>
+-            <grabValueFrom selector="{{AdminLoginToYotpo.OrdersSyncFromDate}}" stepKey="getCurrentSyncFromDate"/>
+-            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
+-            <createData entity="CashOnDeliveryPaymentMethodDefault" stepKey="cashOnDeliveryPaymentMethod"/>
+-            <createData entity="Simple_US_Customer_CA" stepKey="simpleCustomer"/>
+-            <createData entity="SimpleProduct_25" stepKey="simpleProduct">
+-                <field key="price">5</field>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <deleteData createDataKey="simpleCustomer" stepKey="deleteSimpleCustomer"/>
+-            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-            <checkOption selector="{{AdminLoginToYotpo.OrderSyncFromDateCheckbox}}" stepKey="ClickOnOrderSyncFromDateDisabledCheckBox"/>
+-            <checkOption selector="{{AdminLoginToYotpo.OrderSyncCustomStatusesCheckbox}}" stepKey="ClickOnCustomStatusesEnabledCheckbox"/>
+-            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-            <waitForPageLoad stepKey="waitForSaveConfig"/>
+-            <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-        </after>
+-
+-        <actionGroup ref="navigateToNewOrderPageExistingCustomer" stepKey="navigateToNewOrderWithExistingCustomer">
+-            <argument name="customer" value="$$simpleCustomer$$"/>
+-        </actionGroup>
+-        <actionGroup ref="AddSimpleProductToOrderActionGroup" stepKey="addSimpleProductToOrder">
+-            <argument name="product" value="$$simpleProduct$$"/>
+-            <argument name="productQty" value="1"/>
+-        </actionGroup>
+-        <actionGroup ref="SelectCashOnDeliveryPaymentMethodActionGroup" stepKey="selectPaymentMethod"/>
+-        <actionGroup ref="OrderSelectFlatRateShippingActionGroup" stepKey="orderSelectFlatRateShippingMethod"/>
+-        <actionGroup ref="AdminSubmitOrderActionGroup" stepKey="submitOrder"/>
+-        <actionGroup ref="VerifyCreatedOrderInformationActionGroup" stepKey="verifyCreatedOrderInformation"/>
+-        <grabTextFrom selector="|Order # (\d+)|" stepKey="getOrderId"/>
+-        <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder">
+-            <argument name="orderId" value="$getOrderId"/>
+-        </actionGroup>
+-        <actionGroup ref="CheckOrdersSync" stepKey="checkOrdersSync"/>
+-    </test>
+-</tests>
+diff --git a/Test/EnableMagentoReviewsTest.xml b/Test/EnableMagentoReviewsTest.xml
+deleted file mode 100644
+index b85647b..0000000
+--- a/Test/EnableMagentoReviewsTest.xml
++++ /dev/null
+@@ -1,51 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="EnableMagentoReviewsTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable Magento reviews and verify it does not appear on product page"/>
+-            <title value="Test that reviews does not appear on the product page"/>
+-            <description value="Test that reviews does not appear on the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-290"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-            <uncheckOption selector="{{AdminLoginToYotpo.HideMagentoReviewsCheckbox}}" stepKey="ClickOnHideMagentoReviewsEnabledCheckbox"/>
+-            <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.HideMagentoReviews}}" stepKey="hideMagentoReviews"/>
+-            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-            <waitForPageLoad stepKey="waitForSaveConfig"/>
+-            <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-            <createData entity="_defaultCategory" stepKey="createCategory"/>
+-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+-                <field key="price">10.00</field>
+-                <requiredEntity createDataKey="createCategory"/>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="DisableMagentoReviews" stepKey="DisableMagentoReviews"/>
+-            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+-            <deleteData  createDataKey="createCategory" stepKey="deleteCategory"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-            <checkOption selector="{{AdminLoginToYotpo.HideMagentoReviewsCheckbox}}" stepKey="ClickOnHideMagentoReviewsDisabledCheckbox"/>
+-            <selectOption userInput="No" selector="{{AdminLoginToYotpo.HideMagentoReviews}}" stepKey="hideMagentoReviews"/>
+-            <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-            <waitForPageLoad stepKey="waitForSaveConfig"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <actionGroup ref="EnableMagentoReviews" stepKey="EnableMagentoReviews"/>
+-
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <seeElement selector="{{MagentoReviewsProductPageSection.productReviews}}" stepKey="checkProductReviewsSummaryIsAppearsOnPage"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/ActionGroup/DiableYotpoPluginActionGroup.xml b/Test/Mftf/ActionGroup/DiableYotpoPluginActionGroup.xml
+deleted file mode 100644
+index 79c6e5e..0000000
+--- a/Test/Mftf/ActionGroup/DiableYotpoPluginActionGroup.xml
++++ /dev/null
+@@ -1,26 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-  <actionGroup name="DisableYotpoPlugin">
+-    <waitForPageLoad stepKey="waitForYotpoPageToLoad"/>
+-    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-
+-    <!-- disable Yotpo plugin -->
+-    <selectOption userInput="0" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="DisableYotpoPlugin"/>
+-
+-    <!-- save Yotpo configuration -->
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-
+-    <!-- Check that configuraion was saved -->
+-    <waitForPageLoad stepKey="waitForSaveConfig"/>
+-    <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-  </actionGroup>
+-</actionGroups>
+-
+-
+diff --git a/Test/Mftf/ActionGroup/EnableYotpoOnAdditionalStorePluginActionGroup.xml b/Test/Mftf/ActionGroup/EnableYotpoOnAdditionalStorePluginActionGroup.xml
+deleted file mode 100644
+index 6b2d994..0000000
+--- a/Test/Mftf/ActionGroup/EnableYotpoOnAdditionalStorePluginActionGroup.xml
++++ /dev/null
+@@ -1,30 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-  <actionGroup name="EnableYotpoOnAdditionalStorePlugin">
+-    <arguments>
+-      <argument name="yotpo_app_key_2" type="string" defaultValue="{{_CREDS.yotpo/yotpo_app_key_2}}"/>
+-      <argument name="yotpo_secret_2" type="string" defaultValue="{{_CREDS.yotpo/yotpo_secret_2}}"/>
+-    </arguments>
+-
+-    <!-- enable Yotpo plugin -->
+-    <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
+-    <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
+-
+-    <!-- set Yotpo credentials -->
+-    <fillField userInput="{{yotpo_app_key_2}}" selector="{{AdminLoginToYotpo.yotpoAppKey}}" stepKey="fillAppKey"/>
+-    <fillField userInput="{{yotpo_secret_2}}" selector="{{AdminLoginToYotpo.yotpoSecret}}" stepKey="fillSecret"/>
+-
+-    <!-- save Yotpo configuration -->
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-
+-    <!-- Check that configuration was saved -->
+-    <waitForPageLoad stepKey="waitForSaveConfig"/>
+-  </actionGroup>
+-</actionGroups>
+diff --git a/Test/Mftf/ActionGroup/EnableYotpoPluginActionGroup.xml b/Test/Mftf/ActionGroup/EnableYotpoPluginActionGroup.xml
+deleted file mode 100644
+index e59776f..0000000
+--- a/Test/Mftf/ActionGroup/EnableYotpoPluginActionGroup.xml
++++ /dev/null
+@@ -1,31 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-<actionGroup name="EnableYotpoPlugin">
+-  <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-
+-  <!-- enable Yotpo plugin -->
+-  <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
+-  <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
+-
+-  <!-- set Yotpo credentials -->
+-
+-  <fillField userInput="{{_CREDS.yotpo/yotpo_app_key}}" selector="{{AdminLoginToYotpo.yotpoAppKey}}" stepKey="fillAppKey"/>
+-  <fillField userInput="{{_CREDS.yotpo/yotpo_secret}}" selector="{{AdminLoginToYotpo.yotpoSecret}}" stepKey="fillSecret"/>
+-
+-  <!-- save Yotpo configuration -->
+-  <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-
+-  <!-- Check that configuraion was saved -->
+-  <waitForPageLoad stepKey="waitForSaveConfig"/>
+-  <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-</actionGroup>
+-</actionGroups>
+-
+-
+diff --git a/Test/Mftf/ActionGroup/EnableYotpoPluginWithCustomCredentialsActionGroup.xml b/Test/Mftf/ActionGroup/EnableYotpoPluginWithCustomCredentialsActionGroup.xml
+deleted file mode 100644
+index 9afee9b..0000000
+--- a/Test/Mftf/ActionGroup/EnableYotpoPluginWithCustomCredentialsActionGroup.xml
++++ /dev/null
+@@ -1,27 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-  <actionGroup name="EnableYotpoPluginWithCustomCredentials">
+-    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-
+-    <!-- enable Yotpo plugin -->
+-    <selectOption userInput="1" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="setYotpoAsActive"/>
+-    <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoEnabled"/>
+-
+-    <!-- set Yotpo credentials -->
+-    <fillField userInput="{{appKey}}" selector="{{AdminLoginToYotpo.yotpoAppKey}}" stepKey="fillAppKey"/>
+-    <fillField userInput="{{secret}}" selector="{{AdminLoginToYotpo.yotpoSecret}}" stepKey="fillSecret"/>
+-
+-    <!-- save Yotpo configuration -->
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-
+-    <!-- Check that configuration was saved -->
+-    <waitForPageLoad stepKey="waitForSaveConfig"/>
+-  </actionGroup>
+-</actionGroups>
+diff --git a/Test/Mftf/ActionGroup/SetDefaultWidgetSettingsActionGroup.xml b/Test/Mftf/ActionGroup/SetDefaultWidgetSettingsActionGroup.xml
+deleted file mode 100644
+index 2f9c387..0000000
+--- a/Test/Mftf/ActionGroup/SetDefaultWidgetSettingsActionGroup.xml
++++ /dev/null
+@@ -1,35 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+-  <actionGroup name="SetDefaultWidgetSettings">
+-    <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-    <waitForPageLoad stepKey="waitForPageLoad"/>
+-
+-    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-
+-    <!-- Select Yes Show Reviews Widget -->
+-    <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
+-    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
+-
+-    <!-- Select Yes Show star rating on category pages -->
+-    <uncheckOption selector="{{YotpoCategoryPage.StarRatingCheckBox}}" stepKey="checkCheckbox"/>
+-    <selectOption userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="selectWidgetEnabledCheckBox"/>
+-
+-    <!-- Select Yes Show star rating on product pages -->
+-    <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
+-    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeEnable"/>
+-
+-    <!-- Save Configuration -->
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-    <waitForPageLoad stepKey="waitForSaveConfig"/>
+-  </actionGroup>
+-</actionGroups>
+-
+-
+diff --git a/Test/Mftf/Data/YotpoReviewsData.xml b/Test/Mftf/Data/YotpoReviewsData.xml
+deleted file mode 100644
+index a40bd0c..0000000
+--- a/Test/Mftf/Data/YotpoReviewsData.xml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+-    <entity name="AdminMenuMarketingYotpoReviews">
+-        <data key="pageTitle">Yotpo Reviews</data>
+-        <data key="title">Yotpo Reviews</data>
+-        <data key="dataUiId">yotpo-yotpo-yotpo-report-reviews</data>
+-    </entity>
+-</entities>
+diff --git a/Test/Mftf/Section/AdminLoginToYotpoSection.xml b/Test/Mftf/Section/AdminLoginToYotpoSection.xml
+deleted file mode 100644
+index 7487930..0000000
+--- a/Test/Mftf/Section/AdminLoginToYotpoSection.xml
++++ /dev/null
+@@ -1,35 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-  <section name="AdminLoginToYotpo">
+-    <element name="YotpoIconInMenu" type="text" selector="#system_config_tabs .yotpo-icon" timeout="30"/>
+-    <element name="yotpoAppKey" type="text" selector="input#yotpo_settings_app_key" timeout="30"/>
+-    <element name="yotpoSecret" type="text" selector="input#yotpo_settings_secret" timeout="30"/>
+-
+-    <element name="GeneralMenu" type="button" selector="#system_config_tabs > div:nth-child(1) > div" timeout="30"/>
+-    <element name="YotpoMenu" type="button" selector="#system_config_tabs > div:nth-child(6) > div" timeout="30"/>
+-    <element name="WidgetSettings" type="button" selector="//a[@id='yotpo_widget_settings-head']" timeout="30"/>
+-    <element name="YotpoEnabled" type="select" selector="//select[@id='yotpo_settings_active']" timeout="30"/>
+-    <element name="WidgetEnabled" type="select" selector="//select[@id='yotpo_widget_settings_widget_enabled']" timeout="30"/>
+-    <element name="WidgetEnabledCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_widget_enabled_inherit']" timeout="30"/>
+-
+-    <element name="StarRatingProductPage" type="select" selector="//select[@id='yotpo_widget_settings_bottomline_enabled']" timeout="30"/>
+-    <element name="StarRatingProductPageCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_bottomline_enabled_inherit']" timeout="30"/>
+-
+-    <element name="EnableQandA" type="select" selector="//select[@id='yotpo_widget_settings_qna_enabled']" timeout="30"/>
+-    <element name="EnableQandACheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_qna_enabled_inherit']" timeout="30"/>
+-
+-    <element name="SaveConfiguration" type="button" selector="//span[text()='Save Config']" timeout="30"/>
+-    <element name="SavedConfiguration" type="button" selector="//div[text()='You saved the configuration.']" timeout="30"/>
+-    <element name="ReviewsAndVisualMarketing" type="button" selector="//a[contains(@class, 'item-nav')]//span[text()='Reviews and Visual Marketing']" timeout="30"/>
+-    <element name="YotpoSettings" type="button" selector="a.yotpo-settings" timeout="30"/>
+-
+-  </section>
+-</sections>
+\ No newline at end of file
+diff --git a/Test/Mftf/Section/YotpoCategoryPageSection.xml b/Test/Mftf/Section/YotpoCategoryPageSection.xml
+deleted file mode 100644
+index abcd854..0000000
+--- a/Test/Mftf/Section/YotpoCategoryPageSection.xml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-  <section name="YotpoCategoryPage">
+-    <element name="StarRatingEnabled" type="select" selector="//select[@id='yotpo_widget_settings_category_bottomline_enabled']" timeout="30"/>
+-    <element name="StarRatingCheckBox" type="checkbox" selector="//input[@id='yotpo_widget_settings_category_bottomline_enabled_inherit']"/>
+-    <element name="CategoryStarRatingDiv" type="block" selector="//div[@class='yotpo bottomLine bottomline-position yotpo-small']"/>
+-  </section>
+-</sections>
+\ No newline at end of file
+diff --git a/Test/Mftf/Section/YotpoConfigurationSection.xml b/Test/Mftf/Section/YotpoConfigurationSection.xml
+deleted file mode 100644
+index b5702df..0000000
+--- a/Test/Mftf/Section/YotpoConfigurationSection.xml
++++ /dev/null
+@@ -1,14 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-    <section name="YotpoConfigurationSection">
+-        <element name="ErrorMessage" type="text" selector="#messages .messages .message-error" timeout="30"/>
+-    </section>
+-</sections>
+\ No newline at end of file
+diff --git a/Test/Mftf/Section/YotpoDashboardSection.xml b/Test/Mftf/Section/YotpoDashboardSection.xml
+deleted file mode 100644
+index a2d6a81..0000000
+--- a/Test/Mftf/Section/YotpoDashboardSection.xml
++++ /dev/null
+@@ -1,15 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-    <section name="YotpoDashboardSection">
+-        <element name="YotpoReviewsTab" type="text" selector="a#grid_tab_yotpo_reviews" timeout="30"/>
+-        <element name="LaunchYotpoButton" type="button" selector="#launch_yotpo_button" timeout="30"/>
+-    </section>
+-</sections>
+\ No newline at end of file
+diff --git a/Test/Mftf/Section/YotpoProductPageSection.xml b/Test/Mftf/Section/YotpoProductPageSection.xml
+deleted file mode 100644
+index eea65ac..0000000
+--- a/Test/Mftf/Section/YotpoProductPageSection.xml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+-  <section name="YotpoProductPageSection">
+-    <element name="BottomLine" type="text" selector=".yotpoBottomLine .yotpo-display-wrapper .star-clickable" timeout="30"/>
+-    <element name="QuestionAndAnswerBottomLine" type="text" selector=".yotpoBottomLine .QABottomLine" timeout="30"/>
+-    <element name="MainWidget" type="text" selector=".main-widget .yotpo-display-wrapper" timeout="30"/>
+-  </section>
+-</sections>
+diff --git a/Test/Mftf/Suite/yotpoMultiStoreSuite.xml b/Test/Mftf/Suite/yotpoMultiStoreSuite.xml
+deleted file mode 100644
+index cf5b2d4..0000000
+--- a/Test/Mftf/Suite/yotpoMultiStoreSuite.xml
++++ /dev/null
+@@ -1,45 +0,0 @@
+-<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Suite/etc/suiteSchema.xsd">
+-  <suite name="YotpoMultiStoreSuite">
+-    <before>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+-      <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+-        <argument name="storeView" value="_defaultStore.name"/>
+-      </actionGroup>
+-
+-      <!-- create additional store view -->
+-      <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createSecondStoreView">
+-        <argument name="customStore" value="NewStoreViewData"/>
+-      </actionGroup>
+-
+-      <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView" />
+-
+-      <!-- navigate to correct store -->
+-      <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+-        <argument name="storeView" value="NewStoreViewData.name"/>
+-      </actionGroup>
+-
+-      <!-- enable yotpo on additional store -->
+-      <actionGroup ref="EnableYotpoOnAdditionalStorePlugin" stepKey="enableYotpoOnAdditionalStorePlugin"/>
+-    </before>
+-
+-    <after>
+-      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+-
+-      <!-- remove the additional store view -->
+-      <actionGroup ref="AdminDeleteStoreViewActionGroup" stepKey="deleteStoreView">
+-        <argument name="customStore" value="NewStoreViewData"/>
+-      </actionGroup>
+-
+-      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-    </after>
+-
+-    <include>
+-      <group name="YotpoMultiStore"/>
+-    </include>
+-    <exclude>
+-    </exclude>
+-  </suite>
+-</suites>
+diff --git a/Test/Mftf/Suite/yotpoSuite.xml b/Test/Mftf/Suite/yotpoSuite.xml
+deleted file mode 100644
+index 6fb2dc2..0000000
+--- a/Test/Mftf/Suite/yotpoSuite.xml
++++ /dev/null
+@@ -1,24 +0,0 @@
+-<suites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Suite/etc/suiteSchema.xsd">
+-  <suite name="yotpoSuite">
+-    <before>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <createData entity="SimpleProduct2" stepKey="createProduct"/>
+-      <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+-        <argument name="storeView" value="_defaultStore.name"/>
+-      </actionGroup>
+-    </before>
+-
+-    <after>
+-      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+-      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-    </after>
+-
+-    <include>
+-      <group name="Yotpo"/>
+-    </include>
+-    <exclude>
+-    </exclude>
+-  </suite>
+-</suites>
+diff --git a/Test/Mftf/Test/BottomlineQnADoesntAppearInProductPageTest.xml b/Test/Mftf/Test/BottomlineQnADoesntAppearInProductPageTest.xml
+deleted file mode 100644
+index 9543532..0000000
+--- a/Test/Mftf/Test/BottomlineQnADoesntAppearInProductPageTest.xml
++++ /dev/null
+@@ -1,49 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="BottomlineQnADoesntAppearInProductPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <title value="Disable QnA"/>
+-            <stories value="Disable QnA and verify that it does not appear on the product page" />
+-            <description value="Disable QnA and verify that it does not appear on the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-248"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <uncheckOption selector="{{AdminLoginToYotpo.EnableQandACheckBox}}" stepKey="UncheckQnACheckbox"/>
+-        <selectOption userInput="No" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="selectQnAToBeDisable"/>
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-        <seeOptionIsSelected userInput="No" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQnADisable"/>
+-
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that QnA does not appear in the page -->
+-        <dontSeeElement selector="{{YotpoProductPageSection.QuestionAndAnswerBottomLine}}" stepKey="checkQnADoesntAppear"/>
+-    </test>
+-</tests>
+\ No newline at end of file
+diff --git a/Test/Mftf/Test/BottomlineStarAppearInCategoryPageTest.xml b/Test/Mftf/Test/BottomlineStarAppearInCategoryPageTest.xml
+deleted file mode 100644
+index 08cbec0..0000000
+--- a/Test/Mftf/Test/BottomlineStarAppearInCategoryPageTest.xml
++++ /dev/null
+@@ -1,55 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="BottomlineStarAppearInCategoryPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+-            <title value="Test that bottomline stars appear in the product page"/>
+-            <description value="Test that bottomline stars appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-249"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-            <createData entity="ApiCategory" stepKey="createCategory"/>
+-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+-                <requiredEntity createDataKey="createCategory"/>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+-            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingEnabled}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>
+-
+-        <actionGroup ref="GoToStorefrontCategoryPageByParametersActionGroup" stepKey="goToStorefrontCategoryPage">
+-            <argument name="category" value="$$createCategory.custom_attributes[url_key]$$"/>
+-            <argument name="mode" value="grid"/>
+-            <argument name="numOfProductsPerPage" value="25"/>
+-            <argument name="sortBy" value="price"/>
+-            <argument name="sort" value="desc"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <seeElement selector="{{YotpoCategoryPage.CategoryStarRatingDiv}}" stepKey="checkYotpoAppearsInTheMenu"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/BottomlineStarAppearInSubCategoryPageTest.xml b/Test/Mftf/Test/BottomlineStarAppearInSubCategoryPageTest.xml
+deleted file mode 100644
+index c3aff04..0000000
+--- a/Test/Mftf/Test/BottomlineStarAppearInSubCategoryPageTest.xml
++++ /dev/null
+@@ -1,56 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="BottomlineStarAppearInSubCategoryPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+-            <title value="Test that bottomline stars appear in the product page"/>
+-            <description value="Test that bottomline stars appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-250"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-            <createData entity="SimpleSubCategory" stepKey="createCategory"/>
+-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+-                <requiredEntity createDataKey="createCategory"/>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+-            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingEnabled}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <seeOptionIsSelected userInput="Yes" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeBottomlineEnabled"/>
+-
+-        <actionGroup ref="GoToStorefrontCategoryPageByParametersActionGroup" stepKey="goToStorefrontCategoryPage">
+-            <argument name="category" value="$$createCategory.custom_attributes[url_key]$$"/>
+-            <argument name="mode" value="grid"/>
+-            <argument name="numOfProductsPerPage" value="25"/>
+-            <argument name="sortBy" value="price"/>
+-            <argument name="sort" value="desc"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <seeElement selector="{{YotpoCategoryPage.CategoryStarRatingDiv}}" stepKey="checkYotpoAppearsInTheMenu"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/BottomlineStarsAppearInProductPageTest.xml b/Test/Mftf/Test/BottomlineStarsAppearInProductPageTest.xml
+deleted file mode 100644
+index 54b70d9..0000000
+--- a/Test/Mftf/Test/BottomlineStarsAppearInProductPageTest.xml
++++ /dev/null
+@@ -1,49 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="BottomlineStarsAppearInProductPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+-            <title value="Enable show bottomline and verify that bottomline appear on product page"/>
+-            <description value="Test that bottomline stars appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-248"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPage}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeEnable"/>
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-        <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="seeYotpoEnabled"/>
+-
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <seeElement selector="{{YotpoProductPageSection.BottomLine}}" stepKey="checkBottomLineAppearsInTheMenu"/>
+-    </test>
+-</tests>
+-
+diff --git a/Test/Mftf/Test/BottomlineStarsDoesntAppearInProductPageTest.xml b/Test/Mftf/Test/BottomlineStarsDoesntAppearInProductPageTest.xml
+deleted file mode 100644
+index 8efecd1..0000000
+--- a/Test/Mftf/Test/BottomlineStarsDoesntAppearInProductPageTest.xml
++++ /dev/null
+@@ -1,49 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="BottomlineStarsDoesntAppearInProductPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Disable show bottomline and verify that bottomline does not appear on the product page" />
+-            <title value="Disable show bottomline and verify that bottomline does not appear on the product page"/>
+-            <description value="Test that bottomline stars doesnt appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-248"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <uncheckOption selector="{{AdminLoginToYotpo.StarRatingProductPageCheckBox}}" stepKey="ClickOnStarRatingProductPageCheckBox"/>
+-        <selectOption userInput="No" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeDisable"/>
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-        <seeOptionIsSelected userInput="No" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="seeStarRatingDisable"/>
+-
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <dontSeeElement selector="{{YotpoProductPageSection.BottomLine}}" stepKey="checkBottomLineDoesntAppearsInTheMenu"/>
+-    </test>
+-</tests>
+\ No newline at end of file
+diff --git a/Test/Mftf/Test/ClickingOnEnabledBottomlineInProductPageShowsTheWidget.xml b/Test/Mftf/Test/ClickingOnEnabledBottomlineInProductPageShowsTheWidget.xml
+deleted file mode 100644
+index 54ea861..0000000
+--- a/Test/Mftf/Test/ClickingOnEnabledBottomlineInProductPageShowsTheWidget.xml
++++ /dev/null
+@@ -1,52 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="ClickingOnEnabledBottomlineInProductPageShowsTheWidget">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Clicking on enabled bottomline in product page shows the widget" />
+-            <title value="Clicking on enabled bottomline in product page shows the widget 11"/>
+-            <description value="Test that bottomline stars appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-248"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
+-        <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
+-        <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="seeWidgetEnabled"/>
+-        <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="selectStarRatingToBeEnable"/>
+-        <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.StarRatingProductPage}}" stepKey="seeYotpoEnabled"/>
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <click selector="{{YotpoProductPageSection.BottomLine}}" stepKey="clickOnBottomLineProductPage"/>
+-        <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetAppears"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/DisableBottomlineInCategoryPageTest.xml b/Test/Mftf/Test/DisableBottomlineInCategoryPageTest.xml
+deleted file mode 100644
+index 8593e87..0000000
+--- a/Test/Mftf/Test/DisableBottomlineInCategoryPageTest.xml
++++ /dev/null
+@@ -1,63 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="DisableBottomlineInCategoryPageTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+-            <title value="Test that bottomline stars appear in the product page"/>
+-            <description value="Test that bottomline stars appear in the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-251"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-            <createData entity="ApiCategory" stepKey="createCategory"/>
+-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+-                <requiredEntity createDataKey="createCategory"/>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{YotpoCategoryPage.StarRatingCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-        <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-        <uncheckOption selector="{{YotpoCategoryPage.StarRatingCheckBox}}" stepKey="checkCheckbox"/>
+-
+-        <selectOption userInput="No" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="selectStarRatingToBeDisable"/>
+-
+-        <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-        <seeOptionIsSelected userInput="No" selector="{{YotpoCategoryPage.StarRatingEnabled}}" stepKey="seeStarRatingDisable"/>
+-
+-        <click selector="{{AdminLoginToYotpo.WidgetSettings}}" stepKey="clickOnWidgetSettings2"/>
+-        <wait time="30" stepKey="waitTenSeconds2"/>
+-
+-        <actionGroup ref="GoToStorefrontCategoryPageByParametersActionGroup" stepKey="goToStorefrontCategoryPage">
+-            <argument name="category" value="$$createCategory.custom_attributes[url_key]$$"/>
+-            <argument name="mode" value="grid"/>
+-            <argument name="numOfProductsPerPage" value="25"/>
+-            <argument name="sortBy" value="price"/>
+-            <argument name="sort" value="desc"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the created product page -->
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that bottomline stars appear in the page -->
+-        <dontSeeElement selector="{{YotpoCategoryPage.CategoryStarRatingDiv}}" stepKey="checkYotpoDoesNotAppearsInTheMenu"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/DisableDefaultWidgetPositionVerifyTheWidgetDoesntAppearsOnProductPage.xml b/Test/Mftf/Test/DisableDefaultWidgetPositionVerifyTheWidgetDoesntAppearsOnProductPage.xml
+deleted file mode 100644
+index 802eab1..0000000
+--- a/Test/Mftf/Test/DisableDefaultWidgetPositionVerifyTheWidgetDoesntAppearsOnProductPage.xml
++++ /dev/null
+@@ -1,50 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-  <test name="DisableDefaultWidgetPositionVerifyTheWidgetDoesntAppearsOnProductPage">
+-    <annotations>
+-      <features value="Yotpo"/>
+-      <stories value="Disable default widget position and verify the widget does not appear on product page" />
+-      <title value="Verify the widget does not appear on product page"/>
+-      <description value="Test that bottomline stars appear in the product page"/>
+-      <severity value="AVERAGE"/>
+-      <testCaseId value="MC-248"/>
+-      <group value="Yotpo"/>
+-    </annotations>
+-
+-    <before>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-    </before>
+-
+-    <after>
+-      <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-    </after>
+-
+-    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-    <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
+-    <selectOption userInput="No" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeDisable"/>
+-
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-    <seeOptionIsSelected userInput="No" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="seeStarRatingDisable"/>
+-
+-    <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-      <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-    </actionGroup>
+-
+-    <!-- navigate to the created product page -->
+-    <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-    <!-- Check that bottomline stars appear in the page -->
+-    <dontSeeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetAppears"/>
+-  </test>
+-</tests>
+diff --git a/Test/Mftf/Test/DisableYotpoReviewsTest.xml b/Test/Mftf/Test/DisableYotpoReviewsTest.xml
+deleted file mode 100644
+index eed4906..0000000
+--- a/Test/Mftf/Test/DisableYotpoReviewsTest.xml
++++ /dev/null
+@@ -1,51 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="DisableYotpoReviewsTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Disable Yotpo reviews and verify it does not appear on product page1" />
+-            <title value="Test that reviews does not appear on the product page1"/>
+-            <description value="Test that reviews does not appear on the product page"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-290"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-            <createData entity="_defaultCategory" stepKey="createCategory"/>
+-            <createData entity="SimpleProduct" stepKey="createSimpleProduct">
+-                <field key="price">10.00</field>
+-                <requiredEntity createDataKey="createCategory"/>
+-            </createData>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+-                <argument name="storeView" value="_defaultStore.name"/>
+-            </actionGroup>
+-            <deleteData createDataKey="createSimpleProduct" stepKey="deleteProduct"/>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <actionGroup ref="DisableYotpoPlugin" stepKey="DisableYotpoPlugin"/>
+-
+-        <!-- navigate to the created product page -->
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check that the main widget does not appear on the product page page -->
+-        <dontSeeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesNotAppearsOnPage"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/EnableDefaultWidgetPositionVerifyTheWidgetAppearsOnProductPage.xml b/Test/Mftf/Test/EnableDefaultWidgetPositionVerifyTheWidgetAppearsOnProductPage.xml
+deleted file mode 100644
+index 6dfaf85..0000000
+--- a/Test/Mftf/Test/EnableDefaultWidgetPositionVerifyTheWidgetAppearsOnProductPage.xml
++++ /dev/null
+@@ -1,49 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-  <test name="EnableDefaultWidgetPositionVerifyTheWidgetAppearsOnProductPage">
+-    <annotations>
+-      <features value="Yotpo"/>
+-      <stories value="Enable show bottomline and verify that bottomline appear on product page" />
+-      <title value="Verify that bottomline appear on product page"/>
+-      <description value="Test that bottomline stars appear in the product page"/>
+-      <severity value="AVERAGE"/>
+-      <testCaseId value="MC-248"/>
+-      <group value="Yotpo"/>
+-    </annotations>
+-
+-    <before>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-    </before>
+-
+-    <after>
+-      <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-    </after>
+-
+-    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-    <uncheckOption selector="{{AdminLoginToYotpo.WidgetEnabledCheckBox}}" stepKey="ClickOnWidgetEnabledCheckBox"/>
+-    <selectOption userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="selectWidgetToBeEnabled"/>
+-    <click selector="{{AdminLoginToYotpo.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+-    <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.WidgetEnabled}}" stepKey="seeWidgetEnabled"/>
+-
+-    <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-      <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-    </actionGroup>
+-
+-    <!-- navigate to the created product page -->
+-    <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-    <!-- Check that bottomline stars appear in the page -->
+-    <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetAppears"/>
+-  </test>
+-</tests>
+diff --git a/Test/Mftf/Test/EnableShowBottomLineVerifyQ&ABottomlineAppearInProductPage.xml b/Test/Mftf/Test/EnableShowBottomLineVerifyQ&ABottomlineAppearInProductPage.xml
+deleted file mode 100644
+index 2782477..0000000
+--- a/Test/Mftf/Test/EnableShowBottomLineVerifyQ&ABottomlineAppearInProductPage.xml
++++ /dev/null
+@@ -1,47 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-  <test name="EnableShowBottomLineVerifyQandABottomlineAppearInProductPage">
+-    <annotations>
+-      <features value="Yotpo"/>
+-      <stories value="Enable show bottomline and verify Q and A bottomline appear on the product page" />
+-      <title value="Verify that Q and A bottomline appear on product page"/>
+-      <description value="Test that Q and A bottomline stars appear in the product page"/>
+-      <severity value="AVERAGE"/>
+-      <testCaseId value="MC-248"/>
+-      <group value="Yotpo"/>
+-    </annotations>
+-
+-    <before>
+-      <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-      <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView" />
+-    </before>
+-
+-    <after>
+-      <actionGroup ref="SetDefaultWidgetSettings" stepKey="SetDefaultWidgetSettings"/>
+-      <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-      <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+-    </after>
+-
+-    <conditionalClick selector="{{AdminLoginToYotpo.WidgetSettings}}" dependentSelector="{{AdminLoginToYotpo.WidgetSettings}}" visible="false" stepKey="openWidgetSettingsIfNecessary"/>
+-    <waitForPageLoad stepKey="waitForWidgetSettingsLoad"/>
+-    <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToYotpo.EnableQandA}}" stepKey="seeQandAisEnabled"/>
+-
+-    <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-      <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-    </actionGroup>
+-
+-    <!-- navigate to the created product page -->
+-    <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-    <!-- Check that Q&A bottomline appear in the page -->
+-    <seeElement selector="{{YotpoProductPageSection.QuestionAndAnswerBottomLine}}" stepKey="checkQuestionAndAnswerBottomLineAppears"/>
+-  </test>
+-</tests>
+diff --git a/Test/Mftf/Test/EnableYotpoOnMultipleStoreViewsTest.xml b/Test/Mftf/Test/EnableYotpoOnMultipleStoreViewsTest.xml
+deleted file mode 100644
+index 453f2e1..0000000
+--- a/Test/Mftf/Test/EnableYotpoOnMultipleStoreViewsTest.xml
++++ /dev/null
+@@ -1,63 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="EnableYotpoOnMultipleStoreViewsTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable Yotpo on multiple store views"/>
+-            <title value="Enable Yotpo on multiple store views"/>
+-            <description value="Yotpo reviews should appear on different storefront views"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-292"/>
+-            <group value="YotpoMultiStore"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView"/>
+-
+-            <!-- switch to second store view -->
+-            <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+-                <argument name="storeView" value="NewStoreViewData.name"/>
+-            </actionGroup>
+-        </before>
+-
+-        <after>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <actionGroup ref="EnableYotpoOnAdditionalStorePlugin" stepKey="enableYotpoOnAdditionalStore">
+-        </actionGroup>
+-
+-        <!-- Check that configuration was saved -->
+-        <seeElement selector="{{AdminLoginToYotpo.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+-
+-        <!-- navigate to the to default store view product page -->
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- Check Yotpo widget appears -->
+-        <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesAppearsOnFirstStoreViewProductPage"/>
+-
+-        <!-- Switch Storefront StoreView -->
+-        <actionGroup ref="StorefrontSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+-            <argument name="storeView" value="NewStoreViewData"/>
+-        </actionGroup>
+-
+-        <!-- navigate to the second store view product page -->
+-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPageOnSecondStoreView">
+-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+-        </actionGroup>
+-
+-        <!-- Check Yotpo widget appears on the second store view -->
+-        <seeElement selector="{{YotpoProductPageSection.MainWidget}}" stepKey="checkMainWidgetDoesAppearsOnSecondStoreViewProductPage"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/EnableYotpoWithIncorrectAppKeyTest.xml b/Test/Mftf/Test/EnableYotpoWithIncorrectAppKeyTest.xml
+deleted file mode 100644
+index caaf207..0000000
+--- a/Test/Mftf/Test/EnableYotpoWithIncorrectAppKeyTest.xml
++++ /dev/null
+@@ -1,43 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="EnableYotpoWithIncorrectAppKeyTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable Yotpo with incorrect credentials"/>
+-            <title value="Enable Yotpo with incorrect credentials"/>
+-            <description value="Enable Yotpo with incorrect credentials should fail"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-291"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/store/1/" stepKey="navigateToYotpoConfigurationOnDefaultStoreView"/>
+-        </before>
+-
+-        <after>
+-            <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+-                <argument name="storeView" value="_defaultStore.name"/>
+-            </actionGroup>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <actionGroup ref="EnableYotpoPluginWithCustomCredentials" stepKey="enableYotpoPlugin">
+-            <argument name="appKey" value="123"/>
+-            <argument name="secret" value="123"/>
+-        </actionGroup>
+-        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-
+-        <!-- Check an error message appears -->
+-        <seeElement selector="{{YotpoConfigurationSection.ErrorMessage}}" stepKey="checkErrorMessageAppearsOnPage"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/EnableYotpoWithSameCredentialsOnMultipleStoresTest.xml b/Test/Mftf/Test/EnableYotpoWithSameCredentialsOnMultipleStoresTest.xml
+deleted file mode 100644
+index cb45d78..0000000
+--- a/Test/Mftf/Test/EnableYotpoWithSameCredentialsOnMultipleStoresTest.xml
++++ /dev/null
+@@ -1,45 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="EnableYotpoWithSameCredentialsOnMultipleStoresTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Enable Yotpo with same credentials on multiple stores"/>
+-            <title value="Enable Yotpo with same credentials on multiple stores"/>
+-            <description value="Enabling Yotpo with same credentials on multiple stores should fail"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-292"/>
+-            <group value="YotpoMultiStore"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="admin/admin/system_config/edit/section/yotpo/" stepKey="navigateToYotpoConfigurationStoreView"/>
+-
+-            <!-- navigate to correct store -->
+-            <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchToSecondStoreView">
+-                <argument name="storeView" value="NewStoreViewData.name"/>
+-            </actionGroup>
+-        </before>
+-
+-        <after>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <actionGroup ref="EnableYotpoOnAdditionalStorePlugin" stepKey="enableSecondStoreViewWithSameCredentials">
+-            <argument name="yotpo_app_key_2" value="{{_CREDS.yotpo/yotpo_app_key}}"/>
+-            <argument name="yotpo_secret_2" value="{{_CREDS.yotpo/yotpo_secret}}"/>
+-        </actionGroup>
+-        <waitForPageLoad stepKey="waitForYotpoConfigurationPageLoad"/>
+-
+-        <!-- Check an error message appears -->
+-        <seeElement selector="{{YotpoConfigurationSection.ErrorMessage}}" stepKey="checkErrorMessageAppearsOnPage"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/LaunchYotpoButtonTest.xml b/Test/Mftf/Test/LaunchYotpoButtonTest.xml
+deleted file mode 100644
+index bbaff3c..0000000
+--- a/Test/Mftf/Test/LaunchYotpoButtonTest.xml
++++ /dev/null
+@@ -1,37 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-    <test name="LaunchYotpoButtonTest">
+-        <annotations>
+-            <features value="Yotpo"/>
+-            <stories value="Launch Yotpo" />
+-            <title value="Test that click on Launch Yotpo redirects to Yotpo`s admin"/>
+-            <description value="Test that click on Launch Yotpo redirects to Yotpo`s admin"/>
+-            <severity value="AVERAGE"/>
+-            <testCaseId value="MC-"/>
+-            <group value="Yotpo"/>
+-        </annotations>
+-
+-        <before>
+-            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-            <amOnPage url="/admin/admin/dashboard/" stepKey="navigateToDashboard" />
+-        </before>
+-
+-        <after>
+-            <amOnPage url="{{AdminLogoutPage.url}}" stepKey="amOnLogoutPage"/>
+-        </after>
+-
+-        <click selector="{{YotpoDashboardSection.YotpoReviewsTab}}" stepKey="clickYotpoReviewsTab"/>
+-        <click selector="{{YotpoDashboardSection.LaunchYotpoButton}}" stepKey="clickLaunchYotpoButton"/>
+-
+-        <!-- Check that new Yotpo Admin tab opened  -->
+-        <switchToNextTab stepKey="switchToNewTab"/>
+-        <seeInCurrentUrl url="https://yap.yotpo.com/#/preferredAppKey=" stepKey="seeAssertYotpoAdminUrl"/>
+-    </test>
+-</tests>
+diff --git a/Test/Mftf/Test/NavigateToYotpoPageFromMarketingPageTest.xml b/Test/Mftf/Test/NavigateToYotpoPageFromMarketingPageTest.xml
+deleted file mode 100644
+index b5fa46e..0000000
+--- a/Test/Mftf/Test/NavigateToYotpoPageFromMarketingPageTest.xml
++++ /dev/null
+@@ -1,37 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-  <test name="NavigateToYotpoPageFromMarketingPageTest">
+-    <annotations>
+-      <features value="Yotpo"/>
+-      <stories value="Navigation To Yotpo Page From Magento Marketing Page" />
+-      <title value="Navigation To Yotpo Page From Magento Marketing Page"/>
+-      <description value="Test navigation To Yotpo Page From Magento Marketing Page"/>
+-      <severity value="AVERAGE"/>
+-      <testCaseId value="MC-248"/>
+-      <group value="magento-navigation-to-yotpo"/>
+-    </annotations>
+-
+-    <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-
+-    <actionGroup ref="EnableYotpoPlugin" stepKey="enableYotpoPlugin">
+-      <argument name="storeView" value="_defaultStore.name"/>
+-    </actionGroup>
+-
+-    <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToYotpoReviewsFromMarketingMenu">
+-      <argument name="menuUiId" value="{{AdminMenuMarketing.dataUiId}}"/>
+-      <argument name="submenuUiId" value="{{AdminMenuMarketingYotpoReviews.dataUiId}}"/>
+-    </actionGroup>
+-
+-    <click selector="{{AdminLoginToYotpo.YotpoSettings}}" stepKey="ClickOnYotpoSettings"/>
+-
+-    <!-- Check You are now on Yotpo page and Yotpo is enabled -->
+-    <seeElement selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeYotpoReviewTitle" />
+-  </test>
+-</tests>
+diff --git a/Test/Mftf/Test/NavigationToYotpoPageTest.xml b/Test/Mftf/Test/NavigationToYotpoPageTest.xml
+deleted file mode 100644
+index 41b3fc4..0000000
+--- a/Test/Mftf/Test/NavigationToYotpoPageTest.xml
++++ /dev/null
+@@ -1,45 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+- /**
+-  * Copyright © Magento, Inc. All rights reserved.
+-  * See COPYING.txt for license details.
+-  */
+--->
+-<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+-  <test name="NavigationToYotpoPageTest">
+-    <annotations>
+-      <features value="Yotpo"/>
+-      <stories value="Navigation To Yotpo Page" />
+-      <title value="Navigation To Yotpo Page "/>
+-      <description value="Test navigation To Yotpo Page"/>
+-      <severity value="AVERAGE"/>
+-      <testCaseId value="MC-248"/>
+-      <group value="yotpo-navigation"/>
+-    </annotations>
+-
+-    <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup"/>
+-    <actionGroup ref="AdminNavigateMenuActionGroup" stepKey="navigateToStoresAllStoresPage">
+-      <argument name="menuUiId" value="{{AdminMenuStores.dataUiId}}"/>
+-      <argument name="submenuUiId" value="{{AdminMenuStoresSettingsConfiguration.dataUiId}}"/>
+-    </actionGroup>
+-    <actionGroup ref="AdminSwitchStoreViewActionGroup" stepKey="switchStoreViewEnglishProduct">
+-      <argument name="storeView" value="_defaultStore.name"/>
+-    </actionGroup>
+-
+-    <click selector="{{AdminLoginToYotpo.GeneralMenu}}" stepKey="ClickOnGeneralMenu"/>
+-    <waitForPageLoad stepKey="waitForClickOnGeneralMenu"/>
+-
+-    <seeElementInDOM selector="{{AdminLoginToYotpo.YotpoIconInMenu}}" stepKey="checkYotpoAppearsInTheMenu"/>
+-
+-    <!-- open Yotpo main menu store configuration menu -->
+-    <click selector="{{AdminLoginToYotpo.YotpoMenu}}" stepKey="ClickOnYotpoMenu"/>
+-    <waitForPageLoad stepKey="waitForProductPageLoad"/>
+-    <!-- open Yotpo's sub menu 'Reviews and Visual Marketing' store configuration menu -->
+-    <click selector="{{AdminLoginToYotpo.ReviewsAndVisualMarketing}}" stepKey="ClickOnReviewsMenu"/>
+-    <waitForPageLoad stepKey="waitForClickOnReviewsMenu"/>
+-
+-    <!-- Check You see Yotpo page -->
+-    <seeElement selector="{{AdminLoginToYotpo.YotpoEnabled}}" stepKey="seeWidgetIcon" />
+-  </test>
+-</tests>
+diff --git a/composer.json b/composer.json
+index c06610c..48457c4 100644
+--- a/composer.json
++++ b/composer.json
+@@ -1,28 +1,14 @@
+ {
+-    "name": "yotpo/magento2-module-yotpo-reviews",
++    "name": "yotpo/module-review",
+     "description": "Yotpo Reviews extension for Magento2",
+-    "version": "3.1.3",
++    "version": "3.1.2",
+     "license": [
+         "OSL-3.0",
+         "AFL-3.0"
+     ],
+     "require": {
+-        "php": "~7.1.3||~7.2.0||~7.3.0||~7.4.0",
+-        "magento/framework": "103.0.*",
+-        "magento/module-backend": "102.0.*",
+-        "magento/module-catalog": "104.0.*",
+-        "magento/module-checkout": "100.4.*",
+-        "magento/module-config": "101.2.*",
+-        "magento/module-grouped-product": "100.4.*",
+-        "magento/module-reports": "^100",
+-        "magento/module-review": "100.4.*",
+-        "magento/module-sales": "102.1.*||^103.0",
+-        "magento/module-store": "101.1.*",
+-        "magento/module-analytics": "*"
+-    },
+-    "replace": {
+-        "yotpo/module-review": "*",
+-        "yotpo/module-yotpo": "*"
++        "php": "~5.6.0|^7.0",
++        "magento/framework": ">=101.0.0"
+     },
+     "type": "magento2-module",
+     "autoload": {
+diff --git a/etc/acl.xml b/etc/acl.xml
+index b9f68db..43ab8f4 100644
+--- a/etc/acl.xml
++++ b/etc/acl.xml
+@@ -1,31 +1,31 @@
+ <?xml version="1.0"?>
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+-    <acl>
+-        <resources>
+-            <resource id="Magento_Backend::admin">
+-                <resource id="Magento_Backend::stores">
+-                    <resource id="Magento_Backend::stores_settings">
+-                        <resource id="Magento_Config::config">
++	<acl>
++		<resources>
++			<resource id="Magento_Backend::admin">
++				<resource id="Magento_Backend::stores">
++					<resource id="Magento_Backend::stores_settings">
++						<resource id="Magento_Config::config">
+                             <resource id="Yotpo_Core::config" title="Yotpo" translate="title" sortOrder="80">
+                                 <resource id="Yotpo_Yotpo::config" title="Product Reviews Settings" translate="title" sortOrder="20" />
+                             </resource>
+-                        </resource>
+-                    </resource>
+-                </resource>
+-                <resource id="Magento_Backend::marketing">
+-                    <resource id="Magento_Backend::marketing_user_content">
+-                        <resource id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" sortOrder="30"/>
+-                    </resource>
+-                </resource>
+-                <resource id="Magento_Reports::report">
++						</resource>
++					</resource>
++				</resource>
++				<resource id="Magento_Backend::marketing">
++					<resource id="Magento_Backend::marketing_user_content">
++						<resource id="Yotpo_Yotpo::yotpo_report_reviews" title="Yotpo Reviews" translate="title" sortOrder="30"/>
++					</resource>
++				</resource>
++				<resource id="Magento_Reports::report">
+                     <resource id="Magento_Analytics::business_intelligence">
+                         <resource id="Yotpo_Yotpo::yotpo_analytics_external" title="Yotpo Analytics" translate="title" sortOrder="30" />
+                     </resource>
+-                    <resource id="Magento_Reports::review">
++					<resource id="Magento_Reports::review">
+                         <resource id="Yotpo_Yotpo::yotpo_reviews_external" title="Yotpo Reviews" translate="title" sortOrder="30" />
+                     </resource>
+                 </resource>
+-            </resource>
+-        </resources>
+-    </acl>
++			</resource>
++		</resources>
++	</acl>
+ </config>
+diff --git a/etc/adminhtml/system.xml b/etc/adminhtml/system.xml
+index b450e19..43c7078 100644
+--- a/etc/adminhtml/system.xml
++++ b/etc/adminhtml/system.xml
+@@ -21,14 +21,14 @@
+                 </field>
+                 <field id="app_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                     <label>App Key</label>
+-					<config_path>yotpo/settings/app_key</config_path>
+-					<frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
++                    <config_path>yotpo/settings/app_key</config_path>
++                    <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
+                     <comment>Note: Additional stores must be connected to their own App Key via Store View settings.</comment>
+                 </field>
+                 <field id="secret" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                     <label>API Secret</label>
+-					<config_path>yotpo/settings/secret</config_path>
+-					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
++                    <config_path>yotpo/settings/secret</config_path>
++                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                     <frontend_model>Yotpo\Yotpo\Block\Adminhtml\System\Config\Form\Field\NoScopes</frontend_model>
+                     <comment><![CDATA[<a href="https://docs.magento.com/m2/ee/user_guide/marketing/yotpo-connect.html#enable-yotpo-and-connect-your-magento-store" target="_blank" title="I can't find my API Secret" style="color:#2b7dbd">I can't find my API Secret</a>]]></comment>
+                 </field>
+diff --git a/etc/crontab.xml b/etc/crontab.xml
+index e24778a..f350c09 100644
+--- a/etc/crontab.xml
++++ b/etc/crontab.xml
+@@ -1,11 +1,11 @@
+ <?xml version="1.0"?>
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+-    <group id="yotpo_yotpo">
+-        <job name="yotpo_yotpo_orders_sync" instance="Yotpo\Yotpo\Model\Jobs\OrdersSync" method="execute">
++	<group id="yotpo_yotpo">
++		<job name="yotpo_yotpo_orders_sync" instance="Yotpo\Yotpo\Model\Jobs\OrdersSync" method="execute">
+             <schedule>* * * * *</schedule>
+         </job>
+-        <job name="yotpo_yotpo_update_metadata" instance="Yotpo\Yotpo\Model\Jobs\UpdateMetadata" method="execute">
++		<job name="yotpo_yotpo_update_metadata" instance="Yotpo\Yotpo\Model\Jobs\UpdateMetadata" method="execute">
+             <schedule>30 2 * * *</schedule>
+         </job>
+-    </group>
++	</group>
+ </config>
+diff --git a/etc/di.xml b/etc/di.xml
+index c09ef4c..86fd7ae 100644
+--- a/etc/di.xml
++++ b/etc/di.xml
+@@ -1,11 +1,11 @@
+ <?xml version="1.0"?>
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+-    <type name="Magento\Framework\Console\CommandListInterface">
++    <type name="Magento\Framework\Console\CommandList">
+         <arguments>
+             <argument name="commands" xsi:type="array">
+-                <item name="yotpoSyncCommand" xsi:type="object">Yotpo\Yotpo\Console\Command\SyncCommand</item>
+-                <item name="yotpoResetCommand" xsi:type="object">Yotpo\Yotpo\Console\Command\ResetCommand</item>
+-                <item name="yotpoUpdateMetdataCommand" xsi:type="object">Yotpo\Yotpo\Console\Command\UpdateMetadataCommand</item>
++                <item name="yotpo_sync" xsi:type="object">Yotpo\Yotpo\Console\Command\SyncCommand</item>
++                <item name="yotpo_reset" xsi:type="object">Yotpo\Yotpo\Console\Command\ResetCommand</item>
++                <item name="yotpo_update_metadata" xsi:type="object">Yotpo\Yotpo\Console\Command\UpdateMetadataCommand</item>
+             </argument>
+         </arguments>
+     </type>
+@@ -15,8 +15,8 @@
+     <type name="Magento\Review\Block\Product\ReviewRenderer">
+         <plugin name="yotpo_yotpo_review_block_product_reviewrenderer_plugin" type="Yotpo\Yotpo\Plugin\Review\Block\Product\ReviewRenderer" />
+     </type>
+-    <type name="Magento\Catalog\Block\Product\View\Details">
+-        <plugin name="yotpo_yotpo_catalog_block_product_view_details_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\View\Details" />
++    <type name="Magento\Catalog\Block\Product\View">
++        <plugin name="yotpo_yotpo_catalog_block_product_view_plugin" type="Yotpo\Yotpo\Plugin\Catalog\Block\Product\View" />
+     </type>
+     <virtualType name="OmsTableNameArrayIterator">
+         <arguments>
+diff --git a/etc/events.xml b/etc/events.xml
+new file mode 100644
+index 0000000..c07f5e9
+--- /dev/null
++++ b/etc/events.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0"?>
++<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
++    <event name="sales_order_save_after">
++        <observer name="yotpo_yotpo_sales_order_save_after" instance="Yotpo\Yotpo\Observer\OrderSaveAfter" />
++    </event>
++</config>
+diff --git a/etc/module.xml b/etc/module.xml
+index c74ade3..bc56a74 100644
+--- a/etc/module.xml
++++ b/etc/module.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0"?>
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+-    <module name="Yotpo_Yotpo" setup_version="3.1.3">
++    <module name="Yotpo_Yotpo" setup_version="3.1.2">
+         <sequence>
+             <module name="Magento_Backend" />
+             <module name="Magento_Catalog" />
+diff --git a/view/adminhtml/templates/system/config/launch_yotpo_button.phtml b/view/adminhtml/templates/system/config/launch_yotpo_button.phtml
+index a4812e7..5df73ae 100644
+--- a/view/adminhtml/templates/system/config/launch_yotpo_button.phtml
++++ b/view/adminhtml/templates/system/config/launch_yotpo_button.phtml
+@@ -5,7 +5,7 @@
+ ?>
+ <?php if (!$block->isStoreScope()) : ?>
+     <p class="note"><?= $block->escapeHtml(__('Yotpo can only be connected, enabled, or disabled via the Store View menu.'))?><br>
+-        <?= $block->escapeHtml(__('To connect your App Key and API secret, first select the relevant Store View.')) ?>
++                    <?= $block->escapeHtml(__('To connect your App Key and API secret, first select the relevant Store View.')) ?>
+     </p>
+     <p></p>
+     <style>tr#row_yotpo_settings_active,tr#row_yotpo_settings_app_key,tr#row_yotpo_settings_secret{display:none!important;}</style>
+diff --git a/view/frontend/layout/default.xml b/view/frontend/layout/default.xml
+index 73b17c8..2d1b14b 100644
+--- a/view/frontend/layout/default.xml
++++ b/view/frontend/layout/default.xml
+@@ -7,8 +7,8 @@
+         <referenceBlock name="content.aside">
+             <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_widget_div" template="Yotpo_Yotpo::widget_div.phtml" ifconfig="yotpo/settings/active"/>
+         </referenceBlock>
+-       <referenceContainer name="product.info.main">
++        <referenceContainer name="product.info.main">
+             <block class="Yotpo\Yotpo\Block\Yotpo" name="yotpo_bottomline" template="Yotpo_Yotpo::bottomline.phtml" before="product.info.addto" ifconfig="yotpo/settings/active"/>
+-       </referenceContainer>
++        </referenceContainer>
+     </body>
+-</page>
++</page>
+\ No newline at end of file
