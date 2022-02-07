@@ -32,6 +32,6 @@
 
         <!-- Check that new Yotpo Admin tab opened  -->
         <switchToNextTab stepKey="switchToNewTab"/>
-        <seeInCurrentUrl url="https://yap.yotpo.com/#/preferredAppKey=" stepKey="seeAssertYotpoAdminUrl"/>
+        <seeInCurrentUrl url="yotpo.com" stepKey="seeAssertYotpoAdminUrl"/>
     </test>
 </tests>
