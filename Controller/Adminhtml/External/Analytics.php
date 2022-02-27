@@ -59,7 +59,7 @@ class Analytics extends \Magento\Backend\App\Action
                 ->setUrl('https://yap.yotpo.com/?utm_source=MagentoAdmin_ReportingAnalytics#/tools/conversions_dashboard/engagement');
         } else {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl('https://www.yotpo.com/integrations/magento/?utm_source=MagentoAdmin_ReportingAnalytics');
+                ->setUrl('https://www.yotpo.com/integrations/adobe-commerce-magento/?utm_source=MagentoAdmin_ReportingAnalytics');
         }
     }
 }
