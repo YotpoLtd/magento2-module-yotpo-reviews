@@ -150,6 +150,10 @@ class Yotpo extends \Magento\Framework\View\Element\Template
 
     public function escapeString($str)
     {
+        if ($str === null) {
+            return null;
+        }
+
         return $this->_escaper->escapeHtml(strip_tags($str));
     }
 
