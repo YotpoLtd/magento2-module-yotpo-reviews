@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="yotpo_sync" resource="default" engine="innodb" comment="yotpo_sync">
+    <column xsi:type="int" name="sync_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="store_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+    <column xsi:type="varchar" name="entity_type" nullable="true" length="50" comment="Entity Type"/>
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Entity Id"/>
+    <column xsi:type="smallint" name="sync_flag" padding="6" unsigned="false" nullable="true" identity="false" default="0" comment="Sync Flag"/>
+    <column xsi:type="datetime" name="sync_date" on_update="false" nullable="false" comment="Sync Date"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="sync_id"/>
+    </constraint>
+    <constraint xsi:type="unique" referenceId="YOTPO_SYNC_STORE_ID_ENTITY_TYPE_ENTITY_ID">
+      <column name="store_id"/>
+      <column name="entity_type"/>
+      <column name="entity_id"/>
+    </constraint>
+  </table>
+  <table name="yotpo_order_status_history" resource="default" engine="innodb" comment="yotpo_order_status_history">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Order Id"/>
+    <column xsi:type="int" name="store_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+    <column xsi:type="varchar" name="old_status" nullable="true" length="32" comment="Old Status"/>
+    <column xsi:type="varchar" name="new_status" nullable="true" length="32" comment="New Status"/>
+    <column xsi:type="datetime" name="created_at" on_update="false" nullable="true" comment="Created At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+  </table>
+  <table name="yotpo_rich_snippets" resource="default" engine="innodb" comment="yotpo_rich_snippets">
+    <column xsi:type="int" name="rich_snippet_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="product_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Product Id"/>
+    <column xsi:type="int" name="store_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Store Id"/>
+    <column xsi:type="decimal" name="average_score" scale="2" precision="10" unsigned="false" nullable="false" comment="Average Score"/>
+    <column xsi:type="float" name="reviews_count" scale="0" precision="0" unsigned="false" nullable="false" comment="Reviews Count"/>
+    <column xsi:type="timestamp" name="expiration_time" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Expiry Time"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="rich_snippet_id"/>
+    </constraint>
+  </table>
+</schema>

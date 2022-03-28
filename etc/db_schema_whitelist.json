@@ -1,0 +1,42 @@
+{
+    "yotpo_sync": {
+        "column": {
+            "sync_id": true,
+            "store_id": true,
+            "entity_type": true,
+            "entity_id": true,
+            "sync_flag": true,
+            "sync_date": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "YOTPO_SYNC_STORE_ID_ENTITY_TYPE_ENTITY_ID": true
+        }
+    },
+    "yotpo_order_status_history": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "store_id": true,
+            "old_status": true,
+            "new_status": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "yotpo_rich_snippets": {
+        "column": {
+            "rich_snippet_id": true,
+            "product_id": true,
+            "store_id": true,
+            "average_score": true,
+            "reviews_count": true,
+            "expiration_time": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}
