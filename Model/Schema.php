@@ -64,6 +64,20 @@ class Schema
         return "";
     }
 
+    public function getProductDescription(Product $product)
+    {
+        $shortDescription = $product->getShortDescription();
+        if ($shortDescription) {
+            $descriptionWithStrippedTags = strip_tags($shortDescription);
+
+            if ($descriptionWithStrippedTags) {
+                return $this->escaper->escapeHtml($descriptionWithStrippedTags);
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @method prepareProductsData
      * @param  Order $order
@@ -107,11 +121,12 @@ class Schema
                     if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE && isset($productsData[$product->getId()])) {
                         $productsData[$product->getId()]['price'] += $orderItem->getData('row_total_incl_tax') - $orderItem->getData('amount_refunded');
                     } else {
+
                         $productsData[$product->getId()] = [
                                 'name'        => $product->getName(),
                                 'url'         => $product->getProductUrl(),
                                 'image'       => $this->getProductMainImageUrl($product),
-                                'description' => $this->escaper->escapeHtml(strip_tags($product->getDescription())),
+                                'description' => $this->getProductDescription($product),
                                 'price'       => $orderItem->getData('row_total_incl_tax') - $orderItem->getData('amount_refunded'),
                                 'specs'       => array_filter(
                                     [
